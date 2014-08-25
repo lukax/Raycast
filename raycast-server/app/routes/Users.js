@@ -1,25 +1,58 @@
 module.exports = function(router){
 	var usersBear = require('../models/Users');
+	var validator = require('validator');
+
+	function validateUser(req, res){
+		var ok = true;
+
+		if(req.body.username.trim() == ""){		
+			ok = false;
+			res.send(412, { error: 'No username set' });
+		}else{
+			if(!validator.isAlphanumeric(req.body.username)){
+				ok = false;
+				res.send(412, { error: 'Not a valid username' });
+			}
+		}
+
+		if(req.body.name.trim() == ""){		
+			ok = false;
+			res.send(412, { error: 'No name set' });
+		}
+
+		if(req.body.email.trim() == ""){		
+			ok = false;
+			res.send(412, { error: 'No email set' });
+		}else{
+			if(!validator.isEmail(req.body.email)){
+				ok = false;
+				res.send(412, { error: 'Not a valid email' });
+			}
+		}
+
+		return ok;
+	}
 
     router.route('/user')
 
     	//Add a new user
-		.post(function(req, res) {			
-			var users = new usersBear();
-			users.login = req.body.login;
-			users.password = req.body.password;
-			users.name = req.body.name;
-			users.email = req.body.email;
-			users.site = req.body.site;
-			users.description = req.body.description;
-			users.photo = req.body.photo;
+		.post(function(req, res) {		
+			if(validateUser(req, res)){
+				var users = new usersBear();
+				users.username = req.body.username;
+				users.name = req.body.name;
+				users.email = req.body.email;
+				users.site = req.body.site;
+				users.description = req.body.description;
+				users.photo = req.body.photo;
 
-			users.save(function(err) {
-				if (err)
-					res.send(err);
+				users.save(function(err) {
+					if (err)
+						res.send(err);
 
-				res.json({ message: 'Success' });
-			});
+					res.json({ message: 'Success' });
+				});
+			}
 			
 		})
 
@@ -51,21 +84,21 @@ module.exports = function(router){
 				if (err)
 					res.send(err);
 
-				usersBear.login = req.body.login;
-				usersBear.password = req.body.password;
-				usersBear.name = req.body.name;
-				usersBear.email = req.body.email;
-				usersBear.site = req.body.site;
-				usersBear.description = req.body.description;
-				usersBear.photo = req.body.photo;
+				if(validateUser(req, res)){
+					usersBear.username = req.body.username;
+					usersBear.name = req.body.name;
+					usersBear.email = req.body.email;
+					usersBear.site = req.body.site;
+					usersBear.description = req.body.description;
+					usersBear.photo = req.body.photo;
 
-				usersBear.save(function(err) {
-					if (err)
-						res.send(err);
+					usersBear.save(function(err) {
+						if (err)
+							res.send(err);
 
-					res.json({ message: 'Success' });
-				});
-
+						res.json({ message: 'Success' });
+					});
+				}
 			});
 		})
 
@@ -86,6 +119,17 @@ module.exports = function(router){
 		//Get a user by username
 		.get(function(req, res) {
 			usersBear.findByUsername(req.params.user_username, function(err, usersBear) {
+				if (err)
+					res.send(err);
+				res.json(usersBear);
+			});
+		});
+
+	router.route('/user/email/:user_email')
+
+		//Get a user by username
+		.get(function(req, res) {
+			usersBear.findByEmail(req.params.user_email, function(err, usersBear) {
 				if (err)
 					res.send(err);
 				res.json(usersBear);
