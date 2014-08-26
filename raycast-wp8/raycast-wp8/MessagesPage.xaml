@@ -1,0 +1,25 @@
+﻿<Page
+    x:Class="raycast_wp8.MessagesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:raycast_wp8"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Button Content="Send" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top" Margin="282,574,0,-9" 
+                Height="75" 
+                Width="118"/>
+
+        <TextBox HorizontalAlignment="Left" 
+                 Margin="0,584,0,0" 
+                 TextWrapping="Wrap" 
+                 VerticalAlignment="Top" 
+                 Width="282" 
+                 Height="56"/>
+    </Grid>
+</Page>
