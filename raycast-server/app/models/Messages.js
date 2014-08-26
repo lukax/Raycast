@@ -1,23 +1,27 @@
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
-mongoose.set('debug', true);
-
-var BearSchema   = new Schema({
+var MessageSchema   = new Schema({
 	author: String,
 	message: String,
 	time: Number,
-	location: {type: Array, index: '2dsphere'},
+	loc: { type: { type: String } , coordinates: [Number]  },
 	ip: String
 });
 
-BearSchema.static('findByAuthor', function (author, callback) {
+MessageSchema.index({ loc: '2dsphere' });
+
+MessageSchema.static('findByAuthor', function (author, callback) {
 	return this.find({ author: author }, callback);
 });
 
-BearSchema.static('findByRadius', function (radius, latitude, longitude, callback) {
-	return this.find({ location: 
-		{ $geoWithin: { $centerSphere: [ [ longitude, latitude ] , radius / 6371000  ] } } }, callback);
+MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {	
+	return this.find(
+		{"loc":{"$geoWithin":{"$centerSphere":[[ Number(longitude) , Number(latitude) ], radius/3959000]}}},
+		null,
+		{sort: {time: -1}, skip: Number(skip), limit: Number(limit)}, 
+		callback
+	).limit(Number(limit));
 });
 
-module.exports = mongoose.model('Messages', BearSchema);
+module.exports = mongoose.model('Messages', MessageSchema);

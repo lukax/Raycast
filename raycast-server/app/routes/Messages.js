@@ -43,7 +43,7 @@ module.exports = function(router){
 				messages.author = req.body.author;
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
-				messages.location = { type: "Point", coordinates: [req.body.longitude, req.body.latitude ]};
+				messages.loc = { type : "Point", coordinates : [ req.body.longitude, req.body.latitude ]};
 				messages.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
 				messages.save(function(err) {
@@ -100,12 +100,13 @@ module.exports = function(router){
 			});
 		});
 
-	router.route('/message/:message_latitude/:message_longitude/:message_radius')
+	router.route('/message/:message_latitude/:message_longitude/:message_radius/:message_skip/:message_limit')
 
 		//Get all messages from a location
 		.get(function(req, res) {
 			messagesBear.findByRadius(req.params.message_radius, req.params.message_latitude, 
-						req.params.message_longitude, function(err, messagesBear) {
+						req.params.message_longitude, req.params.message_skip, 
+						req.params.message_limit, function(err, messagesBear) {
 				if (err)
 					res.send(err);
 				res.json(messagesBear);
