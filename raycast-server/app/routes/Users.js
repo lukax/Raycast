@@ -5,7 +5,7 @@ module.exports = function(router){
 	function validateUser(req, res){
 		var ok = true;
 
-		if(req.body.username.trim() == ""){		
+		if(req.body.username.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No username set' });
 		}else{
@@ -15,12 +15,12 @@ module.exports = function(router){
 			}
 		}
 
-		if(req.body.name.trim() == ""){		
+		if(req.body.name.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No name set' });
 		}
 
-		if(req.body.email.trim() == ""){		
+		if(req.body.email.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No email set' });
 		}else{
@@ -36,7 +36,7 @@ module.exports = function(router){
     router.route('/user')
 
     	//Add a new user
-		.post(function(req, res) {		
+		.post(function(req, res) {
 			if(validateUser(req, res)){
 				var users = new usersBear();
 				users.username = req.body.username;
@@ -53,7 +53,7 @@ module.exports = function(router){
 					res.json({ message: 'Success' });
 				});
 			}
-			
+
 		})
 
 		//Get all users

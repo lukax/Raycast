@@ -5,7 +5,7 @@ module.exports = function(router){
 	function validateMessage(req, res){
 		var ok = true;
 
-		if(req.body.author.trim() == ""){		
+		if(req.body.author.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
@@ -15,12 +15,12 @@ module.exports = function(router){
 			}
 		}
 
-		if(req.body.message.trim() == ""){		
+		if(req.body.message.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'The message is empty' });
 		}
 
-		if(req.body.longitude.trim() == "" || req.body.latitude.trim() == ""){		
+		if(req.body.longitude.trim() == "" || req.body.latitude.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No coordinates set' });
 		}else{
@@ -37,7 +37,7 @@ module.exports = function(router){
     router.route('/message')
 
     	//Add a new message
-		.post(function(req, res) {	
+		.post(function(req, res) {
 			if(validateMessage(req, res)){
 				var messages = new messagesBear();
 				messages.author = req.body.author;
@@ -52,8 +52,21 @@ module.exports = function(router){
 
 					res.json({ message: 'Success' });
 				});
-			}			
+			}
 		})
+
+        //Get all messages from a location
+        .get(function(req, res) {
+            messagesBear.findByRadius(req.query.radius, req.query.latitude,
+                        req.query.longitude, req.query.skip,
+                        req.query.limit, function(err, messagesBear) {
+                if (err)
+                    res.send(err);
+                res.json(messagesBear);
+            });
+        });
+
+    router.route('/message/all')
 
 		//Get all messages
 		.get(function(req, res) {
@@ -100,16 +113,4 @@ module.exports = function(router){
 			});
 		});
 
-	router.route('/message/:message_latitude/:message_longitude/:message_radius/:message_skip/:message_limit')
-
-		//Get all messages from a location
-		.get(function(req, res) {
-			messagesBear.findByRadius(req.params.message_radius, req.params.message_latitude, 
-						req.params.message_longitude, req.params.message_skip, 
-						req.params.message_limit, function(err, messagesBear) {
-				if (err)
-					res.send(err);
-				res.json(messagesBear);
-			});
-		});
 }
