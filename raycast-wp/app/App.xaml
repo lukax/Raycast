@@ -1,7 +1,7 @@
 ﻿<Application
-    x:Class="raycast_wp8.App"
+    x:Class="raycast_wp.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:raycast_wp8">
+    xmlns:local="using:raycast_wp">
 
 </Application>

@@ -7,8 +7,8 @@
     <ProjectGuid>{0FA0E072-5B81-4E9B-B842-180307EE088B}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>raycast_wp8</RootNamespace>
-    <AssemblyName>raycast-wp8</AssemblyName>
+    <RootNamespace>raycast_wp</RootNamespace>
+    <AssemblyName>raycast-wp</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
