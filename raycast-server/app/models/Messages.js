@@ -15,13 +15,21 @@ MessageSchema.static('findByAuthor', function (author, callback) {
 	return this.find({ author: author }, callback);
 });
 
-MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {	
-	return this.find(
-		{"loc":{"$geoWithin":{"$centerSphere":[[ Number(longitude) , Number(latitude) ], radius/3959000]}}},
-		null,
-		{sort: {time: -1}, skip: Number(skip), limit: Number(limit)}, 
-		callback
-	).limit(Number(limit));
+MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {
+    var lat = Number(latitude) || null;
+    var lon = Number(longitude) || null;
+    var r = (radius / 3959000) || null;
+
+    if((lat == null) || (lon == null) || (r == null)){
+        return null;
+    }
+
+    return this.find(
+        {"loc":{"$geoWithin":{"$centerSphere":[[ lon , lat ], r]}}},
+        null,
+        {sort: {time: -1}, skip: Number(skip), limit: Number(limit)},
+        callback
+    );
 });
 
 module.exports = mongoose.model('Messages', MessageSchema);
