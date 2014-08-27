@@ -8,6 +8,12 @@
 		"url": "git@github.com:lukax/Raycast.git"
 	},
 	"main": "app.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "engines": {
+        "node": "0.10.x"
+    },
 	"dependencies": {
 		"express": "~4.0.0",
 		"mongoose": "~3.8.15",
