@@ -1,4 +1,4 @@
-package com.raycast.domain;
+package com.raycast.domain.util;
 
 /**
  * Created by Lucas on 29/08/2014.

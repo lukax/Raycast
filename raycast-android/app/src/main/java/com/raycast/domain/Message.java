@@ -1,5 +1,8 @@
 package com.raycast.domain;
 
+import com.raycast.domain.base.AbstractEntity;
+import com.raycast.domain.util.Coordinates;
+
 import java.util.Date;
 
 /**
