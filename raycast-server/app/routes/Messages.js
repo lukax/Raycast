@@ -1,5 +1,5 @@
 module.exports = function(router){
-	var messagesBear = require('../models/Messages');
+	var message = require('../models/Messages');
 	var validator = require('validator');
 
 	function validateMessage(req, res){
@@ -39,7 +39,7 @@ module.exports = function(router){
     	//Add a new message
 		.post(function(req, res) {
 			if(validateMessage(req, res)){
-				var messages = new messagesBear();
+				var messages = new message();
 				messages.author = req.body.author;
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
@@ -64,11 +64,11 @@ module.exports = function(router){
             if((lat == null) || (lon == null) || (r == null)){
                 res.send(400, { error: 'Insufficient arguments' });
             }else{
-                messagesBear.findByRadius(r, lat, lon, req.query.skip,
-                            req.query.limit, function(err, messagesBear) {
+                message.findByRadius(r, lat, lon, req.query.skip,
+                            req.query.limit, function(err, message) {
                     if (err)
                         res.send(err);
-                    res.json(messagesBear);
+                    res.json(message);
                 });
             }
         });
@@ -77,7 +77,7 @@ module.exports = function(router){
 
 		//Get all messages
 		.get(function(req, res) {
-			messagesBear.find(function(err, messages) {
+			message.find(function(err, messages) {
 				if (err)
 					res.send(err);
 
@@ -90,18 +90,18 @@ module.exports = function(router){
 
 		//Get a message by id
 		.get(function(req, res) {
-			messagesBear.findById(req.params.message_id, function(err, messagesBear) {
+			message.findById(req.params.message_id, function(err, message) {
 				if (err)
 					res.send(err);
-				res.json(messagesBear);
+				res.json(message);
 			});
 		})
 
 		//Delete a message by id
 		.delete(function(req, res) {
-			messagesBear.remove({
+			message.remove({
 				_id: req.params.message_id
-			}, function(err, messagesBear) {
+			}, function(err, message) {
 				if (err)
 					res.send(err);
 
@@ -113,10 +113,10 @@ module.exports = function(router){
 
 		//Get all messages from a user
 		.get(function(req, res) {
-			messagesBear.findByAuthor(req.params.user_username, function(err, messagesBear) {
+			message.findByAuthor(req.params.user_username, function(err, message) {
 				if (err)
 					res.send(err);
-				res.json(messagesBear);
+				res.json(message);
 			});
 		});
 
