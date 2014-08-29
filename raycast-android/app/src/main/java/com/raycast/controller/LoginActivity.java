@@ -1,4 +1,4 @@
-package com.raycast;
+package com.raycast.controller;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

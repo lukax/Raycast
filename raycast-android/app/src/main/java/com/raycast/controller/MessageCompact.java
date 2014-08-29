@@ -1,4 +1,4 @@
-package com.raycast;
+package com.raycast.controller;
 
 import android.app.Activity;
 import android.net.Uri;

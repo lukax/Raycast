@@ -1,4 +1,4 @@
-package com.raycast;
+package com.raycast.controller;
 
 import android.content.Intent;
 import android.content.IntentSender;
