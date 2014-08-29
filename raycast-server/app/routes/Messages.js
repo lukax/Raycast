@@ -57,13 +57,20 @@ module.exports = function(router){
 
         //Get all messages from a location
         .get(function(req, res) {
-            messagesBear.findByRadius(req.query.radius, req.query.latitude,
-                        req.query.longitude, req.query.skip,
-                        req.query.limit, function(err, messagesBear) {
-                if (err)
-                    res.send(err);
-                res.json(messagesBear);
-            });
+            var lat = Number(req.query.latitude) || null;
+            var lon = Number(req.query.longitude) || null;
+            var r = Number(req.query.radius) || null;
+
+            if((lat == null) || (lon == null) || (r == null)){
+                res.send(400, { error: 'Insufficient arguments' });
+            }else{
+                messagesBear.findByRadius(r, lat, lon, req.query.skip,
+                            req.query.limit, function(err, messagesBear) {
+                    if (err)
+                        res.send(err);
+                    res.json(messagesBear);
+                });
+            }
         });
 
     router.route('/message/all')
