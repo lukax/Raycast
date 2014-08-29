@@ -1,6 +1,8 @@
 package com.raycast.controller;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -11,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.raycast.R;
+import com.raycast.domain.Message;
+import com.raycast.service.MessageService;
 
 
 /**
@@ -25,29 +29,25 @@ import com.raycast.R;
 public class MessageCompact extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String MESSAGE_COMPACT_ID = "com.raycast.controller.MessageCompact.FRAGMENT_BUNDLE_KEY";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    private String messageID;
+    private Message thisMessage;
     private OnFragmentInteractionListener mListener;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param id MessageID.
      * @return A new instance of fragment MessageCompact.
      */
     // TODO: Rename and change types and number of parameters
-    public static MessageCompact newInstance(String param1, String param2) {
+    public static MessageCompact newInstance(String id) {
         MessageCompact fragment = new MessageCompact();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(MESSAGE_COMPACT_ID, id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,8 +59,7 @@ public class MessageCompact extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            messageID = getArguments().getString(MESSAGE_COMPACT_ID);
         }
     }
 
@@ -75,14 +74,15 @@ public class MessageCompact extends Fragment {
         TextView distance = (TextView) view.findViewById(R.id.message_distance);
 
         ImageView profileImage = (ImageView) view.findViewById(R.id.profile_image);
+        Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getPhoto(), 0,
+                thisMessage.getAuthor().getPhoto().length);
 
+        //thisMessage = MessageService.getMessageID(messageID);
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO: Navigate to the message Activity.
-            }
-        });
+        name.setText(thisMessage.getAuthor().getName());
+        content.setText(thisMessage.getMessage());
+        distance.setText(thisMessage.getCoordinate().toString());
+        profileImage.setImageBitmap(userImage);
 
         return view;
     }
