@@ -1,11 +1,11 @@
 module.exports = function(router){
-	var commentsBear = require('../models/Comments');
+	var comment = require('../models/Comments');
 	var validator = require('validator');
 
 	function validateComment(req, res){
 		var ok = true;
 
-		if(req.body.author.trim() == ""){		
+		if(req.body.author.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
@@ -15,7 +15,7 @@ module.exports = function(router){
 			}
 		}
 
-		if(req.body.to.trim() == ""){		
+		if(req.body.to.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No message set' });
 		}else{
@@ -25,9 +25,9 @@ module.exports = function(router){
 			}
 		}
 
-		if(req.body.message.trim() == ""){		
+		if(req.body.comment.trim() == ""){
 			ok = false;
-			res.send(412, { error: 'The message is empty' });
+			res.send(412, { error: 'The comment is empty' });
 		}
 
 		return ok;
@@ -36,9 +36,9 @@ module.exports = function(router){
     router.route('/comment')
 
     	//Add a new comment
-		.post(function(req, res) {		
-			if(validateMessage(req, res)){	
-				var comments = new commentsBear();
+		.post(function(req, res) {
+			if(validateComment(req, res)){
+				var comments = new comment();
 				comments.to = req.body.to;
 				comments.author = req.body.author;
 				comments.comment = req.body.comment.substr(0, 160);
@@ -56,7 +56,7 @@ module.exports = function(router){
 
 		//Get all comments
 		.get(function(req, res) {
-			commentsBear.find(function(err, comments) {
+			comment.find(function(err, comments) {
 				if (err)
 					res.send(err);
 
@@ -69,18 +69,18 @@ module.exports = function(router){
 
 		//Get a comment by id
 		.get(function(req, res) {
-			commentsBear.findById(req.params.comment_id, function(err, commentsBear) {
+			comment.findById(req.params.comment_id, function(err, comment) {
 				if (err)
 					res.send(err);
-				res.json(commentsBear);
+				res.json(comment);
 			});
 		})
 
 		//Delete a comment by id
 		.delete(function(req, res) {
-			commentsBear.remove({
+			comment.remove({
 				_id: req.params.comment_id
-			}, function(err, commentsBear) {
+			}, function(err, comment) {
 				if (err)
 					res.send(err);
 
@@ -92,10 +92,10 @@ module.exports = function(router){
 
 		//Get all comments from a message
 		.get(function(req, res) {
-			commentsBear.findByMessage(req.params.message_id, function(err, commentsBear) {
+			comment.findByMessage(req.params.message_id, function(err, comment) {
 				if (err)
 					res.send(err);
-				res.json(commentsBear);
+				res.json(comment);
 			});
 		});
 }
