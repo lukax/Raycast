@@ -1,4 +1,4 @@
-package raycast.espindola.com.raycast;
+package com.raycast;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.raycast.R;
 
 
 /**
@@ -81,6 +83,8 @@ public class MessageCompact extends Fragment {
                 // TODO: Navigate to the message Activity.
             }
         });
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
