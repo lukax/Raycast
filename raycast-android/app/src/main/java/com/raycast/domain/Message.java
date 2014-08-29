@@ -9,16 +9,16 @@ import java.util.Date;
  * Created by Lucas on 29/08/2014.
  */
 public class Message extends AbstractEntity {
-    private String author;
+    private User author;
     private String message;
     private Date time;
     private Coordinates coordinate;
 
-    public String getAuthor() {
+    public User getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(User author) {
         this.author = author;
     }
 
