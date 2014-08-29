@@ -15,11 +15,11 @@ MessageSchema.static('findByAuthor', function (author, callback) {
 	return this.find({ author: author }, callback);
 });
 
-MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {	
+MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {
 	return this.find(
 		{"loc":{"$geoWithin":{"$centerSphere":[[ Number(longitude) , Number(latitude) ], radius/3959000]}}},
 		null,
-		{sort: {time: -1}, skip: Number(skip), limit: Number(limit)}, 
+		{sort: {time: -1}, skip: Number(skip), limit: Number(limit)},
 		callback
 	).limit(Number(limit));
 });
