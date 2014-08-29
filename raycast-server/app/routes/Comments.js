@@ -5,11 +5,11 @@ module.exports = function(router){
 	function validateComment(req, res){
 		var ok = true;
 
-		if(req.body.author.trim() == ""){
+		if(req.body.author_id.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
-			if(!validator.isAlphanumeric(req.body.author)){
+			if(!validator.isAlphanumeric(req.body.author_id)){
 				ok = false;
 				res.send(412, { error: 'Not a valid author id' });
 			}
@@ -40,7 +40,11 @@ module.exports = function(router){
 			if(validateComment(req, res)){
 				var comments = new comment();
 				comments.to = req.body.to;
-				comments.author = req.body.author;
+				comments.author =  {
+                    id: req.body.author_id,
+                    name: req.body.author_name,
+                    username: req.body.author_username
+                };
 				comments.comment = req.body.comment.substr(0, 160);
 				comments.time = Date.now();
 				comments.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

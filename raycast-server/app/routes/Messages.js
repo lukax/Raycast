@@ -5,11 +5,11 @@ module.exports = function(router){
 	function validateMessage(req, res){
 		var ok = true;
 
-		if(req.body.author.trim() == ""){
+		if(req.body.author_id.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
-			if(!validator.isAlphanumeric(req.body.author)){
+			if(!validator.isAlphanumeric(req.body.author_id)){
 				ok = false;
 				res.send(412, { error: 'Not a valid author id' });
 			}
@@ -40,10 +40,17 @@ module.exports = function(router){
 		.post(function(req, res) {
 			if(validateMessage(req, res)){
 				var messages = new message();
-				messages.author = req.body.author;
+                messages.author = {
+                    id: req.body.author_id,
+                    name: req.body.author_name,
+                    username: req.body.author_username
+                };
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
-				messages.loc = { type : "Point", coordinates : [ req.body.longitude, req.body.latitude ]};
+				messages.loc = {
+                    type : "Point",
+                    coordinates : [ req.body.longitude, req.body.latitude ]
+                };
 				messages.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
 				messages.save(function(err) {
