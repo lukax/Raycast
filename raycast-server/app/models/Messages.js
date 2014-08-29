@@ -2,7 +2,7 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var MessageSchema   = new Schema({
-    author: {id: String, name: String, username: String},
+    author: {id: String, name: String, username: String, image: String},
 	message: String,
 	time: Number,
 	loc: { type: { type: String } , coordinates: [Number]  },

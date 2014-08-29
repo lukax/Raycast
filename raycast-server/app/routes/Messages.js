@@ -43,7 +43,8 @@ module.exports = function(router){
                 messages.author = {
                     id: req.body.author_id,
                     name: req.body.author_name,
-                    username: req.body.author_username
+                    username: req.body.author_username,
+                    image: req.body.author_image
                 };
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();

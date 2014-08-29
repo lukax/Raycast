@@ -43,7 +43,8 @@ module.exports = function(router){
 				comments.author =  {
                     id: req.body.author_id,
                     name: req.body.author_name,
-                    username: req.body.author_username
+                    username: req.body.author_username,
+                    image: req.body.author_image
                 };
 				comments.comment = req.body.comment.substr(0, 160);
 				comments.time = Date.now();
