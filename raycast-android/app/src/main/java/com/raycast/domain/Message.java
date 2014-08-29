@@ -5,20 +5,11 @@ import java.util.Date;
 /**
  * Created by Lucas on 29/08/2014.
  */
-public class Message {
-    private long id;
+public class Message extends AbstractEntity {
     private String author;
     private String message;
     private Date time;
-    private Coordinate coordinate;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    private Coordinates coordinate;
 
     public String getAuthor() {
         return author;
@@ -44,11 +35,11 @@ public class Message {
         this.time = time;
     }
 
-    public Coordinate getCoordinate() {
+    public Coordinates getCoordinate() {
         return coordinate;
     }
 
-    public void setCoordinate(Coordinate coordinate) {
+    public void setCoordinate(Coordinates coordinate) {
         this.coordinate = coordinate;
     }
 }

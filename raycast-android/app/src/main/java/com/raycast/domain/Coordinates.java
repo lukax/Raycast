@@ -3,18 +3,9 @@ package com.raycast.domain;
 /**
  * Created by Lucas on 29/08/2014.
  */
-public class Coordinate {
-    private String type;
+public class Coordinates {
     private double latitude;
     private double longitude;
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public double getLatitude() {
         return latitude;
