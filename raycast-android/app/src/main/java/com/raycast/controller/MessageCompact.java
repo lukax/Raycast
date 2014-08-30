@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
+import com.raycast.domain.util.ImageLoader;
 import com.raycast.service.base.Tracker;
 
 
@@ -45,7 +46,7 @@ public class MessageCompact extends Fragment {
      * @return A new instance of fragment MessageCompact.
      */
     // TODO: Rename and change types and number of parameters
-    public static MessageCompact newInstance(String id) {
+    public static MessageCompact newMessage(String id) {
         MessageCompact fragment = new MessageCompact();
         Bundle args = new Bundle();
         args.putString(MESSAGE_COMPACT_ID, id);
@@ -75,9 +76,7 @@ public class MessageCompact extends Fragment {
         TextView distance = (TextView) view.findViewById(R.id.message_distance);
 
         ImageView profileImage = (ImageView) view.findViewById(R.id.profile_image);
-        ///TODO: load image from the new User.image URL
-        //Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getImage(), 0,
-        //        thisMessage.getAuthor().getImage().length);
+        ImageLoader imageSetter = new ImageLoader(thisMessage.getAuthor().getImage(), profileImage);
 
         Tracker tracker = new Tracker(view.getContext());
         Location myLocation = new Location("");
@@ -96,7 +95,7 @@ public class MessageCompact extends Fragment {
         }
 
         distance.setText(String.valueOf(messageLocation.distanceTo(myLocation)));
-        //profileImage.setImageBitmap(userImage);
+        imageSetter.execute(null, null);
 
         return view;
     }
