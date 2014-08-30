@@ -44,7 +44,7 @@ module.exports = function(router){
 				users.email = req.body.email;
 				users.site = req.body.site;
 				users.description = req.body.description;
-				users.photo = req.body.photo;
+				users.image = req.body.image;
 
 				users.save(function(err) {
 					if (err)
@@ -90,7 +90,7 @@ module.exports = function(router){
 					user.email = req.body.email;
 					user.site = req.body.site;
 					user.description = req.body.description;
-					user.photo = req.body.photo;
+					user.image = req.body.image;
 
 					user.save(function(err) {
 						if (err)
