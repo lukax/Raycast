@@ -82,8 +82,8 @@ public class MessageCompact extends Fragment {
         Location myLocation = new Location("");
 
         Location messageLocation = new Location("");
-        messageLocation.setLatitude(thisMessage.getCoordinate().getLatitude());
-        messageLocation.setLongitude(thisMessage.getCoordinate().getLongitude());
+        messageLocation.setLatitude(thisMessage.getLocation().getCoordinates().getLatitude());
+        messageLocation.setLongitude(thisMessage.getLocation().getCoordinates().getLongitude());
 
         //thisMessage = MessageService.getMessageID(messageID);
 
