@@ -1,5 +1,5 @@
 module.exports = function(router){
-	var usersBear = require('../models/Users');
+	var user = require('../models/Users');
 	var validator = require('validator');
 
 	function validateUser(req, res){
@@ -38,7 +38,7 @@ module.exports = function(router){
     	//Add a new user
 		.post(function(req, res) {
 			if(validateUser(req, res)){
-				var users = new usersBear();
+				var users = new user();
 				users.username = req.body.username;
 				users.name = req.body.name;
 				users.email = req.body.email;
@@ -58,7 +58,7 @@ module.exports = function(router){
 
 		//Get all users
 		.get(function(req, res) {
-			usersBear.find(function(err, users) {
+			user.find(function(err, users) {
 				if (err)
 					res.send(err);
 
@@ -71,28 +71,28 @@ module.exports = function(router){
 
 		//Get a user by id
 		.get(function(req, res) {
-			usersBear.findById(req.params.user_id, function(err, usersBear) {
+			user.findById(req.params.user_id, function(err, user) {
 				if (err)
 					res.send(err);
-				res.json(usersBear);
+				res.json(user);
 			});
 		})
 
 		//Update a user by id
 		.put(function(req, res) {
-			usersBear.findById(req.params.user_id, function(err, usersBear) {
+			user.findById(req.params.user_id, function(err, user) {
 				if (err)
 					res.send(err);
 
 				if(validateUser(req, res)){
-					usersBear.username = req.body.username;
-					usersBear.name = req.body.name;
-					usersBear.email = req.body.email;
-					usersBear.site = req.body.site;
-					usersBear.description = req.body.description;
-					usersBear.photo = req.body.photo;
+					user.username = req.body.username;
+					user.name = req.body.name;
+					user.email = req.body.email;
+					user.site = req.body.site;
+					user.description = req.body.description;
+					user.photo = req.body.photo;
 
-					usersBear.save(function(err) {
+					user.save(function(err) {
 						if (err)
 							res.send(err);
 
@@ -104,9 +104,9 @@ module.exports = function(router){
 
 		//Delete a user by id
 		.delete(function(req, res) {
-			usersBear.remove({
+			user.remove({
 				_id: req.params.user_id
-			}, function(err, usersBear) {
+			}, function(err, user) {
 				if (err)
 					res.send(err);
 
@@ -118,10 +118,10 @@ module.exports = function(router){
 
 		//Get a user by username
 		.get(function(req, res) {
-			usersBear.findByUsername(req.params.user_username, function(err, usersBear) {
+			user.findByUsername(req.params.user_username, function(err, user) {
 				if (err)
 					res.send(err);
-				res.json(usersBear);
+				res.json(user);
 			});
 		});
 
@@ -129,10 +129,10 @@ module.exports = function(router){
 
 		//Get a user by username
 		.get(function(req, res) {
-			usersBear.findByEmail(req.params.user_email, function(err, usersBear) {
+			user.findByEmail(req.params.user_email, function(err, user) {
 				if (err)
 					res.send(err);
-				res.json(usersBear);
+				res.json(user);
 			});
 		});
 }

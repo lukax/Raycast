@@ -2,7 +2,7 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var MessageSchema   = new Schema({
-	author: String,
+    author: {id: String, name: String, username: String, image: String},
 	message: String,
 	time: Number,
 	loc: { type: { type: String } , coordinates: [Number]  },
@@ -12,7 +12,7 @@ var MessageSchema   = new Schema({
 MessageSchema.index({ loc: '2dsphere' });
 
 MessageSchema.static('findByAuthor', function (author, callback) {
-	return this.find({ author: author }, callback);
+	return this.find({'author.id': author }, callback);
 });
 
 MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {

@@ -1,4 +1,4 @@
-package raycast.espindola.com.raycast;
+package com.raycast;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

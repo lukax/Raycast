@@ -5,12 +5,12 @@ var express    = require('express');
 var app        = express();
 var bodyParser = require('body-parser');
 var mongoose   = require('mongoose');
-mongoose.connect('mongodb://mestre:eunaosei@ds063919.mongolab.com:63919/raycast');
+mongoose.connect(process.env.MONGOLAB_URI);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var port = process.env.PORT || 4000; 
+var port = process.env.PORT || 4000;
 
 // ROUTES
 // =============================================================================
@@ -22,7 +22,7 @@ router.use(function(req, res, next) {
 });
 
 router.get('/', function(req, res) {
-	res.json({ message: 'Raycast API' });	
+	res.json({ message: 'Raycast API' });
 });
 
 require('./app/routes/Users')(router);

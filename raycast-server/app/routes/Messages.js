@@ -1,15 +1,15 @@
 module.exports = function(router){
-	var messagesBear = require('../models/Messages');
+	var message = require('../models/Messages');
 	var validator = require('validator');
 
 	function validateMessage(req, res){
 		var ok = true;
 
-		if(req.body.author.trim() == ""){
+		if(req.body.author_id.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
-			if(!validator.isAlphanumeric(req.body.author)){
+			if(!validator.isAlphanumeric(req.body.author_id)){
 				ok = false;
 				res.send(412, { error: 'Not a valid author id' });
 			}
@@ -39,11 +39,19 @@ module.exports = function(router){
     	//Add a new message
 		.post(function(req, res) {
 			if(validateMessage(req, res)){
-				var messages = new messagesBear();
-				messages.author = req.body.author;
+				var messages = new message();
+                messages.author = {
+                    id: req.body.author_id,
+                    name: req.body.author_name,
+                    username: req.body.author_username,
+                    image: req.body.author_image
+                };
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
-				messages.loc = { type : "Point", coordinates : [ req.body.longitude, req.body.latitude ]};
+				messages.loc = {
+                    type : "Point",
+                    coordinates : [ req.body.longitude, req.body.latitude ]
+                };
 				messages.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
 				messages.save(function(err) {
@@ -57,20 +65,27 @@ module.exports = function(router){
 
         //Get all messages from a location
         .get(function(req, res) {
-            messagesBear.findByRadius(req.query.radius, req.query.latitude,
-                        req.query.longitude, req.query.skip,
-                        req.query.limit, function(err, messagesBear) {
-                if (err)
-                    res.send(err);
-                res.json(messagesBear);
-            });
+            var lat = Number(req.query.latitude) || null;
+            var lon = Number(req.query.longitude) || null;
+            var r = Number(req.query.radius) || null;
+
+            if((lat == null) || (lon == null) || (r == null)){
+                res.send(400, { error: 'Insufficient arguments' });
+            }else{
+                message.findByRadius(r, lat, lon, req.query.skip,
+                            req.query.limit, function(err, message) {
+                    if (err)
+                        res.send(err);
+                    res.json(message);
+                });
+            }
         });
 
     router.route('/message/all')
 
 		//Get all messages
 		.get(function(req, res) {
-			messagesBear.find(function(err, messages) {
+			message.find(function(err, messages) {
 				if (err)
 					res.send(err);
 
@@ -83,18 +98,18 @@ module.exports = function(router){
 
 		//Get a message by id
 		.get(function(req, res) {
-			messagesBear.findById(req.params.message_id, function(err, messagesBear) {
+			message.findById(req.params.message_id, function(err, message) {
 				if (err)
 					res.send(err);
-				res.json(messagesBear);
+				res.json(message);
 			});
 		})
 
 		//Delete a message by id
 		.delete(function(req, res) {
-			messagesBear.remove({
+			message.remove({
 				_id: req.params.message_id
-			}, function(err, messagesBear) {
+			}, function(err, message) {
 				if (err)
 					res.send(err);
 
@@ -106,10 +121,10 @@ module.exports = function(router){
 
 		//Get all messages from a user
 		.get(function(req, res) {
-			messagesBear.findByAuthor(req.params.user_username, function(err, messagesBear) {
+			message.findByAuthor(req.params.user_username, function(err, message) {
 				if (err)
 					res.send(err);
-				res.json(messagesBear);
+				res.json(message);
 			});
 		});
 

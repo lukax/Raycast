@@ -1,16 +1,16 @@
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
-var BearSchema   = new Schema({
+var CommentSchema   = new Schema({
 	to: String,
-	author: String,
+	author: {id: String, name: String, username: String, image: String},
 	comment: String,
 	time: Number,
 	ip: String
 });
 
-BearSchema.static('findByMessage', function (message, callback) {
+CommentSchema.static('findByMessage', function (message, callback) {
 	return this.find({ to: message }, callback);
 });
 
-module.exports = mongoose.model('Comments', BearSchema);
+module.exports = mongoose.model('Comments', CommentSchema);
