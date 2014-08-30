@@ -8,7 +8,7 @@ var UserSchema   = new Schema({
 	email: {type: String, lowercase: true, trim: true, required: true, unique: true},
 	site: String,
 	description: String,
-	photo: String
+	image: String
 });
 
 UserSchema.static('findByUsername', function (username, callback) {
