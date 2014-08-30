@@ -5,7 +5,7 @@ var express    = require('express');
 var app        = express();
 var bodyParser = require('body-parser');
 var mongoose   = require('mongoose');
-mongoose.connect(process.env.MONGOLAB_URI);
+mongoose.connect((process.env.MONGOLAB_URI || 'mongodb://localhost/raycast'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
