@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
-import com.raycast.service.MessageService;
 import com.raycast.service.base.Tracker;
 
 
@@ -76,8 +75,8 @@ public class MessageCompact extends Fragment {
         TextView distance = (TextView) view.findViewById(R.id.message_distance);
 
         ImageView profileImage = (ImageView) view.findViewById(R.id.profile_image);
-        Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getPhoto(), 0,
-                thisMessage.getAuthor().getPhoto().length);
+        Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getImage(), 0,
+                thisMessage.getAuthor().getImage().length);
 
         Tracker tracker = new Tracker(view.getContext());
         Location myLocation = new Location("");
