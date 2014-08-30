@@ -40,7 +40,7 @@ public final class Tracker implements LocationListener {
      *
      * @return Most recent location.
      */
-    private Location getLocation() {
+    public Location getLocation() {
         try {
             myLocationManager = (LocationManager) myContext.getSystemService(Context.LOCATION_SERVICE);
 

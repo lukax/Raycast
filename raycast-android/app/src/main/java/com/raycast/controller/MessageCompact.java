@@ -3,6 +3,7 @@ package com.raycast.controller;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.raycast.R;
 import com.raycast.domain.Message;
 import com.raycast.service.MessageService;
+import com.raycast.service.base.Tracker;
 
 
 /**
@@ -77,11 +79,23 @@ public class MessageCompact extends Fragment {
         Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getPhoto(), 0,
                 thisMessage.getAuthor().getPhoto().length);
 
+        Tracker tracker = new Tracker(view.getContext());
+        Location myLocation = new Location("");
+
+        Location messageLocation = new Location("");
+        messageLocation.setLatitude(thisMessage.getCoordinate().getLatitude());
+        messageLocation.setLongitude(thisMessage.getCoordinate().getLongitude());
+
         //thisMessage = MessageService.getMessageID(messageID);
 
         name.setText(thisMessage.getAuthor().getName());
         content.setText(thisMessage.getMessage());
-        distance.setText(thisMessage.getCoordinate().toString());
+
+        if (tracker.canGetLocation()) {
+            myLocation = tracker.getLocation();
+        }
+
+        distance.setText(String.valueOf(messageLocation.distanceTo(myLocation)));
         profileImage.setImageBitmap(userImage);
 
         return view;
