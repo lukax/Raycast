@@ -75,8 +75,9 @@ public class MessageCompact extends Fragment {
         TextView distance = (TextView) view.findViewById(R.id.message_distance);
 
         ImageView profileImage = (ImageView) view.findViewById(R.id.profile_image);
-        Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getImage(), 0,
-                thisMessage.getAuthor().getImage().length);
+        ///TODO: load image from the new User.image URL
+        //Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getImage(), 0,
+        //        thisMessage.getAuthor().getImage().length);
 
         Tracker tracker = new Tracker(view.getContext());
         Location myLocation = new Location("");
@@ -95,7 +96,7 @@ public class MessageCompact extends Fragment {
         }
 
         distance.setText(String.valueOf(messageLocation.distanceTo(myLocation)));
-        profileImage.setImageBitmap(userImage);
+        //profileImage.setImageBitmap(userImage);
 
         return view;
     }

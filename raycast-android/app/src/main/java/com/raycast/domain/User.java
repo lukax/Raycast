@@ -8,7 +8,7 @@ import com.raycast.domain.base.AbstractEntity;
 public class User extends AbstractEntity {
     private String username;
     private String name;
-    private byte[] image;
+    private String image;
     private UserDetail detail;
 
     public String getUsername() {
@@ -27,11 +27,11 @@ public class User extends AbstractEntity {
         this.name = name;
     }
 
-    public byte[] getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(byte[] image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
