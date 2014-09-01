@@ -1,8 +1,6 @@
 package com.raycast.controller;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,8 +13,8 @@ import android.widget.TextView;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
-import com.raycast.domain.util.ImageLoader;
-import com.raycast.service.base.Tracker;
+import com.raycast.service.ImageLoader;
+import com.raycast.service.Tracker;
 
 
 /**

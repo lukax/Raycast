@@ -1,4 +1,4 @@
-package com.raycast.service.base;
+package com.raycast.service;
 
 import android.content.Context;
 import android.location.Location;

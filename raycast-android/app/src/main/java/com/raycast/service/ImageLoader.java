@@ -1,4 +1,4 @@
-package com.raycast.domain.util;
+package com.raycast.service;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
