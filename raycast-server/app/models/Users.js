@@ -12,7 +12,7 @@ var UserSchema   = new Schema({
 });
 
 UserSchema.static('findByUsername', function (username, callback) {
-	return this.find({ username: username }, callback);
+    return this.find({ username: username }, callback);
 });
 
 UserSchema.static('findByEmail', function (email, callback) {

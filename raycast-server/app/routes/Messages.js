@@ -5,11 +5,11 @@ module.exports = function(router){
 	function validateMessage(req, res){
 		var ok = true;
 
-		if(req.body.author_id.trim() == ""){
+		if(req.body.author.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
-			if(!validator.isAlphanumeric(req.body.author_id)){
+			if(!validator.isAlphanumeric(req.body.author)){
 				ok = false;
 				res.send(412, { error: 'Not a valid author id' });
 			}
@@ -40,12 +40,13 @@ module.exports = function(router){
 		.post(function(req, res) {
 			if(validateMessage(req, res)){
 				var messages = new message();
-                messages.author = {
+                /*messages.author = {
                     id: req.body.author_id,
                     name: req.body.author_name,
                     username: req.body.author_username,
                     image: req.body.author_image
-                };
+                };*/
+                messages.author = req.body.author;
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
 				messages.loc = {
@@ -85,12 +86,11 @@ module.exports = function(router){
 
 		//Get all messages
 		.get(function(req, res) {
-			message.find(function(err, messages) {
-				if (err)
-					res.send(err);
-
-				res.json(messages);
-			});
+            message.find({}).populate('author').exec(function(err, message) {
+                if (err)
+                    res.send(err);
+                res.json(message);
+            });
 		});
 
 
@@ -98,7 +98,7 @@ module.exports = function(router){
 
 		//Get a message by id
 		.get(function(req, res) {
-			message.findById(req.params.message_id, function(err, message) {
+			message.findById(req.params.message_id).populate('author').exec(function(err, message) {
 				if (err)
 					res.send(err);
 				res.json(message);
