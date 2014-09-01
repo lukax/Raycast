@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
-import com.raycast.service.MessageService;
+import com.raycast.domain.util.ImageLoader;
 import com.raycast.service.base.Tracker;
 
 
@@ -46,7 +46,7 @@ public class MessageCompact extends Fragment {
      * @return A new instance of fragment MessageCompact.
      */
     // TODO: Rename and change types and number of parameters
-    public static MessageCompact newInstance(String id) {
+    public static MessageCompact newMessage(String id) {
         MessageCompact fragment = new MessageCompact();
         Bundle args = new Bundle();
         args.putString(MESSAGE_COMPACT_ID, id);
@@ -76,15 +76,14 @@ public class MessageCompact extends Fragment {
         TextView distance = (TextView) view.findViewById(R.id.message_distance);
 
         ImageView profileImage = (ImageView) view.findViewById(R.id.profile_image);
-        Bitmap userImage = BitmapFactory.decodeByteArray(thisMessage.getAuthor().getPhoto(), 0,
-                thisMessage.getAuthor().getPhoto().length);
+        ImageLoader imageSetter = new ImageLoader(thisMessage.getAuthor().getImage(), profileImage);
 
         Tracker tracker = new Tracker(view.getContext());
         Location myLocation = new Location("");
 
         Location messageLocation = new Location("");
-        messageLocation.setLatitude(thisMessage.getCoordinate().getLatitude());
-        messageLocation.setLongitude(thisMessage.getCoordinate().getLongitude());
+        messageLocation.setLatitude(thisMessage.getLocation().getCoordinates().getLatitude());
+        messageLocation.setLongitude(thisMessage.getLocation().getCoordinates().getLongitude());
 
         //thisMessage = MessageService.getMessageID(messageID);
 
@@ -96,7 +95,7 @@ public class MessageCompact extends Fragment {
         }
 
         distance.setText(String.valueOf(messageLocation.distanceTo(myLocation)));
-        profileImage.setImageBitmap(userImage);
+        imageSetter.execute(null, null);
 
         return view;
     }

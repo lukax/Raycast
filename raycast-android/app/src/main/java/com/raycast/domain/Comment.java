@@ -1,5 +1,6 @@
 package com.raycast.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raycast.domain.base.AbstractEntity;
 
 import java.util.Date;
@@ -8,17 +9,18 @@ import java.util.Date;
  * Created by Lucas on 29/08/2014.
  */
 public class Comment extends AbstractEntity {
-    User to;
-    User author;
-    String comment;
-    Date time;
+    @JsonProperty("message_id")
+    private long messageId;
+    private User author;
+    private String comment;
+    private Date time;
 
-    public User getTo() {
-        return to;
+    public long getMessageId() {
+        return messageId;
     }
 
-    public void setTo(User to) {
-        this.to = to;
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 
     public User getAuthor() {
