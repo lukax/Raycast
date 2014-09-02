@@ -3,7 +3,6 @@ var Schema       = mongoose.Schema;
 
 var UserSchema   = new Schema({
 	username: {type: String, lowercase: true, trim: true, required: true, unique: true},
-	lastToken: String,
 	name: String,
 	email: {type: String, lowercase: true, trim: true, required: true, unique: true},
 	site: String,
@@ -12,7 +11,7 @@ var UserSchema   = new Schema({
 });
 
 UserSchema.static('findByUsername', function (username, callback) {
-	return this.find({ username: username }, callback);
+    return this.find({ username: username }, callback);
 });
 
 UserSchema.static('findByEmail', function (email, callback) {

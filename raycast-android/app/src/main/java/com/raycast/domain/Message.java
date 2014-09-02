@@ -1,7 +1,8 @@
 package com.raycast.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raycast.domain.base.AbstractEntity;
-import com.raycast.domain.util.Coordinates;
+import com.raycast.domain.util.Location;
 
 import java.util.Date;
 
@@ -12,7 +13,8 @@ public class Message extends AbstractEntity {
     private User author;
     private String message;
     private Date time;
-    private Coordinates coordinate;
+    @JsonProperty("loc")
+    private Location location;
 
     public User getAuthor() {
         return author;
@@ -38,11 +40,11 @@ public class Message extends AbstractEntity {
         this.time = time;
     }
 
-    public Coordinates getCoordinate() {
-        return coordinate;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setCoordinate(Coordinates coordinate) {
-        this.coordinate = coordinate;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

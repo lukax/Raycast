@@ -1,7 +1,6 @@
 package com.raycast.domain;
 
 import com.raycast.domain.base.AbstractEntity;
-import com.raycast.domain.util.AuthInfo;
 
 /**
  * Created by Lucas on 29/08/2014.
@@ -9,11 +8,8 @@ import com.raycast.domain.util.AuthInfo;
 public class User extends AbstractEntity {
     private String username;
     private String name;
-    private String email;
-    private String site;
-    private String description;
-    private byte[] photo;
-    private AuthInfo authInfo;
+    private String image;
+    private UserDetail detail;
 
     public String getUsername() {
         return username;
@@ -31,43 +27,19 @@ public class User extends AbstractEntity {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getImage() {
+        return image;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public String getSite() {
-        return site;
+    public UserDetail getDetail() {
+        return detail;
     }
 
-    public void setSite(String site) {
-        this.site = site;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
-
-    public AuthInfo getAuthInfo() {
-        return authInfo;
-    }
-
-    public void setAuthInfo(AuthInfo authInfo) {
-        this.authInfo = authInfo;
+    public void setDetail(UserDetail detail) {
+        this.detail = detail;
     }
 }

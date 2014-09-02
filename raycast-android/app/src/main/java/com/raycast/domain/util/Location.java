@@ -1,7 +1,5 @@
 package com.raycast.domain.util;
 
-import com.raycast.domain.util.Coordinates;
-
 /**
  * Created by Lucas on 29/08/2014.
  */

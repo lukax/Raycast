@@ -5,11 +5,11 @@ module.exports = function(router){
 	function validateComment(req, res){
 		var ok = true;
 
-		if(req.body.author_id.trim() == ""){
+		if(req.body.author.trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No author set' });
 		}else{
-			if(!validator.isAlphanumeric(req.body.author_id)){
+			if(!validator.isAlphanumeric(req.body.author)){
 				ok = false;
 				res.send(412, { error: 'Not a valid author id' });
 			}
@@ -40,12 +40,7 @@ module.exports = function(router){
 			if(validateComment(req, res)){
 				var comments = new comment();
 				comments.to = req.body.to;
-				comments.author =  {
-                    id: req.body.author_id,
-                    name: req.body.author_name,
-                    username: req.body.author_username,
-                    image: req.body.author_image
-                };
+                comments.author = req.body.author,
 				comments.comment = req.body.comment.substr(0, 160);
 				comments.time = Date.now();
 				comments.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -61,11 +56,11 @@ module.exports = function(router){
 
 		//Get all comments
 		.get(function(req, res) {
-			comment.find(function(err, comments) {
+			comment.find({}).populate('author').exec(function(err, message) {
 				if (err)
 					res.send(err);
 
-				res.json(comments);
+				res.json(message);
 			});
 		});
 
@@ -74,10 +69,10 @@ module.exports = function(router){
 
 		//Get a comment by id
 		.get(function(req, res) {
-			comment.findById(req.params.comment_id, function(err, comment) {
+			comment.findById(req.params.comment_id).populate('author').exec(function(err, message) {
 				if (err)
 					res.send(err);
-				res.json(comment);
+				res.json(message);
 			});
 		})
 
@@ -97,10 +92,10 @@ module.exports = function(router){
 
 		//Get all comments from a message
 		.get(function(req, res) {
-			comment.findByMessage(req.params.message_id, function(err, comment) {
+			comment.findByMessage(req.params.message_id, function(err, message) {
 				if (err)
 					res.send(err);
-				res.json(comment);
+				res.json(message);
 			});
 		});
 }

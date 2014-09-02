@@ -2,7 +2,7 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var MessageSchema   = new Schema({
-    author: {id: String, name: String, username: String, image: String},
+    author: { type: String, ref: 'Users' },
 	message: String,
 	time: Number,
 	loc: { type: { type: String } , coordinates: [Number]  },
@@ -12,7 +12,7 @@ var MessageSchema   = new Schema({
 MessageSchema.index({ loc: '2dsphere' });
 
 MessageSchema.static('findByAuthor', function (author, callback) {
-	return this.find({'author.id': author }, callback);
+	return this.find({'author': author }).populate('author').exec(callback);
 });
 
 MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {
@@ -27,9 +27,8 @@ MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip
     return this.find(
         {"loc":{"$geoWithin":{"$centerSphere":[[ lon , lat ], r]}}},
         null,
-        {sort: {time: -1}, skip: Number(skip), limit: Number(limit)},
-        callback
-    );
+        {sort: {time: -1}, skip: Number(skip), limit: Number(limit)}
+    ).populate('author').exec(callback);
 });
 
 module.exports = mongoose.model('Messages', MessageSchema);
