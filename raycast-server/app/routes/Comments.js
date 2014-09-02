@@ -41,12 +41,6 @@ module.exports = function(router){
 				var comments = new comment();
 				comments.to = req.body.to;
                 comments.author = req.body.author,
-				/*comments.author =  {
-                    id: req.body.author_id,
-                    name: req.body.author_name,
-                    username: req.body.author_username,
-                    image: req.body.author_image
-                };*/
 				comments.comment = req.body.comment.substr(0, 160);
 				comments.time = Date.now();
 				comments.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

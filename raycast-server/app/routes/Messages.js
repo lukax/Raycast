@@ -40,12 +40,6 @@ module.exports = function(router){
 		.post(function(req, res) {
 			if(validateMessage(req, res)){
 				var messages = new message();
-                /*messages.author = {
-                    id: req.body.author_id,
-                    name: req.body.author_name,
-                    username: req.body.author_username,
-                    image: req.body.author_image
-                };*/
                 messages.author = req.body.author;
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
