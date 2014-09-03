@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
+import com.raycast.domain.util.Coordinates;
 import com.raycast.service.MessageService;
 
 import java.util.List;
@@ -49,7 +50,11 @@ public class FeedActivity extends Activity {
     private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {
         @Override
         protected List<Message> doInBackground(Void... params) {
-            return new MessageService().list();
+            Coordinates c = new Coordinates();
+            c.setLongitude(-43.417882);
+            c.setLatitude(-22.885069);
+            double r = 10000;
+            return new MessageService().list(c, r);
         }
 
         @Override
