@@ -9,7 +9,9 @@ public class User extends AbstractEntity {
     private String username;
     private String name;
     private String image;
-    private UserDetail detail;
+    private String email;
+    private String site;
+    private String description;
 
     public String getUsername() {
         return username;
@@ -35,11 +37,27 @@ public class User extends AbstractEntity {
         this.image = image;
     }
 
-    public UserDetail getDetail() {
-        return detail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDetail(UserDetail detail) {
-        this.detail = detail;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
