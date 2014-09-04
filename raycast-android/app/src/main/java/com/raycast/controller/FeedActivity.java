@@ -1,18 +1,31 @@
 package com.raycast.controller;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
 import com.raycast.domain.util.Coordinates;
+import com.raycast.service.ImageLoader;
 import com.raycast.service.MessageService;
+import com.raycast.service.Tracker;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class FeedActivity extends Activity {
@@ -21,6 +34,21 @@ public class FeedActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
+
+        final ListView listView = (ListView) findViewById(R.id.feed);
+        ArrayList<Message> messageList = (ArrayList<Message>) new HttpRequestTask().doInBackground();
+
+        final FeedAdapter feedAdapter = new FeedAdapter(this, R.layout.message_compact, messageList);
+
+        listView.setAdapter(feedAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final Message item = (Message) adapterView.getItemAtPosition(i);
+                //TODO: Load MessageActivity or Popup and populate it with item data.
+            }
+        });
     }
 
     @Override
@@ -72,6 +100,68 @@ public class FeedActivity extends Activity {
             else {
                 hw.setText(message.get(0).getMessage());
             }
+        }
+    }
+
+    private class FeedAdapter extends ArrayAdapter<Message> {
+
+        private HashMap<Message, Integer> idMap = new HashMap<Message, Integer>();
+        private final Context context;
+        private final List<Message> messages;
+
+
+        public FeedAdapter(Context context, int textViewResourceId, List<Message> messages) {
+            super(context, textViewResourceId, messages);
+            this.context = context;
+            this.messages = messages;
+
+            for (int i = 0; i < messages.size(); i++) {
+                idMap.put(messages.get(i), i);
+            }
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.message_compact, parent, false);
+
+            ImageView profileImage = (ImageView) rowView.findViewById(R.id.profile_image);
+            TextView name = (TextView) rowView.findViewById(R.id.message_creator);
+            TextView content = (TextView) rowView.findViewById(R.id.message_content);
+            TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
+
+            ImageLoader loader = new ImageLoader(messages.get(position).getAuthor().getImage(), profileImage);
+            loader.execute(null, null);
+
+            Tracker tracker = new Tracker(rowView.getContext());
+
+            Location messageLocation = new Location("");
+            messageLocation.setLongitude(messages.get(position).getLocation().getCoordinates().getLongitude());
+            messageLocation.setLatitude(messages.get(position).getLocation().getCoordinates().getLatitude());
+
+            Location myLocation = new Location("");
+
+            if (tracker.canGetLocation()) {
+                myLocation = tracker.getLocation();
+            }
+
+            name.setText(messages.get(position).getAuthor().getName());
+            content.setText(messages.get(position).getMessage());
+            distance.setText(String.valueOf(messageLocation.distanceTo(myLocation)));
+
+
+            return rowView;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            Message item = getItem(position);
+            return idMap.get(item);
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
         }
     }
 }
