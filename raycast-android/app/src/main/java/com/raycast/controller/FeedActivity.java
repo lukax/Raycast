@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
@@ -60,7 +61,17 @@ public class FeedActivity extends Activity {
         @Override
         protected void onPostExecute(List<Message> message) {
             TextView hw = (TextView) findViewById(R.id.helloworld);
-            hw.setText(message.get(0).getMessage());
+            if(message == null){
+                //TODO: get message string from 'strings'
+                Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
+            }
+            else if(message.size() == 0){
+                //TODO: get message string from 'strings'
+                Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                hw.setText(message.get(0).getMessage());
+            }
         }
     }
 }
