@@ -44,13 +44,7 @@ public final class Tracker implements LocationListener {
         try {
             myLocationManager = (LocationManager) myContext.getSystemService(Context.LOCATION_SERVICE);
 
-            // Checks if providers are enabled.
-            isGPSTrackerEnable = myLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            isNetworkTrackerEnable = myLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (isGPSTrackerEnable && isNetworkTrackerEnable) {
-                this.canGetLocation = true;
-
+            if (canGetLocation()) {
                 if (isNetworkTrackerEnable) {
                     currentLocation = null;
                     myLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
@@ -64,6 +58,7 @@ public final class Tracker implements LocationListener {
                             longitude = currentLocation.getLongitude();
                         }
                     }
+                    return currentLocation;
                 }
 
                 if (isGPSTrackerEnable) {
@@ -83,6 +78,7 @@ public final class Tracker implements LocationListener {
                             }
                         }
                     }
+                    return currentLocation;
                 }
             }
         } catch (Exception e) {
@@ -116,6 +112,12 @@ public final class Tracker implements LocationListener {
      * @return enabled/disabled
      */
     public boolean canGetLocation() {
+        // Checks if providers are enabled.
+        isGPSTrackerEnable = myLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        isNetworkTrackerEnable = myLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        this.canGetLocation = (isNetworkTrackerEnable || isGPSTrackerEnable);
+
         return this.canGetLocation;
     }
 
