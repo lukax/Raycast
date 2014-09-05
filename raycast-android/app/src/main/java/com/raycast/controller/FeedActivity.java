@@ -34,21 +34,6 @@ public class FeedActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-
-        final ListView listView = (ListView) findViewById(R.id.feed);
-        ArrayList<Message> messageList = (ArrayList<Message>) new HttpRequestTask().doInBackground();
-
-        final FeedAdapter feedAdapter = new FeedAdapter(this, R.layout.message_compact, messageList);
-
-        listView.setAdapter(feedAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final Message item = (Message) adapterView.getItemAtPosition(i);
-                //TODO: Load MessageActivity or Popup and populate it with item data.
-            }
-        });
     }
 
     @Override
@@ -88,7 +73,6 @@ public class FeedActivity extends Activity {
 
         @Override
         protected void onPostExecute(List<Message> message) {
-            TextView hw = (TextView) findViewById(R.id.helloworld);
             if(message == null){
                 //TODO: get message string from 'strings'
                 Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
@@ -98,7 +82,17 @@ public class FeedActivity extends Activity {
                 Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
             }
             else {
-                hw.setText(message.get(0).getMessage());
+                //Build ListView in here so it doesn't block the UI because doInBackground() takes too long to complete
+                final ListView listView = (ListView) findViewById(R.id.feed);
+                final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.message_compact, message);
+                listView.setAdapter(feedAdapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        final Message item = (Message) adapterView.getItemAtPosition(i);
+                        //TODO: Load MessageActivity or Popup and populate it with item data.
+                    }
+                });
             }
         }
     }
