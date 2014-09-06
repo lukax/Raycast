@@ -22,4 +22,11 @@ public class Location {
     public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
     }
+
+    public android.location.Location toAndroidLocation(){
+        android.location.Location androidLocation = new android.location.Location("");
+        androidLocation.setLongitude(getCoordinates().getLongitude());
+        androidLocation.setLatitude(getCoordinates().getLatitude());
+        return androidLocation;
+    }
 }

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class FeedActivity extends Activity {
+    Location myLocation = new Location("");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,26 +125,12 @@ public class FeedActivity extends Activity {
             TextView content = (TextView) rowView.findViewById(R.id.message_content);
             TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
 
-            ImageLoader loader = new ImageLoader(messages.get(position).getAuthor().getImage(), profileImage);
-            loader.execute(null, null);
-
-            Tracker tracker = new Tracker(rowView.getContext());
-
-            Location messageLocation = new Location("");
-            messageLocation.setLongitude(messages.get(position).getLocation().getCoordinates().getLongitude());
-            messageLocation.setLatitude(messages.get(position).getLocation().getCoordinates().getLatitude());
-
-            Location myLocation = new Location("");
-
-            if (tracker.canGetLocation()) {
-                myLocation = tracker.getLocation();
-            }
-
+            new ImageLoader(messages.get(position).getAuthor().getImage(), profileImage).execute(null, null);
             name.setText(messages.get(position).getAuthor().getName());
             content.setText(messages.get(position).getMessage());
+            Location messageLocation = messages.get(position).getLocation().toAndroidLocation();
             //TODO: there are better ways to do it
             distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) /1000) + " km");
-
 
             return rowView;
         }
