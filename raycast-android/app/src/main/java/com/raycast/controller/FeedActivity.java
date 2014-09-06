@@ -141,7 +141,8 @@ public class FeedActivity extends Activity {
 
             name.setText(messages.get(position).getAuthor().getName());
             content.setText(messages.get(position).getMessage());
-            distance.setText(String.valueOf(messageLocation.distanceTo(myLocation)));
+            //TODO: there are better ways to do it
+            distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) /1000) + " km");
 
 
             return rowView;
