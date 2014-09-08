@@ -34,7 +34,7 @@ public class MessageService extends AbstractCrudService {
         try {
             final String url = contextUrl.buildUpon().appendPath("all")
                     .build().toString();
-            Log.d("MessageService", "attempting request on: " + url);
+            Log.d("MessageService", "attempting get request on: " + url);
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             ResponseEntity<Message[]> responseEntity = restTemplate.getForEntity(url, Message[].class);
@@ -53,12 +53,28 @@ public class MessageService extends AbstractCrudService {
                     .appendQueryParameter("longitude", String.valueOf(coordinates.getLongitude()))
                     .appendQueryParameter("radius", String.valueOf(radius))
                     .build().toString();
-            Log.d("MessageService", "attempting request on: " + url);
+            Log.d("MessageService", "attempting get request on: " + url);
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             ResponseEntity<Message[]> responseEntity = restTemplate.getForEntity(url, Message[].class);
             Log.d("MessageService", "result was: " + responseEntity.getBody());
             return Arrays.asList(responseEntity.getBody());
+        } catch (Exception e){
+            Log.e("MessageService", e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public Message add(Message msg){
+        try {
+            final String url = contextUrl.buildUpon()
+                    .build().toString();
+            Log.d("MessageService", "attempting post request on: " + url);
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+            ResponseEntity<Message> responseEntity = restTemplate.postForEntity(url, msg, Message.class);
+            Log.d("MessageService", "result was: " + responseEntity.getBody());
+            return responseEntity.getBody();
         } catch (Exception e){
             Log.e("MessageService", e.getMessage(), e);
         }
