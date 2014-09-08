@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -99,6 +100,10 @@ public class LoginActivity extends PlusBaseActivity {
     @Override
     protected void onPlusClientSignIn() {
         //Set up sign out and disconnect buttons.
+        Intent i = new Intent(this, FeedActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
+        startActivity(i);
+        finish();
         Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
         signOutButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -124,7 +129,9 @@ public class LoginActivity extends PlusBaseActivity {
     protected void updateConnectButtonState() {
         //TODO: Update this logic to also handle the user logged in by email.
         boolean connected = getPlusClient().isConnected();
-
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
+        mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
         mSignOutButtons.setVisibility(connected ? View.VISIBLE : View.GONE);
         mPlusSignInButton.setVisibility(connected ? View.GONE : View.VISIBLE);
     }
