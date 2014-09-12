@@ -2,9 +2,11 @@ package com.raycast.controller;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.IntentSender;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
 import com.raycast.R;
 import com.raycast.domain.Message;
 import com.raycast.domain.util.Coordinates;
@@ -28,19 +33,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class FeedActivity extends Activity {
+public class FeedActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener {
+
+    LocationClient locationClient;
     Location myLocation = new Location("");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
+
+        locationClient = new LocationClient(this, this, this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        locationClient.connect();
         new HttpRequestTask().execute();
+    }
+
+    @Override
+    protected void onStop() {
+        locationClient.disconnect();
+        super.onStop();
     }
 
     @Override
@@ -60,6 +77,32 @@ public class FeedActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        //Log.w("passouu", "aqui");
+        //myLocation = locationClient.getLastLocation();
+    }
+
+    @Override
+    public void onDisconnected() {
+        Toast.makeText(this, "Disconnected. Please re-connect.",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, 9000);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, String.valueOf(connectionResult.getErrorCode()),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {
@@ -130,6 +173,7 @@ public class FeedActivity extends Activity {
             content.setText(messages.get(position).getMessage());
             Location messageLocation = messages.get(position).getLocation().toAndroidLocation();
             //TODO: there are better ways to do it
+            Log.d("Lat/Long", myLocation.getLatitude() + "/" + myLocation.getLongitude());
             distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) /1000) + " km");
 
             return rowView;
