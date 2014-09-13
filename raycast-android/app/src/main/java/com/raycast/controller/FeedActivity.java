@@ -37,7 +37,7 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         GooglePlayServicesClient.OnConnectionFailedListener {
 
     LocationClient locationClient;
-    Location myLocation = new Location("");
+    Location myLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +81,22 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        //Log.w("passouu", "aqui");
-        //myLocation = locationClient.getLastLocation();
+        myLocation = locationClient.getLastLocation();
+        if(myLocation != null){
+            Log.d("FeedActivity", "Lat/Long received" + myLocation.getLatitude() + "/" + myLocation.getLongitude());
+        }
+        else{
+            Log.e("FeedActivity", "Couln't get Location, falling back to default coordinates");
+            //Fallback to Rio de Janeiro Center coordinates
+            myLocation = new Location("");
+            myLocation.setLatitude(-22.9082998);
+            myLocation.setLongitude(-43.1970773);
+        }
     }
 
     @Override
     public void onDisconnected() {
-        Toast.makeText(this, "Disconnected. Please re-connect.",
-                Toast.LENGTH_SHORT).show();
+        Log.d("FeedActivity", "Disconnected from LocationListener");
     }
 
     @Override
@@ -142,17 +150,14 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
     }
 
     private class FeedAdapter extends ArrayAdapter<Message> {
-
         private HashMap<Message, Integer> idMap = new HashMap<Message, Integer>();
         private final Context context;
         private final List<Message> messages;
-
 
         public FeedAdapter(Context context, int textViewResourceId, List<Message> messages) {
             super(context, textViewResourceId, messages);
             this.context = context;
             this.messages = messages;
-
             for (int i = 0; i < messages.size(); i++) {
                 idMap.put(messages.get(i), i);
             }
@@ -162,20 +167,16 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rowView = inflater.inflate(R.layout.message_compact, parent, false);
-
             ImageView profileImage = (ImageView) rowView.findViewById(R.id.profile_image);
             TextView name = (TextView) rowView.findViewById(R.id.message_creator);
             TextView content = (TextView) rowView.findViewById(R.id.message_content);
             TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
-
             new ImageLoader(messages.get(position).getAuthor().getImage(), profileImage).execute(null, null);
             name.setText(messages.get(position).getAuthor().getName());
             content.setText(messages.get(position).getMessage());
             Location messageLocation = messages.get(position).getLocation().toAndroidLocation();
             //TODO: there are better ways to do it
-            Log.d("Lat/Long", myLocation.getLatitude() + "/" + myLocation.getLongitude());
-            distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) /1000) + " km");
-
+            distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) / 1000) + " km");
             return rowView;
         }
 
