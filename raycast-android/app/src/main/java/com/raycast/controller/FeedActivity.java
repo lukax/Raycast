@@ -51,7 +51,6 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
     protected void onStart() {
         super.onStart();
         locationClient.connect();
-        new HttpRequestTask().execute();
     }
 
     @Override
@@ -92,6 +91,8 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
             myLocation.setLatitude(-22.9082998);
             myLocation.setLongitude(-43.1970773);
         }
+        //Get List of messages async
+        new HttpRequestTask().execute(myLocation);
     }
 
     @Override
@@ -113,14 +114,11 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         }
     }
 
-    private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {
+    private class HttpRequestTask extends AsyncTask<Location, Void, List<Message>> {
         @Override
-        protected List<Message> doInBackground(Void... params) {
-            Coordinates c = new Coordinates();
-            c.setLongitude(-43.417882);
-            c.setLatitude(-22.885069);
-            double r = 10000;
-            return new MessageService().list(c, r);
+        protected List<Message> doInBackground(Location... params) {
+            //Get message within 100000 radius
+            return new MessageService().list(params[0], 100000);
         }
 
         @Override

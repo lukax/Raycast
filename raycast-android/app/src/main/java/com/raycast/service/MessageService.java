@@ -1,5 +1,6 @@
 package com.raycast.service;
 
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
@@ -52,11 +53,11 @@ public class MessageService extends AbstractCrudService {
     /*
         LIST all messages from API being withing the specified radius of the coordinates
      */
-    public List<Message> list(Coordinates coordinates, double radius){
+    public List<Message> list(Location location, double radius){
         try {
             final String url = contextUrl.buildUpon()
-                    .appendQueryParameter("latitude", String.valueOf(coordinates.getLatitude()))
-                    .appendQueryParameter("longitude", String.valueOf(coordinates.getLongitude()))
+                    .appendQueryParameter("latitude", String.valueOf(location.getLatitude()))
+                    .appendQueryParameter("longitude", String.valueOf(location.getLongitude()))
                     .appendQueryParameter("radius", String.valueOf(radius))
                     .build().toString();
             Log.d("MessageService", "attempting get request on: " + url);
