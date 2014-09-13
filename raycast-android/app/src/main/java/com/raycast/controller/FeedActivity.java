@@ -2,6 +2,7 @@ package com.raycast.controller;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -36,6 +37,8 @@ import java.util.List;
 
 public class FeedActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
+
+    private static final int RESULT_SETTINGS = 1;
 
     LocationClient locationClient;
     Location myLocation;
@@ -79,15 +82,16 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch(item.getItemId()){
+            case R.id.action_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivityForResult(i, RESULT_SETTINGS);
+                break;
+            case R.id.action_feed_refresh:
+                new HttpRequestTask().execute();
+                break;
         }
-        if(id == R.id.action_feed_refresh){
-            new HttpRequestTask().execute();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override
