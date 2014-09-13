@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -67,6 +68,13 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //Make refresh invisible if there's no location available yet
+        menu.findItem(R.id.action_feed_refresh).setVisible(myLocation != null);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -75,16 +83,19 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         if (id == R.id.action_settings) {
             return true;
         }
+        if(id == R.id.action_feed_refresh){
+            new HttpRequestTask().execute();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
         myLocation = locationClient.getLastLocation();
-        if(myLocation != null){
+        if (myLocation != null) {
             Log.d("FeedActivity", "Lat/Long received" + myLocation.getLatitude() + "/" + myLocation.getLongitude());
-        }
-        else{
+        } else {
             Log.e("FeedActivity", "Couln't get Location, falling back to default coordinates");
             //Fallback to Rio de Janeiro Center coordinates
             myLocation = new Location("");
@@ -92,7 +103,7 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
             myLocation.setLongitude(-43.1970773);
         }
         //Get List of messages async
-        new HttpRequestTask().execute(myLocation);
+        new HttpRequestTask().execute();
     }
 
     @Override
@@ -114,24 +125,22 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         }
     }
 
-    private class HttpRequestTask extends AsyncTask<Location, Void, List<Message>> {
+    private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {
         @Override
-        protected List<Message> doInBackground(Location... params) {
+        protected List<Message> doInBackground(Void... params) {
             //Get message within 100000 radius
-            return new MessageService().list(params[0], 100000);
+            return new MessageService().list(myLocation, 100000);
         }
 
         @Override
         protected void onPostExecute(List<Message> message) {
-            if(message == null){
+            if (message == null) {
                 //TODO: get message string from 'strings'
                 Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
-            }
-            else if(message.size() == 0){
+            } else if (message.size() == 0) {
                 //TODO: get message string from 'strings'
                 Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
                 //Build ListView in here so it doesn't block the UI because doInBackground() takes too long to complete
                 final ListView listView = (ListView) findViewById(R.id.feed);
                 final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.message_compact, message);
