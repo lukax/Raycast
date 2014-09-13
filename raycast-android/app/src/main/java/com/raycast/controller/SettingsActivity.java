@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import com.raycast.R;
+import com.raycast.util.Preferences;
 
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class SettingsActivity extends PreferenceActivity {
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
         bindPreferenceSummaryToValue(findPreference("example_text"));
-        bindPreferenceSummaryToValue(findPreference("feed_radius"));
+        bindPreferenceSummaryToValue(findPreference(Preferences.FEED_RADIUS.toString()));
     }
 
     /** {@inheritDoc} */
@@ -199,7 +200,7 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("feed_radius"));
+            bindPreferenceSummaryToValue(findPreference(Preferences.FEED_RADIUS.toString()));
         }
     }
 }

@@ -7,13 +7,13 @@ import android.content.IntentSender;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -26,12 +26,10 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.raycast.R;
 import com.raycast.domain.Message;
-import com.raycast.domain.util.Coordinates;
 import com.raycast.service.ImageLoader;
 import com.raycast.service.MessageService;
-import com.raycast.service.Tracker;
+import com.raycast.util.Preferences;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,12 +40,12 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
 
     LocationClient locationClient;
     Location myLocation;
+    float myFeedRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-
         locationClient = new LocationClient(this, this, this);
     }
 
@@ -55,6 +53,14 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
     protected void onStart() {
         super.onStart();
         locationClient.connect();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //TODO make pref come as a float already
+        myFeedRadius = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.FEED_RADIUS.toString(), "50000"));
+        Log.d("FeedActivity", "radius "+ myFeedRadius);
     }
 
     @Override
@@ -133,7 +139,7 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         @Override
         protected List<Message> doInBackground(Void... params) {
             //Get message within 100000 radius
-            return new MessageService().list(myLocation, 100000);
+            return new MessageService().list(myLocation, myFeedRadius);
         }
 
         @Override
