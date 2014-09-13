@@ -127,12 +127,13 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void updateConnectButtonState() {
-        //TODO: Update this logic to also handle the user logged in by email.
         boolean connected = getPlusClient().isConnected();
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
-        mSignOutButtons.setVisibility(connected ? View.VISIBLE : View.GONE);
+
+        //TODO: remove this button completely
+        mSignOutButtons.setVisibility(View.GONE/*connected ? View.VISIBLE : View.GONE*/);
         mPlusSignInButton.setVisibility(connected ? View.GONE : View.VISIBLE);
     }
 
