@@ -17,7 +17,8 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/messagewrite_message"
-        android:layout_weight="0.2" />
+        android:layout_weight="0.2"
+        android:text="ds" />
 
     <Button
         android:layout_width="50dp"
