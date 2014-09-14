@@ -77,7 +77,7 @@ module.exports = function(router){
             if((lat == null) || (lon == null) || (r == null)){
                 res.send(400, { error: 'Insufficient arguments' });
             }else{
-                message.findByRadius(r, lat, lon, 0, 100, function(err, message) {
+                message.findByRadius(r, lat, lon, null, null, null, function(err, message) {
                     if (err)
                         res.send(err);
                     res.json(message);
@@ -96,7 +96,7 @@ module.exports = function(router){
                 res.send(400, { error: 'Insufficient arguments' });
             }else{
                 message.findByRadius(r, lat, lon, req.body.skip,
-                            req.body.limit, function(err, message) {
+                            req.body.limit, req.body.time, function(err, message) {
                     if (err)
                         res.send(err);
                     res.json(message);
