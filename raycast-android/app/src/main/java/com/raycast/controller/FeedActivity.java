@@ -1,6 +1,7 @@
 package com.raycast.controller;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,6 +49,14 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
         locationClient = new LocationClient(this, this, this);
+
+        Button msgWriteBtn = (Button) findViewById(R.id.feed_messagewrite);
+        msgWriteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showMessageWriteDialog();
+            }
+        });
     }
 
     @Override
@@ -133,6 +143,12 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
             Toast.makeText(this, String.valueOf(connectionResult.getErrorCode()),
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void showMessageWriteDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new MessageWriteDialogFragment();
+        dialog.show(getFragmentManager(), "MessageWriteDialog");
     }
 
     private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {

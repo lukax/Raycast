@@ -10,5 +10,6 @@
     <string name="message_author">Author</string>
     <string name="message_message">Message</string>
     <string name="message_distance">Distance</string>
+    <string name="messagewrite_title">Cast a message</string>
 
 </resources>
