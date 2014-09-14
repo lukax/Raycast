@@ -3,7 +3,7 @@ package com.raycast.domain.util;
 /**
  * Created by Lucas on 29/08/2014.
  */
-public class Location {
+public class CustomLocation {
     private String type;
     private Coordinates coordinates;
 

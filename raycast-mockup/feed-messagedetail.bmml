@@ -12,27 +12,7 @@
         <icon>HLinesIcon%7Csmall</icon>
       </controlProperties>
     </control>
-    <control controlID="11" controlTypeID="com.balsamiq.mockups::Component" x="439" y="276" w="218" h="45" measuredW="218" measuredH="45" zOrder="3" locked="false" isInGroup="-1">
-      <controlProperties>
-        <src>./assets/symbols.bmml#Message_small</src>
-      </controlProperties>
-    </control>
-    <control controlID="12" controlTypeID="com.balsamiq.mockups::Component" x="439" y="322" w="218" h="45" measuredW="218" measuredH="45" zOrder="4" locked="false" isInGroup="-1">
-      <controlProperties>
-        <src>./assets/symbols.bmml#Message_small</src>
-      </controlProperties>
-    </control>
-    <control controlID="13" controlTypeID="com.balsamiq.mockups::Component" x="439" y="368" w="218" h="45" measuredW="218" measuredH="45" zOrder="5" locked="false" isInGroup="-1">
-      <controlProperties>
-        <src>./assets/symbols.bmml#Message_small</src>
-      </controlProperties>
-    </control>
-    <control controlID="14" controlTypeID="com.balsamiq.mockups::Component" x="436" y="505" w="218" h="45" measuredW="218" measuredH="45" zOrder="6" locked="false" isInGroup="-1">
-      <controlProperties>
-        <src>./assets/symbols.bmml#Message_small</src>
-      </controlProperties>
-    </control>
-    <control controlID="15" controlTypeID="com.balsamiq.mockups::RoundButton" x="615" y="530" w="-1" h="-1" measuredW="32" measuredH="32" zOrder="7" locked="false" isInGroup="-1">
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::RoundButton" x="615" y="530" w="-1" h="-1" measuredW="32" measuredH="32" zOrder="3" locked="false" isInGroup="-1">
       <controlProperties>
         <backgroundAlpha>0.75</backgroundAlpha>
         <icon>PencilIcon%7Csmall</icon>
@@ -40,12 +20,49 @@
         <text/>
       </controlProperties>
     </control>
-    <control controlID="16" controlTypeID="com.balsamiq.mockups::Component" x="439" y="413" w="218" h="91" measuredW="218" measuredH="91" zOrder="8" locked="false" isInGroup="-1">
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Component" x="434" y="274" w="225" h="303" measuredW="225" measuredH="303" zOrder="4" locked="false" isInGroup="-1">
       <controlProperties>
+        <override controlID="0" x="0" y="0" w="225" h="303"/>
+        <override controlID="1" x="69" y="13" w="152" h="96"/>
+        <override controlID="2" x="9" y="67" w="54" h="22"/>
+        <override controlID="3" x="148" y="93" w="23" h="17"/>
+        <override controlID="4" x="168" y="93" w="52" h="17"/>
+        <override controlID="5" x="9" y="89" w="34" h="17"/>
+        <override controlID="17" x="6" y="13" w="59" h="54"/>
+        <override controlID="18" x="0" y="2" w="225" h="119"/>
+        <override controlID="31" x="0" y="141" w="225" h="55"/>
+        <override controlID="34" x="0" y="194" w="225" h="55"/>
+        <override controlID="35" x="0" y="248" w="225" h="55"/>
+        <override controlID="36" x="0" y="121" w="225" h="20"/>
+        <override controlID="37" x="197" y="118" w="28" h="26"/>
+        <override controlID="35:1" x="6" y="4" w="48" h="47"/>
+        <override controlID="34:0" x="0" y="0" w="225" h="55"/>
+        <override controlID="34:1:0" x="0" y="0" w="48" h="47"/>
+        <override controlID="31:1" x="6" y="4" w="48" h="47"/>
+        <override controlID="34:3" x="63" y="0" w="156" h="16"/>
+        <override controlID="35:0" x="0" y="0" w="225" h="55"/>
+        <override controlID="17:1" x="6" y="5" w="48" h="48"/>
+        <override controlID="36:1" x="78" y="0" w="71" h="14"/>
+        <override controlID="35:1:0" x="0" y="0" w="48" h="47"/>
+        <override controlID="34:2" x="63" y="18" w="152" h="30"/>
+        <override controlID="31:0" x="0" y="0" w="225" h="55"/>
+        <override controlID="31:3" x="63" y="0" w="156" h="16"/>
+        <override controlID="34:1" x="6" y="4" w="48" h="47"/>
+        <override controlID="35:3" x="63" y="0" w="156" h="16"/>
+        <override controlID="36:2" x="9" y="0" w="69" h="14"/>
+        <override controlID="17:0" x="0" y="0" w="59" h="54"/>
+        <override controlID="31:1:1" x="9" y="8" w="32" h="32"/>
+        <override controlID="36:0" x="0" y="0" w="225" h="20"/>
+        <override controlID="-1"/>
+        <override controlID="35:1:1" x="9" y="8" w="32" h="32"/>
+        <override controlID="34:1:1" x="9" y="8" w="32" h="32"/>
+        <override controlID="31:1:0" x="0" y="0" w="48" h="47"/>
+        <override controlID="35:2" x="63" y="18" w="152" h="30"/>
+        <override controlID="31:2" x="63" y="18" w="152" h="30"/>
         <src>./assets/symbols.bmml#Message_larga</src>
       </controlProperties>
     </control>
-    <control controlID="17" controlTypeID="com.balsamiq.mockups::Icon" x="629" y="250" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="9" locked="false" isInGroup="-1">
+    <control controlID="17" controlTypeID="com.balsamiq.mockups::Icon" x="629" y="250" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="5" locked="false" isInGroup="-1">
       <controlProperties>
         <icon>GearIcon%7Csmall</icon>
       </controlProperties>

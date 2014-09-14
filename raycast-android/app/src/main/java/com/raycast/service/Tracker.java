@@ -48,7 +48,7 @@ public final class Tracker implements LocationListener {
             isGPSTrackerEnable = myLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkTrackerEnable = myLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-            if (isGPSTrackerEnable && isNetworkTrackerEnable) {
+            if (isGPSTrackerEnable || isNetworkTrackerEnable) {
                 this.canGetLocation = true;
 
                 if (isNetworkTrackerEnable) {

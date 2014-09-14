@@ -8,16 +8,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 
 //Found no use to have the IP field on this client, server perhaps should NOT return the field as default
-@JsonIgnoreProperties({"ip"})
+//Don't throw exception on fields that are not specified
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AbstractEntity {
     @JsonProperty("_id")
-    private long id;
+    private String id;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

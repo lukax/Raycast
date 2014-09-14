@@ -1,6 +1,7 @@
 module.exports = function(router){
 	var comment = require('../models/Comments');
 	var validator = require('validator');
+    var user = require('../models/Users');
 
 	function validateComment(req, res){
 		var ok = true;
@@ -45,22 +46,30 @@ module.exports = function(router){
 				comments.time = Date.now();
 				comments.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-				comments.save(function(err) {
+				comments.save(function(err, comments) {
 					if (err)
 						res.send(err);
 
-					res.json({ message: 'Success' });
+                    var cmm = comments.toObject();
+
+                    user.findById(comments.author, function(uerr, user) {
+                        if(uerr)
+                            res.send(uerr);
+
+                        cmm.author = user.toObject();
+                        res.json(cmm);
+                    });
 				});
 			}
 		})
 
 		//Get all comments
 		.get(function(req, res) {
-			comment.find({}).populate('author').exec(function(err, message) {
+			comment.find({}).populate('author').exec(function(err, comment) {
 				if (err)
 					res.send(err);
 
-				res.json(message);
+				res.json(comment);
 			});
 		});
 
@@ -69,10 +78,14 @@ module.exports = function(router){
 
 		//Get a comment by id
 		.get(function(req, res) {
-			comment.findById(req.params.comment_id).populate('author').exec(function(err, message) {
+			comment.findById(req.params.comment_id).populate('author').exec(function(err, comment) {
 				if (err)
 					res.send(err);
-				res.json(message);
+
+                if(comment == null)
+                    res.json({error: 'No comment found'});
+
+				res.json(comment);
 			});
 		})
 
