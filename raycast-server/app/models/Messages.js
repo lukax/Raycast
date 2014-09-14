@@ -12,7 +12,7 @@ var MessageSchema   = new Schema({
 MessageSchema.index({ loc: '2dsphere' });
 
 MessageSchema.static('findByAuthor', function (author, callback) {
-	return this.find({'author': author }).populate('author').exec(callback);
+	return this.find({'author': author }, null, {sort: {time: -1}}).populate('author').exec(callback);
 });
 
 MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip, limit, callback) {
