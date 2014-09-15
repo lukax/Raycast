@@ -30,6 +30,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.google.android.gms:play-services:4.2.+'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
-    compile files('libs/universal-image-loader-1.9.3.jar')
 }

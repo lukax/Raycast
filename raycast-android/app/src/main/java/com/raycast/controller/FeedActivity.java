@@ -34,7 +34,6 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.raycast.R;
 import com.raycast.domain.Message;
-import com.raycast.service.LoadImage;
 import com.raycast.service.MessageService;
 import com.raycast.util.Preferences;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -236,8 +235,6 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
             TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
 
             ImageLoader.getInstance().displayImage(messages.get(position).getAuthor().getImage(), profileImage, options, animateFirstListener);
-
-            //new LoadImage(messages.get(position).getAuthor().getImage(), profileImage).execute(null, null);
 
             name.setText(messages.get(position).getAuthor().getName());
 
