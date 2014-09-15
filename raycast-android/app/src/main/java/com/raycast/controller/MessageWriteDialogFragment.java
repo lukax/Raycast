@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.raycast.R;
@@ -59,7 +60,6 @@ public class MessageWriteDialogFragment extends DialogFragment {
     private class HttpRequestTask extends AsyncTask<Message, Void, Message> {
         @Override
         protected Message doInBackground(Message... params) {
-            //Get message within 100000 radius
             return new MessageService().add(params[0]);
         }
 

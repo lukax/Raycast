@@ -37,9 +37,9 @@ import java.util.List;
 
 public class FeedActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
+    public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
     private static final int RESULT_SETTINGS = 1;
-
     LocationClient locationClient;
     Location myLocation;
     float myFeedRadius;
@@ -174,7 +174,10 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        final Message item = (Message) adapterView.getItemAtPosition(i);
+                        final Message msg = (Message) adapterView.getItemAtPosition(i);
+                        Intent msgDetailIntent = new Intent(FeedActivity.this, MessageDetailActivity.class);
+                        msgDetailIntent.putExtra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId());
+                        startActivity(msgDetailIntent);
                         //TODO: Load MessageActivity or Popup and populate it with item data.
                     }
                 });
