@@ -1,6 +1,5 @@
 package com.raycast.controller;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +32,7 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.raycast.R;
+import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Message;
 import com.raycast.service.MessageService;
 import com.raycast.util.Preferences;
@@ -43,10 +43,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FeedActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
+public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
-
-    private static final int RESULT_SETTINGS = 1;
+    public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
     LocationClient locationClient;
     Location myLocation;
@@ -94,7 +93,7 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         super.onResume();
         //TODO make pref come as a float already
         myFeedRadius = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.FEED_RADIUS.toString(), "50000"));
-        Log.d("FeedActivity", "radius "+ myFeedRadius);
+        Log.d("FeedActivity", "radius " + myFeedRadius);
     }
 
     @Override
@@ -123,15 +122,11 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch(item.getItemId()){
-            case R.id.action_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivityForResult(i, RESULT_SETTINGS);
-                break;
             case R.id.action_feed_refresh:
                 new HttpRequestTask().execute();
                 break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -198,7 +193,10 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        final Message item = (Message) adapterView.getItemAtPosition(i);
+                        final Message msg = (Message) adapterView.getItemAtPosition(i);
+                        Intent msgDetailIntent = new Intent(FeedActivity.this, MessageDetailActivity.class);
+                        msgDetailIntent.putExtra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId());
+                        startActivity(msgDetailIntent);
                         //TODO: Load MessageActivity or Popup and populate it with item data.
                     }
                 });
