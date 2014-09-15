@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
@@ -32,7 +30,7 @@ public class MessageWriteDialogFragment extends DialogFragment {
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
-        final View v = inflater.inflate(R.layout.dialog_messagewrite, null);
+        final View v = inflater.inflate(R.layout.dialog_message_write, null);
         builder.setView(v);
 
 
