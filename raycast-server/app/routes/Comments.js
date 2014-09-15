@@ -6,15 +6,17 @@ module.exports = function(router){
 	function validateComment(req, res){
 		var ok = true;
 
-		if(req.body.author.trim() == ""){
-			ok = false;
-			res.send(412, { error: 'No author set' });
-		}else{
-			if(!validator.isAlphanumeric(req.body.author)){
-				ok = false;
-				res.send(412, { error: 'Not a valid author id' });
-			}
-		}
+        var author =  typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
+
+        if(author != null && author.trim() != null){
+            if(!validator.isAlphanumeric(author)){
+                ok = false;
+                res.send(412, { error: 'Not a valid author id' });
+            }
+        }else{
+            ok = false;
+            res.send(412, { error: 'No author set' });
+        }
 
 		if(req.body.to.trim() == ""){
 			ok = false;

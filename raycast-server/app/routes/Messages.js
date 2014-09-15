@@ -6,8 +6,10 @@ module.exports = function(router){
 	function validateMessage(req, res){
 		var ok = true;
 
-		if(req.body.author != null && req.body.author.trim() != null){
-            if(!validator.isAlphanumeric(req.body.author)){
+        var author =  typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
+
+		if(author != null && author.trim() != null){
+            if(!validator.isAlphanumeric(author)){
                 ok = false;
                 res.send(412, { error: 'Not a valid author id' });
             }
@@ -42,7 +44,7 @@ module.exports = function(router){
 		.post(function(req, res) {
             if(validateMessage(req, res)){
 				var messages = new message();
-                messages.author = req.body.author;
+                messages.author = typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
 				messages.loc = {
