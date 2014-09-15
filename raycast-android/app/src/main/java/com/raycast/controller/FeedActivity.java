@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,13 +27,21 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.raycast.R;
 import com.raycast.domain.Message;
-import com.raycast.service.ImageLoader;
+import com.raycast.service.LoadImage;
 import com.raycast.service.MessageService;
 import com.raycast.util.Preferences;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FeedActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,
@@ -43,6 +52,8 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
     LocationClient locationClient;
     Location myLocation;
     float myFeedRadius;
+
+    DisplayImageOptions options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +68,20 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
                 showMessageWriteDialog();
             }
         });
+
+        if (!ImageLoader.getInstance().isInited()) {
+            RaycastApp.initImageLoader(this);
+        }
+
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_action_refresh)
+                .showImageForEmptyUri(R.drawable.ic_plusone_small_off_client)
+                .showImageOnFail(R.drawable.ic_launcher)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .displayer(new RoundedBitmapDisplayer(20))
+                .build();
     }
 
     @Override
@@ -187,6 +212,8 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         private final Context context;
         private final List<Message> messages;
 
+        private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+
         public FeedAdapter(Context context, int textViewResourceId, List<Message> messages) {
             super(context, textViewResourceId, messages);
             this.context = context;
@@ -199,17 +226,27 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
             View rowView = inflater.inflate(R.layout.message_compact, parent, false);
+
             ImageView profileImage = (ImageView) rowView.findViewById(R.id.profile_image);
+
             TextView name = (TextView) rowView.findViewById(R.id.message_creator);
             TextView content = (TextView) rowView.findViewById(R.id.message_content);
             TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
-            new ImageLoader(messages.get(position).getAuthor().getImage(), profileImage).execute(null, null);
+
+            ImageLoader.getInstance().displayImage(messages.get(position).getAuthor().getImage(), profileImage, options, animateFirstListener);
+
+            //new LoadImage(messages.get(position).getAuthor().getImage(), profileImage).execute(null, null);
+
             name.setText(messages.get(position).getAuthor().getName());
+
             content.setText(messages.get(position).getMessage());
+
             Location messageLocation = messages.get(position).getLocation().toAndroidLocation();
             //TODO: there are better ways to do it
             distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) / 1000) + " km");
+
             return rowView;
         }
 
@@ -222,6 +259,23 @@ public class FeedActivity extends Activity implements GooglePlayServicesClient.C
         @Override
         public boolean hasStableIds() {
             return true;
+        }
+    }
+
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
+                }
+            }
         }
     }
 }
