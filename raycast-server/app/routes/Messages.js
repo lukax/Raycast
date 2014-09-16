@@ -23,12 +23,12 @@ module.exports = function(router){
 			res.send(412, { error: 'The message is empty' });
 		}
 
-		if(req.body.longitude == null || req.body.latitude == null ||
-           req.body.longitude.trim() == "" || req.body.latitude.trim() == ""){
+		if(req.body.loc.coordinates[0] == null || req.body.loc.coordinates[1] == null ||
+           req.body.loc.coordinates[0].trim() == "" || req.body.loc.coordinates[1].trim() == ""){
 			ok = false;
 			res.send(412, { error: 'No coordinates set' });
 		}else{
-			if(!validator.isFloat(req.body.longitude) || !validator.isFloat(req.body.latitude)){
+			if(!validator.isFloat(req.body.loc.coordinates[0]) || !validator.isFloat(req.body.loc.coordinates[0])){
 				ok = false;
 				res.send(412, { error: 'Not a valid coordinate' });
 			}
@@ -49,7 +49,7 @@ module.exports = function(router){
 				messages.time = Date.now();
 				messages.loc = {
                     type : "Point",
-                    coordinates : [ req.body.longitude, req.body.latitude ]
+                    coordinates : req.body.loc.coordinates
                 };
 				messages.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 

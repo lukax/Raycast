@@ -28,7 +28,12 @@
         <activity
             android:name=".controller.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".controller.FeedActivity">
+            android:parentActivityName=".controller.FeedActivity" >
+        </activity>
+        <activity
+            android:name=".controller.MessageDetailActivity"
+            android:label="@string/title_activity_message_detail"
+            android:parentActivityName=".controller.FeedActivity" >
         </activity>
     </application>
     <!-- To access Google+ APIs: -->
@@ -52,6 +57,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- To write data in the SD card -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.location"
