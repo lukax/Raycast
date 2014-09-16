@@ -23,8 +23,7 @@ module.exports = function(router){
 			res.send(412, { error: 'The message is empty' });
 		}
 
-		if(req.body.loc.coordinates[0] == null || req.body.loc.coordinates[1] == null ||
-           req.body.loc.coordinates[0].trim() == "" || req.body.loc.coordinates[1].trim() == ""){
+		if(req.body.loc.coordinates == null){
 			ok = false;
 			res.send(412, { error: 'No coordinates set' });
 		}else{
