@@ -3,6 +3,7 @@ package com.raycast.controller;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,20 @@ import com.raycast.service.MessageService;
  * Created by Lucas on 13/09/2014.
  */
 public class MessageWriteDialogFragment extends DialogFragment {
+
+    public static final String ARGUMENT_MYLOCATION = "com.raycast.messagewritedialogfragment.mylocation";
+    public static final String ARGUMENT_USERID = "com.raycast.messagewritedialogfragment.userid";
+
+    private Location myLocation;
+    private String userId;
+
+    @Override
+    public void setArguments(Bundle args) {
+        super.setArguments(args);
+        myLocation = args.getParcelable(ARGUMENT_MYLOCATION);
+        userId = args.getString(ARGUMENT_USERID);
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -39,13 +54,11 @@ public class MessageWriteDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 User usr = new User();
-                usr.setId("54051e25a3d4380200c795d2");
-                CustomLocation loc = new CustomLocation();
-                loc.setCoordinates(new Coordinates(-22.9082998, -43.1970773));
+                usr.setId(userId);
                 Message msg = new Message();
                 msg.setAuthor(usr);
                 msg.setMessage(((EditText)v.findViewById(R.id.messagewrite_message)).getText().toString());
-                msg.setLocation(loc);
+                msg.setLocation(CustomLocation.fromLocation(myLocation));
                 //TODO make sure dialog can't be dismissable until message is sent
                 new HttpRequestTask().execute(msg);
                 getDialog().dismiss();

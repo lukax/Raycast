@@ -1,5 +1,7 @@
 package com.raycast.domain.util;
 
+import android.location.Location;
+
 /**
  * Created by Lucas on 29/08/2014.
  */
@@ -23,7 +25,16 @@ public class CustomLocation {
         this.coordinates = coordinates;
     }
 
-    public android.location.Location toAndroidLocation(){
+    public static CustomLocation fromLocation(Location location){
+        CustomLocation loc = new CustomLocation();
+        Coordinates coordinates = new Coordinates();
+        coordinates.setLatitude(location.getLatitude());
+        coordinates.setLongitude(location.getLongitude());
+        loc.setCoordinates(coordinates);
+        return loc;
+    }
+
+    public Location toLocation(){
         android.location.Location androidLocation = new android.location.Location("");
         androidLocation.setLongitude(getCoordinates().getLongitude());
         androidLocation.setLatitude(getCoordinates().getLatitude());

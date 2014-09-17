@@ -63,7 +63,13 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         msgWriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showMessageWriteDialog();
+            // Create an instance of the dialog fragment and show it
+            Bundle dialogArgs = new Bundle();
+            dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
+            dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
+            DialogFragment dialog = new MessageWriteDialogFragment();
+            dialog.setArguments(dialogArgs);
+            dialog.show(getFragmentManager(), "MessageWriteDialog");
             }
         });
 
@@ -165,9 +171,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     public void showMessageWriteDialog() {
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new MessageWriteDialogFragment();
-        dialog.show(getFragmentManager(), "MessageWriteDialog");
+
     }
 
     private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {
@@ -238,7 +242,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
             content.setText(messages.get(position).getMessage());
 
-            Location messageLocation = messages.get(position).getLocation().toAndroidLocation();
+            Location messageLocation = messages.get(position).getLocation().toLocation();
             //TODO: there are better ways to do it
             distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) / 1000) + " km");
 
