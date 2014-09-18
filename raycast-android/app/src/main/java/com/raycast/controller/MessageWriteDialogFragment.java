@@ -96,7 +96,8 @@ public class MessageWriteDialogFragment extends DialogFragment {
         msg.setLocation(CustomLocation.fromLocation(myLocation));
         //TODO make sure dialog can't be dismissable until message is sent
         new HttpRequestTask().execute(msg);
-        MessageWriteDialogFragment.this.dismiss();
+        ((MessageWriteDialogListener)getActivity()).onFinishedDialog(); // Call onFinishedDialog on the guy that called this
+        this.dismiss();
     }
 
     private class HttpRequestTask extends AsyncTask<Message, Void, Message> {

@@ -45,7 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener {
+        GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
     LocationClient locationClient;
@@ -166,6 +166,11 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             Toast.makeText(this, String.valueOf(connectionResult.getErrorCode()),
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onFinishedDialog() {
+        new HttpRequestTask().execute();
     }
 
     private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {
