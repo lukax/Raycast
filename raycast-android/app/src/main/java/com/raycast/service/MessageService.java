@@ -2,6 +2,7 @@ package com.raycast.service;
 
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.raycast.domain.Message;
@@ -32,44 +33,40 @@ public class MessageService extends AbstractCrudService {
     }
 
     /*
-        LIST all messages with no filtering from API
-     */
-    public List<Message> list(){
-        try {
-            final String url = contextUrl.buildUpon().appendPath("all")
-                    .build().toString();
-            Log.d("MessageService", "attempting get request on: " + url);
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-            ResponseEntity<Message[]> responseEntity = restTemplate.getForEntity(url, Message[].class);
-            Log.d("MessageService", "result was: " + responseEntity.getBody());
-            return Arrays.asList(responseEntity.getBody());
-        } catch (RestClientException ex) {
-            Log.e("MessageService", ex.getMessage(), ex);
-        }
-        return null;
-    }
-
-    /*
         LIST all messages from API being withing the specified radius of the coordinates
      */
-    public List<Message> list(Location location, float radius){
+    public void list(final Location location, final float radius, final ServiceListener<List<Message>> listener){
         try {
-            final String url = contextUrl.buildUpon()
-                    .appendQueryParameter("latitude", String.valueOf(location.getLatitude()))
-                    .appendQueryParameter("longitude", String.valueOf(location.getLongitude()))
-                    .appendQueryParameter("radius", String.valueOf(radius))
-                    .build().toString();
-            Log.d("MessageService", "attempting get request on: " + url);
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-            ResponseEntity<Message[]> responseEntity = restTemplate.getForEntity(url, Message[].class);
-            Log.d("MessageService", "result was: " + responseEntity.getBody());
-            return Arrays.asList(responseEntity.getBody());
+            new AsyncTask<Void, Void, List<Message>>() {
+                @Override
+                protected List<Message> doInBackground(Void... voids) {
+                    final String url = contextUrl.buildUpon()
+                            .appendQueryParameter("latitude", String.valueOf(location.getLatitude()))
+                            .appendQueryParameter("longitude", String.valueOf(location.getLongitude()))
+                            .appendQueryParameter("radius", String.valueOf(radius))
+                            .build().toString();
+                    Log.d("MessageService", "attempting get request on: " + url);
+                    RestTemplate restTemplate = new RestTemplate();
+                    restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                    ResponseEntity<Message[]> responseEntity = restTemplate.getForEntity(url, Message[].class);
+                    Log.d("MessageService", "result was: " + responseEntity.getBody());
+                    return Arrays.asList(responseEntity.getBody());
+                }
+
+                @Override
+                protected void onPostExecute(List<Message> messages) {
+                    if(messages != null) {
+                        listener.OnSuccess(messages);
+                    }
+                    else{
+                        listener.OnFail();
+                    }
+                }
+            }.execute();
         } catch (RestClientException ex){
             Log.e("MessageService", ex.getMessage(), ex);
+            listener.OnFail();
         }
-        return null;
     }
 
     /*
