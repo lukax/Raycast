@@ -6,20 +6,15 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.raycast.domain.Message;
-import com.raycast.domain.util.Coordinates;
 import com.raycast.service.base.AbstractCrudService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Lucas on 29/08/2014.
@@ -35,7 +30,7 @@ public class MessageService extends AbstractCrudService {
     /*
         LIST all messages from API being withing the specified radius of the coordinates
      */
-    public void list(final Location location, final float radius, final ServiceListener<List<Message>> listener){
+    public void list(final Location location, final float radius, final ServiceResponseListener<List<Message>> listener){
         try {
             new AsyncTask<Void, Void, List<Message>>() {
                 @Override
@@ -49,62 +44,91 @@ public class MessageService extends AbstractCrudService {
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                     ResponseEntity<Message[]> responseEntity = restTemplate.getForEntity(url, Message[].class);
-                    Log.d("MessageService", "result was: " + responseEntity.getBody());
+                    Log.d("MessageService", "result was: " + responseEntity.getBody().toString());
                     return Arrays.asList(responseEntity.getBody());
                 }
 
                 @Override
                 protected void onPostExecute(List<Message> messages) {
                     if(messages != null) {
-                        listener.OnSuccess(messages);
+                        listener.onSuccess(messages);
                     }
                     else{
-                        listener.OnFail();
+                        listener.onFail();
                     }
                 }
             }.execute();
         } catch (RestClientException ex){
             Log.e("MessageService", ex.getMessage(), ex);
-            listener.OnFail();
+            listener.onFail();
         }
     }
 
     /*
         ADD a new Message to API
      */
-    public Message add(Message msg){
+    public void add(final Message msg, final ServiceResponseListener<Message> listener){
         try {
-            final String url = contextUrl.buildUpon()
-                    .build().toString();
-            Log.d("MessageService", "attempting post request on: " + url);
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-            ResponseEntity<Message> responseEntity = restTemplate.postForEntity(url, msg, Message.class);
-            Log.d("MessageService", "result was: " + responseEntity.getBody());
-            return responseEntity.getBody();
+            new AsyncTask<Void, Void, Message>() {
+                @Override
+                protected Message doInBackground(Void... voids) {
+                    final String url = contextUrl.buildUpon()
+                            .build().toString();
+                    Log.d("MessageService", "attempting post request on: " + url);
+                    RestTemplate restTemplate = new RestTemplate();
+                    restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                    ResponseEntity<Message> responseEntity = restTemplate.postForEntity(url, msg, Message.class);
+                    Log.d("MessageService", "result was: " + responseEntity.getBody());
+                    return responseEntity.getBody();
+                }
+
+                @Override
+                protected void onPostExecute(Message message) {
+                    if(message != null){
+                        listener.onSuccess(message);
+                    }else{
+                        listener.onFail();
+                    }
+                }
+            }.execute();
         } catch (RestClientException ex){
             Log.e("MessageService", ex.getMessage(), ex);
+            listener.onFail();
         }
-        return null;
     }
 
     /*
         GET a Message from API by it's ID
      */
-    public Message get(String id){
+    public void get(final String id, final ServiceResponseListener<Message> listener){
         try{
-            final String url = contextUrl.buildUpon()
-                    .appendPath(id)
-                    .build().toString();
-            Log.d("MessageService", "attempting get request on: " + url);
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-            ResponseEntity<Message> responseEntity = restTemplate.getForEntity(url, Message.class);
-            Log.d("MessageService", "result was: " + responseEntity.getBody());
-            return responseEntity.getBody();
+            new AsyncTask<Void, Void, Message>() {
+                @Override
+                protected Message doInBackground(Void... voids) {
+                    final String url = contextUrl.buildUpon()
+                            .appendPath(id)
+                            .build().toString();
+                    Log.d("MessageService", "attempting get request on: " + url);
+                    RestTemplate restTemplate = new RestTemplate();
+                    restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                    ResponseEntity<Message> responseEntity = restTemplate.getForEntity(url, Message.class);
+                    Log.d("MessageService", "result was: " + responseEntity.getBody());
+                    return responseEntity.getBody();
+                }
+
+                @Override
+                protected void onPostExecute(Message message) {
+                    if(message != null){
+                        listener.onSuccess(message);
+                    }else{
+                        listener.onFail();
+                    }
+                }
+            }.execute();
+
         } catch (RestClientException ex){
             Log.e("MessageService", ex.getMessage(), ex);
+            listener.onFail();
         }
-        return null;
     }
 }

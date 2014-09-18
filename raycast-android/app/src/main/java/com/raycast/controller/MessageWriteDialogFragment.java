@@ -25,6 +25,7 @@ import com.raycast.domain.User;
 import com.raycast.domain.util.Coordinates;
 import com.raycast.domain.util.CustomLocation;
 import com.raycast.service.MessageService;
+import com.raycast.service.base.AbstractCrudService;
 
 /**
  * Created by Lucas on 13/09/2014.
@@ -95,22 +96,19 @@ public class MessageWriteDialogFragment extends DialogFragment {
         msg.setMessage(((EditText) getDialog().findViewById(R.id.dialogmessagewrite_messagetext)).getText().toString());
         msg.setLocation(CustomLocation.fromLocation(myLocation));
         //TODO make sure dialog can't be dismissable until message is sent
-        new HttpRequestTask().execute(msg);
-        ((MessageWriteDialogListener)getActivity()).onFinishedDialog(); // Call onFinishedDialog on the guy that called this
-        this.dismiss();
-    }
+        new MessageService().add(msg, new AbstractCrudService.ServiceResponseListener<Message>() {
+            @Override
+            public void onSuccess(Message t) {
 
-    private class HttpRequestTask extends AsyncTask<Message, Void, Message> {
-        @Override
-        protected Message doInBackground(Message... params) {
-            return new MessageService().add(params[0]);
-        }
-        @Override
-        protected void onPostExecute(Message message) {
-            if (message == null) {
+            }
+
+            @Override
+            public void onFail() {
                 //TODO properly show an error
                 Log.e(getClass().toString(), "couldn't save message");
             }
-        }
+        });
+        ((MessageWriteDialogListener)getActivity()).onFinishedDialog(); // Call onFinishedDialog on the guy that called this
+        this.dismiss();
     }
 }

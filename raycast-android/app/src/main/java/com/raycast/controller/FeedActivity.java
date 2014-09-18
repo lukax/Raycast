@@ -173,9 +173,9 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     private void listMessages() {
-        new MessageService().list(myLocation, myFeedRadius, new AbstractCrudService.ServiceListener<List<Message>>() {
+        new MessageService().list(myLocation, myFeedRadius, new AbstractCrudService.ServiceResponseListener<List<Message>>() {
             @Override
-            public void OnSuccess(List<Message> message) {
+            public void onSuccess(List<Message> message) {
                 if (message.size() == 0) {
                     //TODO: get message string from 'strings'
                     Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
@@ -197,7 +197,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
                 }
             }
             @Override
-            public void OnFail() {
+            public void onFail() {
                 Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
             }
         });
