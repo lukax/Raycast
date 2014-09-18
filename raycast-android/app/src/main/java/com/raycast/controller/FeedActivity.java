@@ -38,6 +38,7 @@ import com.raycast.service.MessageService;
 import com.raycast.service.base.AbstractCrudService;
 import com.raycast.util.Preferences;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -239,8 +240,9 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             content.setText(messages.get(position).getMessage());
 
             Location messageLocation = messages.get(position).getLocation().toLocation();
-            //TODO: there are better ways to do it
-            distance.setText(String.format("%.1f", messageLocation.distanceTo(myLocation) / 1000) + " km");
+
+            double distanceInKm = messageLocation.distanceTo(myLocation) / 1000;
+            distance.setText(new DecimalFormat("#.#").format(distanceInKm)+" km");
 
             return rowView;
         }
