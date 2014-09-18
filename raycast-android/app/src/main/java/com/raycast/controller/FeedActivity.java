@@ -2,6 +2,7 @@ package com.raycast.controller;
 
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
@@ -58,25 +59,22 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
         locationClient = new LocationClient(this, this, this);
-
         Button msgWriteBtn = (Button) findViewById(R.id.feed_messagewrite);
         msgWriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            // Create an instance of the dialog fragment and show it
-            Bundle dialogArgs = new Bundle();
-            dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
-            dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
-            DialogFragment dialog = new MessageWriteDialogFragment();
-            dialog.setArguments(dialogArgs);
-            dialog.show(getFragmentManager(), "MessageWriteDialog");
+                // Create an instance of the dialog fragment and show it
+                Bundle dialogArgs = new Bundle();
+                dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
+                dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
+                DialogFragment dialog = new MessageWriteDialogFragment();
+                dialog.setArguments(dialogArgs);
+                dialog.show(getFragmentManager(), "MessageWriteDialog");
             }
         });
-
         if (!ImageLoader.getInstance().isInited()) {
             RaycastApp.initImageLoader(this);
         }
-
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.ic_action_refresh)
                 .showImageForEmptyUri(R.drawable.ic_plusone_small_off_client)
@@ -168,10 +166,6 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             Toast.makeText(this, String.valueOf(connectionResult.getErrorCode()),
                     Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void showMessageWriteDialog() {
-
     }
 
     private class HttpRequestTask extends AsyncTask<Void, Void, List<Message>> {

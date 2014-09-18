@@ -3,14 +3,21 @@ package com.raycast.controller;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.raycast.R;
 import com.raycast.domain.Message;
@@ -23,6 +30,10 @@ import com.raycast.service.MessageService;
  * Created by Lucas on 13/09/2014.
  */
 public class MessageWriteDialogFragment extends DialogFragment {
+
+    public interface MessageWriteDialogListener {
+        void onFinishedDialog();
+    }
 
     public static final String ARGUMENT_MYLOCATION = "com.raycast.messagewritedialogfragment.mylocation";
     public static final String ARGUMENT_USERID = "com.raycast.messagewritedialogfragment.userid";
@@ -40,32 +51,52 @@ public class MessageWriteDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_message_write, null);
+        builder.setView(view);
+        final Dialog dialog = builder.create();
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        final View v = inflater.inflate(R.layout.dialog_message_write, null);
-        builder.setView(v);
-
-
-        Button sendBtn = (Button) v.findViewById(R.id.messagewrite_send);
-        sendBtn.setOnClickListener(new View.OnClickListener() {
+        EditText messageTxt = (EditText) view.findViewById(R.id.dialogmessagewrite_messagetext);
+        messageTxt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View view) {
-                User usr = new User();
-                usr.setId(userId);
-                Message msg = new Message();
-                msg.setAuthor(usr);
-                msg.setMessage(((EditText)v.findViewById(R.id.messagewrite_message)).getText().toString());
-                msg.setLocation(CustomLocation.fromLocation(myLocation));
-                //TODO make sure dialog can't be dismissable until message is sent
-                new HttpRequestTask().execute(msg);
-                getDialog().dismiss();
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (EditorInfo.IME_ACTION_SEND == actionId) {
+                    sendMessage();
+                    return true;
+                }
+                return false;
+            }
+        });
+        messageTxt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
             }
         });
 
-        return builder.create();
+        Button sendBtn = (Button) view.findViewById(R.id.dialogmessagewrite_sendbtn);
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendMessage();
+            }
+        });
+
+        return dialog;
+    }
+
+    private void sendMessage(){
+        User usr = new User();
+        usr.setId(userId);
+        Message msg = new Message();
+        msg.setAuthor(usr);
+        msg.setMessage(((EditText) getDialog().findViewById(R.id.dialogmessagewrite_messagetext)).getText().toString());
+        msg.setLocation(CustomLocation.fromLocation(myLocation));
+        //TODO make sure dialog can't be dismissable until message is sent
+        new HttpRequestTask().execute(msg);
+        MessageWriteDialogFragment.this.dismiss();
     }
 
     private class HttpRequestTask extends AsyncTask<Message, Void, Message> {
@@ -73,7 +104,6 @@ public class MessageWriteDialogFragment extends DialogFragment {
         protected Message doInBackground(Message... params) {
             return new MessageService().add(params[0]);
         }
-
         @Override
         protected void onPostExecute(Message message) {
             if (message == null) {
