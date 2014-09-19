@@ -11,17 +11,18 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/feed" />
+        android:id="@+id/feed"
+        tools:listitem="@layout/message_compact"
+        android:background="#ffdcdcdc" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/feed_messagewrite"
         android:layout_alignBottom="@+id/feed"
-        android:layout_alignRight="@+id/feed"
-        android:layout_alignEnd="@+id/feed"
-        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/ic_action_edit" />
+        android:background="@drawable/ic_action_edit"
+        android:layout_alignRight="@+id/feed"
+        android:layout_alignEnd="@+id/feed" />
 
 </RelativeLayout>
