@@ -10,15 +10,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="#fffdfdfe">
+        android:layout_alignParentStart="true">
 
         <ImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:id="@+id/profile_image"
             android:src="@drawable/ic_launcher"
-            android:background="#fffdfdfe"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
@@ -30,7 +28,6 @@
             android:text="@string/message_distance"
             android:id="@+id/message_distance"
             android:layout_toEndOf="@+id/profile_image"
-            android:background="#fffdfdfe"
             android:layout_alignBottom="@+id/profile_image"
             android:layout_toRightOf="@+id/profile_image" />
 
@@ -39,10 +36,7 @@
             android:layout_height="50dp"
             android:text="@string/message_author"
             android:gravity="center_vertical|center_horizontal"
-            android:textStyle="bold"
-            android:layout_toEndOf="@+id/profile_image"
             android:id="@+id/message_creator"
-            android:background="#fffdfdfe"
             android:layout_above="@+id/message_distance"
             android:layout_toLeftOf="@+id/message_content"
             android:layout_toStartOf="@+id/message_content" />
@@ -54,7 +48,6 @@
             android:text="@string/message_message"
             android:id="@+id/message_content"
             android:layout_toEndOf="@+id/message_distance"
-            android:background="#fffdfdfe"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/message_distance" />
     </RelativeLayout>
