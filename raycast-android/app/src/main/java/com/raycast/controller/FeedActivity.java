@@ -1,6 +1,7 @@
 package com.raycast.controller;
 
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -134,6 +135,18 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     @Override
+    public void onBackPressed(){
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            Log.i("MainActivity", "popping backstack");
+            fm.popBackStack();
+        } else {
+            Log.i("MainActivity", "nothing on backstack, calling super");
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onConnected(Bundle bundle) {
         myLocation = locationClient.getLastLocation();
         if (myLocation != null) {
@@ -246,6 +259,8 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
             return rowView;
         }
+
+
 
         @Override
         public long getItemId(int position) {
