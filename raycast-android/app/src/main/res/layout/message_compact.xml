@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,20 +6,22 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <RelativeLayout
+    <AbsoluteLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="89dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:id="@+id/profile_image"
             android:src="@drawable/ic_launcher"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_x="5dp"
+            android:layout_y="7dp" />
 
         <TextView
             android:layout_width="100dp"
@@ -29,7 +31,10 @@
             android:id="@+id/message_distance"
             android:layout_toEndOf="@+id/profile_image"
             android:layout_alignBottom="@+id/profile_image"
-            android:layout_toRightOf="@+id/profile_image" />
+            android:layout_toRightOf="@+id/profile_image"
+            android:layout_x="154dp"
+            android:layout_y="7dp"
+            android:textSize="12dp" />
 
         <TextView
             android:layout_width="100dp"
@@ -39,7 +44,10 @@
             android:id="@+id/message_creator"
             android:layout_above="@+id/message_distance"
             android:layout_toLeftOf="@+id/message_content"
-            android:layout_toStartOf="@+id/message_content" />
+            android:layout_toStartOf="@+id/message_content"
+            android:layout_x="69dp"
+            android:layout_y="-10dp"
+            android:textSize="14dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -49,7 +57,10 @@
             android:id="@+id/message_content"
             android:layout_toEndOf="@+id/message_distance"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/message_distance" />
-    </RelativeLayout>
+            android:layout_toRightOf="@+id/message_distance"
+            android:layout_x="95dp"
+            android:layout_y="32dp"
+            android:textSize="12dp" />
+    </AbsoluteLayout>
 
-</RelativeLayout>
+</AbsoluteLayout>
