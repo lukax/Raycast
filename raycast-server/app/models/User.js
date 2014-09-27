@@ -18,4 +18,4 @@ UserSchema.static('findByEmail', function (email, callback) {
 	return this.find({ email: email }, callback);
 });
 
-module.exports = mongoose.model('Users', UserSchema);
+module.exports = mongoose.model('User', UserSchema);

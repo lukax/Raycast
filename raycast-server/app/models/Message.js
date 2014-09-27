@@ -2,7 +2,7 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var MessageSchema   = new Schema({
-    author: { type: String, ref: 'Users' },
+    author: { type: String, ref: 'User' },
 	message: String,
 	time: Number,
 	loc: { type: { type: String } , coordinates: [Number]  },
@@ -38,4 +38,4 @@ MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip
     .exec(callback);
 });
 
-module.exports = mongoose.model('Messages', MessageSchema);
+module.exports = mongoose.model('Message', MessageSchema);

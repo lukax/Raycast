@@ -1,7 +1,7 @@
 module.exports = function(router){
-	var comment = require('../models/Comments');
-    var commentValidator = require('../validation/CommentValidator');
-	var user = require('../models/Users');
+	var comment = require('../models/Comment');
+    var commentValidator = require('../validators/CommentValidator');
+	var user = require('../models/User');
 
 
     router.route('/comment')
@@ -81,4 +81,4 @@ module.exports = function(router){
 				res.json(message);
 			});
 		});
-}
+};

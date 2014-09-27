@@ -1,6 +1,6 @@
 module.exports = function(router){
-	var user = require('../models/Users');
-    var userValidator = require('../validation/UserValidator');
+	var user = require('../models/User');
+    var userValidator = require('../validators/UserValidator');
 
 
     router.route('/user')
@@ -54,7 +54,7 @@ module.exports = function(router){
 				if (err)
 					res.send(err);
 
-				if(validateUser(req, res)){
+				if(userValidator(req, res)){
 					user.username = req.body.username;
 					user.name = req.body.name;
 					user.email = req.body.email;
@@ -105,4 +105,4 @@ module.exports = function(router){
 				res.json(user);
 			});
 		});
-}
+};

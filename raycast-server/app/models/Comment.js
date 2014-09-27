@@ -13,4 +13,4 @@ CommentSchema.static('findByMessage', function (message, callback) {
     return this.find({ to: message }).populate('author').exec(callback);
 });
 
-module.exports = mongoose.model('Comments', CommentSchema);
+module.exports = mongoose.model('Comment', CommentSchema);

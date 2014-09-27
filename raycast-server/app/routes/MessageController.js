@@ -1,7 +1,7 @@
 module.exports = function(router){
-	var message = require('../models/Messages');
-	var messageValidator = require('../validation/MessageValidator');
-    var user = require('../models/Users');
+	var message = require('../models/Message');
+	var messageValidator = require('../validators/MessageValidator');
+    var user = require('../models/User');
 
 
     router.route('/message')
@@ -131,4 +131,4 @@ module.exports = function(router){
 			});
 		});
 
-}
+};

@@ -25,9 +25,9 @@ router.get('/', function(req, res) {
 	res.json({ message: 'Raycast API' });
 });
 
-require('./app/routes/Users')(router);
-require('./app/routes/Messages')(router);
-require('./app/routes/Comments')(router);
+require('./app/routes/UserController')(router);
+require('./app/routes/MessageController')(router);
+require('./app/routes/CommentController')(router);
 
 // REGISTER OUR ROUTES -------------------------------
 app.use('/', router);
