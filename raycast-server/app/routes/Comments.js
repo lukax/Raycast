@@ -1,46 +1,14 @@
 module.exports = function(router){
 	var comment = require('../models/Comments');
-	var validator = require('validator');
-    var user = require('../models/Users');
+    var commentValidator = require('../validation/CommentValidator');
+	var user = require('../models/Users');
 
-	function validateComment(req, res){
-		var ok = true;
-
-        var author =  typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
-
-        if(author != null && author.trim() != null){
-            if(!validator.isAlphanumeric(author)){
-                ok = false;
-                res.send(412, { error: 'Not a valid author id' });
-            }
-        }else{
-            ok = false;
-            res.send(412, { error: 'No author set' });
-        }
-
-		if(req.body.to.trim() == ""){
-			ok = false;
-			res.send(412, { error: 'No message set' });
-		}else{
-			if(!validator.isAlphanumeric(req.body.to)){
-				ok = false;
-				res.send(412, { error: 'Not a valid message id' });
-			}
-		}
-
-		if(req.body.comment.trim() == ""){
-			ok = false;
-			res.send(412, { error: 'The comment is empty' });
-		}
-
-		return ok;
-	}
 
     router.route('/comment')
 
     	//Add a new comment
 		.post(function(req, res) {
-			if(validateComment(req, res)){
+			if(commentValidator(req, res)){
 				var comments = new comment();
 				comments.to = req.body.to;
                 comments.author = req.body.author,

@@ -1,43 +1,13 @@
 module.exports = function(router){
 	var user = require('../models/Users');
-	var validator = require('validator');
+    var userValidator = require('../validation/UserValidator');
 
-	function validateUser(req, res){
-		var ok = true;
-
-		if(req.body.username.trim() == ""){
-			ok = false;
-			res.send(412, { error: 'No username set' });
-		}else{
-			if(!validator.isAlphanumeric(req.body.username)){
-				ok = false;
-				res.send(412, { error: 'Not a valid username' });
-			}
-		}
-
-		if(req.body.name.trim() == ""){
-			ok = false;
-			res.send(412, { error: 'No name set' });
-		}
-
-		if(req.body.email.trim() == ""){
-			ok = false;
-			res.send(412, { error: 'No email set' });
-		}else{
-			if(!validator.isEmail(req.body.email)){
-				ok = false;
-				res.send(412, { error: 'Not a valid email' });
-			}
-		}
-
-		return ok;
-	}
 
     router.route('/user')
 
     	//Add a new user
 		.post(function(req, res) {
-			if(validateUser(req, res)){
+			if(userValidator(req, res)){
 				var users = new user();
 				users.username = req.body.username;
 				users.name = req.body.name;
