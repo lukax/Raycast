@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function (req, res){
     var validator = require('validator');
     var ok = true;
@@ -13,7 +15,7 @@ module.exports = function (req, res){
         res.send(412, { error: 'No author set' });
     }
 
-    if(req.body.to.trim() == ""){
+    if(req.body.to.trim() == ''){
         ok = false;
         res.send(412, { error: 'No message set' });
     }else{
@@ -23,7 +25,7 @@ module.exports = function (req, res){
         }
     }
 
-    if(req.body.comment.trim() == ""){
+    if(req.body.comment.trim() == ''){
         ok = false;
         res.send(412, { error: 'The comment is empty' });
     }

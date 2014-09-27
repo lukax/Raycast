@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(router){
 	var user = require('../models/User');
     var userValidator = require('../validators/UserValidator');

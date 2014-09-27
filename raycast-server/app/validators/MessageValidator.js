@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function (req, res){
     var validator = require('validator');
     var ok = true;
@@ -13,7 +15,7 @@ module.exports = function (req, res){
         res.send(412, { error: 'No author set' });
     }
 
-    if(req.body.message == null || req.body.message.trim() == ""){
+    if(req.body.message == null || req.body.message.trim() == ''){
         ok = false;
         res.send(412, { error: 'The message is empty' });
     }

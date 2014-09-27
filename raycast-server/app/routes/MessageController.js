@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(router){
 	var message = require('../models/Message');
 	var messageValidator = require('../validators/MessageValidator');
@@ -14,7 +16,7 @@ module.exports = function(router){
 				messages.message = req.body.message.substr(0, 160);
 				messages.time = Date.now();
 				messages.loc = {
-                    type : "Point",
+                    type : 'Point',
                     coordinates : req.body.loc.coordinates
                 };
 				messages.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

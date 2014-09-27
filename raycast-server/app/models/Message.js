@@ -1,3 +1,5 @@
+'use strict';
+
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
@@ -29,7 +31,7 @@ MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip
     }
 
     return this.find(
-        {"loc":{"$geoWithin":{"$centerSphere":[[ lon , lat ], r]}}},
+        {'loc':{'$geoWithin':{'$centerSphere':[[ lon , lat ], r]}}},
         null,
         {sort: {time: -1}, skip: Number(skip), limit: Number(limit)}
     )

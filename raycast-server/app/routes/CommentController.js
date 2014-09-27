@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(router){
 	var comment = require('../models/Comment');
     var commentValidator = require('../validators/CommentValidator');
