@@ -10,15 +10,16 @@ module.exports = function(router){
     	//Add a new user
 		.post(function(req, res) {
 			if(userValidator(req, res)){
-				var users = new user();
-				users.username = req.body.username;
-				users.name = req.body.name;
-				users.email = req.body.email;
-				users.site = req.body.site;
-				users.description = req.body.description;
-				users.image = req.body.image;
+				var usr = new user();
+				usr.username = req.body.username;
+                usr.password = req.body.password;
+				usr.name = req.body.name;
+				usr.email = req.body.email;
+				usr.site = req.body.site;
+				usr.description = req.body.description;
+				usr.image = req.body.image;
 
-				users.save(function(err) {
+				usr.save(function(err) {
 					if (err)
 						res.send(err);
 
