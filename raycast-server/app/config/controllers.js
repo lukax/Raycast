@@ -10,24 +10,35 @@ module.exports = function(router){
 
     router.route('/message')
         .post(authController.isAuthenticated, messageController.addMessage)
-        .get(messageController.listMessageByLocation);
+        .get(messageController.getAllMessageByLocation);
 
     router.route('/message/filter')
-        .post(messageController.listMessageByFilter);
+        .post(messageController.getAllMessageByFilter);
 
     router.route('/message/all')
-        .get(messageController.listAllMessage);
+        .get(messageController.getAllMessage);
 
     router.route('/message/:message_id')
         .get(messageController.getMessageById)
         .delete(messageController.removeMessage);
 
     router.route('/message/user/:user_username')
-        .get(messageController.listMessageByUser);
+        .get(messageController.getAllMessageByUser);
+
+
+    router.route('/comment')
+        .post(authController.isAuthenticated, commentController.addComment)
+        .get(commentController.getAllComment);
+
+    router.route('/comment/:comment_id')
+        .get(commentController.getCommentById)
+        .delete(commentController.removeComment);
+
+    router.route('/comment/message/:message_id')
+        .get(commentController.getAllCommentByMessage);
+
 
     userController(router);
-
-    commentController(router);
 
     return router;
 };

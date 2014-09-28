@@ -3,29 +3,24 @@
 module.exports = function (req, res){
     var validator = require('validator');
     var ok = true;
-    var author =  typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
 
-    if(author != null && author.trim() != null){
-        if(!validator.isAlphanumeric(author)){
-            ok = false;
-            res.send(412, { error: 'Not a valid author id' });
-        }
-    }else{
+    if(!req.user || !req.user._id){
         ok = false;
+        if(!validator.isAlphanumeric(req.user._id)){
+            res.send(412, { error: 'Not a valid author' });
+        }
         res.send(412, { error: 'No author set' });
     }
 
-    if(req.body.to.trim() == ''){
+    if(!req.body.messageId || req.body.messageId.trim() == ''){
         ok = false;
-        res.send(412, { error: 'No message set' });
-    }else{
         if(!validator.isAlphanumeric(req.body.to)){
-            ok = false;
             res.send(412, { error: 'Not a valid message id' });
         }
+        res.send(412, { error: 'No message set' });
     }
 
-    if(req.body.comment.trim() == ''){
+    if(!req.body.comment || req.body.comment.trim() == ''){
         ok = false;
         res.send(412, { error: 'The comment is empty' });
     }

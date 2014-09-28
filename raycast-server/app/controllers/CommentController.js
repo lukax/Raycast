@@ -1,86 +1,68 @@
 'use strict';
 
-module.exports = function(router){
-	var comment = require('../models/Comment');
-    var commentValidator = require('../validators/CommentValidator');
-	var user = require('../models/User');
+var User = require('../models/User');
+var Comment = require('../models/Comment');
+var commentValidator = require('../validators/CommentValidator');
 
+//Add a new comment
+exports.addComment = function(req, res) {
+    if(commentValidator(req, res)){
+        var cmm = new Comment();
+        cmm.messageId = req.body.messageId;
+        cmm.author = req.user._id;
+        cmm.comment = req.body.comment.substr(0, 160);
+        cmm.time = Date.now();
+        cmm.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-    router.route('/comment')
+        cmm.save(function(err, comments) {
+            if (err){
+                res.send(err);
+            }
+            res.json(comments);
+        });
+    }
+};
 
-    	//Add a new comment
-		.post(function(req, res) {
-			if(commentValidator(req, res)){
-				var comments = new comment();
-				comments.to = req.body.to;
-                comments.author = req.body.author,
-				comments.comment = req.body.comment.substr(0, 160);
-				comments.time = Date.now();
-				comments.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+//Get all comments
+exports.getAllComment = function(req, res) {
+    Comment.find({}).populate('author').exec(function(err, comment) {
+        if (err)
+            res.send(err);
 
-				comments.save(function(err, comments) {
-					if (err)
-						res.send(err);
+        res.json(comment);
+    });
+};
 
-                    var cmm = comments.toObject();
+//Get a comment by id
+exports.getCommentById = function(req, res) {
+    Comment.findById(req.params.comment_id).populate('author').exec(function(err, comment) {
+        if (err)
+            res.send(err);
 
-                    user.findById(comments.author, function(uerr, user) {
-                        if(uerr)
-                            res.send(uerr);
+        if(comment == null)
+            res.json({error: 'No comment found'});
 
-                        cmm.author = user.toObject();
-                        res.json(cmm);
-                    });
-				});
-			}
-		})
+        res.json(comment);
+    });
+};
 
-		//Get all comments
-		.get(function(req, res) {
-			comment.find({}).populate('author').exec(function(err, comment) {
-				if (err)
-					res.send(err);
+//Delete a comment by id
+exports.removeComment = function(req, res) {
+    Comment.remove({
+        _id: req.params.comment_id
+    }, function(err, comment) {
+        if (err)
+            res.send(err);
 
-				res.json(comment);
-			});
-		});
+        res.json({ message: 'Success' });
+    });
+};
 
-
-	router.route('/comment/:comment_id')
-
-		//Get a comment by id
-		.get(function(req, res) {
-			comment.findById(req.params.comment_id).populate('author').exec(function(err, comment) {
-				if (err)
-					res.send(err);
-
-                if(comment == null)
-                    res.json({error: 'No comment found'});
-
-				res.json(comment);
-			});
-		})
-
-		//Delete a comment by id
-		.delete(function(req, res) {
-			comment.remove({
-				_id: req.params.comment_id
-			}, function(err, comment) {
-				if (err)
-					res.send(err);
-
-				res.json({ message: 'Success' });
-			});
-		});
-
-	router.route('/comment/message/:message_id')
-
-		//Get all comments from a message
-		.get(function(req, res) {
-			comment.findByMessage(req.params.message_id, function(err, message) {
-				if (err)
-					res.send(err);
-				res.json(message);
-			});
-		});
+//Get all comments from a message
+exports.getAllCommentByMessage = function(req, res) {
+    Comment.findByMessage(req.params.message_id, function(err, message) {
+        if (err)
+            res.send(err);
+        res.json(message);
+    });
 };

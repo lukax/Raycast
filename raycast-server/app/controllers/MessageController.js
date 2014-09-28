@@ -27,7 +27,7 @@ exports.addMessage = function(req, res) {
 };
 
 //Get all messages from a location
-exports.listMessageByLocation = function(req, res) {
+exports.getAllMessageByLocation = function(req, res) {
     var lat = Number(req.query.latitude) || null;
     var lon = Number(req.query.longitude) || null;
     var r = Number(req.query.radius) || null;
@@ -44,7 +44,7 @@ exports.listMessageByLocation = function(req, res) {
 };
 
 //Get all messages from a location with filters
-exports.listMessageByFilter = function(req, res) {
+exports.getAllMessageByFilter = function(req, res) {
     var lat = Number(req.query.latitude) || null;
     var lon = Number(req.query.longitude) || null;
     var r = Number(req.query.radius) || null;
@@ -62,7 +62,7 @@ exports.listMessageByFilter = function(req, res) {
 };
 
 //Get all messages
-exports.listAllMessage = function(req, res) {
+exports.getAllMessage = function(req, res) {
     Message.find({}).populate('author').exec(function(err, message) {
         if (err)
             res.send(err);
@@ -100,7 +100,7 @@ exports.removeMessage = function(req, res) {
 };
 
 //Get all messages from a user
-exports.listMessageByUser = function(req, res) {
+exports.getAllMessageByUser = function(req, res) {
     Message.findByAuthor(req.params.user_username, function(err, message) {
         if (err)
             res.send(err);
