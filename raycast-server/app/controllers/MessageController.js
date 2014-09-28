@@ -1,37 +1,27 @@
 'use strict';
 
-var message = require('../models/Message');
+var User = require('../models/User');
+var Message = require('../models/Message');
 var messageValidator = require('../validators/MessageValidator');
-var user = require('../models/User');
 
 //Add a message
 exports.addMessage = function(req, res) {
     if(messageValidator(req, res)){
-        var messages = new message();
-        messages.author = typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
-        messages.message = req.body.message.substr(0, 160);
-        messages.time = Date.now();
-        messages.loc = {
+        var message = new Message();
+        message.author = req.user._id;
+        message.message = req.body.message.substr(0, 160);
+        message.time = Date.now();
+        message.loc = {
             type : 'Point',
             coordinates : req.body.loc.coordinates
         };
-        messages.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        message.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-        messages.save(function(err, messages) {
-            if (err)
+        message.save(function(err, message) {
+            if (err){
                 res.send(err);
-
-            var msg = messages.toObject();
-
-            user.findById(messages.author, function(uerr, user) {
-                if(uerr)
-                    res.send(uerr);
-
-                if(user != null){
-                    msg.author = user.toObject();
-                    res.json(msg);
-                }
-            });
+            }
+            res.json(message);
         });
     }
 };
@@ -45,7 +35,7 @@ exports.listMessageByLocation = function(req, res) {
     if((lat == null) || (lon == null) || (r == null)){
         res.send(400, { error: 'Insufficient arguments' });
     }else{
-        message.findByRadius(r, lat, lon, null, null, null, function(err, message) {
+        Message.findByRadius(r, lat, lon, null, null, null, function(err, message) {
             if (err)
                 res.send(err);
             res.json(message);
@@ -62,7 +52,7 @@ exports.listMessageByFilter = function(req, res) {
     if((lat == null) || (lon == null) || (r == null)){
         res.send(400, { error: 'Insufficient arguments' });
     }else{
-        message.findByRadius(r, lat, lon, req.body.skip,
+        Message.findByRadius(r, lat, lon, req.body.skip,
             req.body.limit, req.body.time, function(err, message) {
                 if (err)
                     res.send(err);
@@ -73,7 +63,7 @@ exports.listMessageByFilter = function(req, res) {
 
 //Get all messages
 exports.listAllMessage = function(req, res) {
-    message.find({}).populate('author').exec(function(err, message) {
+    Message.find({}).populate('author').exec(function(err, message) {
         if (err)
             res.send(err);
         res.json(message);
@@ -82,7 +72,7 @@ exports.listAllMessage = function(req, res) {
 
 //Get a message by id
 exports.getMessageById = function(req, res) {
-    message.findById(req.params.message_id).populate('author').exec(function(err, message) {
+    Message.findById(req.params.message_id).populate('author').exec(function(err, message) {
         if (err)
             res.send(err);
 
@@ -95,7 +85,7 @@ exports.getMessageById = function(req, res) {
 
 //Delete a message by id
 exports.removeMessage = function(req, res) {
-    message.remove({
+    Message.remove({
         _id: req.params.message_id
     }, function(err, message) {
         if (err)
@@ -111,7 +101,7 @@ exports.removeMessage = function(req, res) {
 
 //Get all messages from a user
 exports.listMessageByUser = function(req, res) {
-    message.findByAuthor(req.params.user_username, function(err, message) {
+    Message.findByAuthor(req.params.user_username, function(err, message) {
         if (err)
             res.send(err);
 

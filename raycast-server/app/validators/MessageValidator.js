@@ -3,24 +3,21 @@
 module.exports = function (req, res){
     var validator = require('validator');
     var ok = true;
-    var author =  typeof req.body.author == 'string' ? req.body.author : req.body.author._id;
 
-    if(author != null && author.trim() != null){
-        if(!validator.isAlphanumeric(author)){
-            ok = false;
-            res.send(412, { error: 'Not a valid author id' });
-        }
-    }else{
+    if(!req.user || !req.user._id){
         ok = false;
+        if(!validator.isAlphanumeric(req.user._id)){
+            res.send(412, { error: 'Not a valid author' });
+        }
         res.send(412, { error: 'No author set' });
     }
 
-    if(req.body.message == null || req.body.message.trim() == ''){
+    if(!req.body.message || req.body.message.trim() == ''){
         ok = false;
         res.send(412, { error: 'The message is empty' });
     }
 
-    if(req.body.loc.coordinates == null){
+    if(!req.body.loc || !req.body.loc.coordinates) {
         ok = false;
         res.send(412, { error: 'No coordinates set' });
     }else{
