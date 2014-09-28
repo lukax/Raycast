@@ -1,0 +1,9 @@
+{
+    "port" : 4000,
+    "security": {
+        "tokenLife" : 36000
+    },
+    "mongoose": {
+        "uri": "mongodb://localhost/raycast"
+    }
+}

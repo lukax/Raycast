@@ -2,17 +2,17 @@
 // =============================================================================
 
 var express    = require('express');
-var app        = express();
 var bodyParser = require('body-parser');
 var passport   = require('passport');
 var mongoose   = require('mongoose');
-mongoose.connect((process.env.MONGOLAB_URI || 'mongodb://localhost/raycast'));
+var config     = require('./app/config/config');
 
+mongoose.connect((process.env.MONGOLAB_URI || config.mongoose.uri));
+
+var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
-
-var port = process.env.PORT || 4000;
 
 
 // ROUTES
@@ -34,5 +34,4 @@ app.use('/', require('./app/config/controllers')(router));
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log('Running on port ' + port);
+app.listen(process.env.PORT || config.port);

@@ -2,6 +2,7 @@
  * Created by lucas on 9/27/14.
  */
 
+var config                  = require('../config/config');
 var User                    = require('../models/User');
 var Client                  = require('../models/oauth/Client');
 var AccessToken             = require('../models/oauth/AccessToken');
