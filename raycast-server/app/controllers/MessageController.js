@@ -27,8 +27,10 @@ exports.addMessage = function(req, res) {
                 if(uerr)
                     res.send(uerr);
 
-                msg.author = user.toObject();
-                res.json(msg);
+                if(user != null){
+                    msg.author = user.toObject();
+                    res.json(msg);
+                }
             });
         });
     }
