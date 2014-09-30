@@ -1,5 +1,5 @@
 <RelativeLayout
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="89dp"
     android:layout_alignParentLeft="true"
     android:layout_alignParentStart="true"
@@ -7,8 +7,8 @@
     android:id="@+id/relativeLayout">
 
     <ImageView
-        android:layout_width="65dp"
-        android:layout_height="65dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:id="@+id/profile_image"
         android:src="@drawable/ic_launcher"
         android:layout_alignParentTop="true"
@@ -21,7 +21,8 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/message_distance"
         android:id="@+id/message_distance"
-        android:layout_toRightOf="@+id/message_creator"
+        android:layout_toRightOf="@+id/profile_image"
+        android:layout_below="@+id/message_creator"
         android:textSize="12dp" />
 
     <TextView
@@ -39,7 +40,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/message_message"
         android:id="@+id/message_content"
-        android:layout_toRightOf="@+id/profile_image"
-        android:layout_below="@+id/message_creator"
+
+        android:layout_below="@+id/profile_image"
         android:textSize="12dp" />
 </RelativeLayout>
