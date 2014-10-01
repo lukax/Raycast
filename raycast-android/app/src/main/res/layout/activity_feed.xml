@@ -9,7 +9,7 @@
     tools:context="com.raycast.controller.FeedActivity">
 
     <ListView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:id="@+id/feed"
         tools:listitem="@layout/message_compact" />
