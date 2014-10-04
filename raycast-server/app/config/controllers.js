@@ -9,6 +9,7 @@ module.exports = function(router){
     var commentController = require('../controllers/CommentController');
     var clientController = require('../controllers/ClientController');
 
+
     router.route('/message')
         .post(authController.isAuthenticated, messageController.addMessage)
         .get(messageController.getAllMessageByLocation);
@@ -39,12 +40,26 @@ module.exports = function(router){
         .get(commentController.getAllCommentByMessage);
 
 
+    router.route('/user')
+        .post(userController.addUser)
+        .get(userController.getUsers);
+
+    router.route('/user/id/:user_id')
+        .get(userController.getUserById)
+        .put(userController.updateUser)
+        .delete(userController.removeUser);
+
+    router.route('/user/:user_username')
+        .get(userController.getUserByUsername);
+
+    router.route('/user/email/:user_email')
+        .get(userController.getUserByEmail);
+
+
     router.route('/clients')
         .post(authController.isAuthenticated, clientController.addClient)
         .get(authController.isAuthenticated, clientController.getClients);
 
-
-    userController(router);
 
     return router;
 };
