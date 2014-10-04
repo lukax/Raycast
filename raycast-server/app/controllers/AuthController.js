@@ -4,9 +4,9 @@
 
 var config                  = require('../config/config');
 var User                    = require('../models/User');
-var Client                  = require('../models/oauth/Client');
-var AccessToken             = require('../models/oauth/AccessToken');
-var RefreshToken            = require('../models/oauth/RefreshToken');
+var Client                  = require('../models/Client');
+var AccessToken             = require('../models/AccessToken');
+var RefreshToken            = require('../models/RefreshToken');
 var passport                = require('passport');
 var BasicStrategy           = require('passport-http').BasicStrategy;
 var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strategy;

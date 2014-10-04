@@ -7,6 +7,7 @@ module.exports = function(router){
     var messageController = require('../controllers/MessageController');
     var userController = require('../controllers/UserController');
     var commentController = require('../controllers/CommentController');
+    var clientController = require('../controllers/ClientController');
 
     router.route('/message')
         .post(authController.isAuthenticated, messageController.addMessage)
@@ -36,6 +37,11 @@ module.exports = function(router){
 
     router.route('/comment/message/:message_id')
         .get(commentController.getAllCommentByMessage);
+
+
+    router.route('/clients')
+        .post(authController.isAuthenticated, clientController.addClient)
+        .get(authController.isAuthenticated, clientController.getClients);
 
 
     userController(router);
