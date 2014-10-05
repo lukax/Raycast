@@ -1,6 +1,4 @@
-/**
- * Created by lucas on 9/27/14.
- */
+'use strict';
 
 var log                 = require('../util/log')(module);
 var authController      = require('../controllers/AuthController');

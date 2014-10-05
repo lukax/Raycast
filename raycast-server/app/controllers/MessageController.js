@@ -32,12 +32,13 @@ exports.getAllMessageByLocation = function(req, res) {
     var lon = Number(req.query.longitude) || null;
     var r = Number(req.query.radius) || null;
 
-    if((lat == null) || (lon == null) || (r == null)){
+    if((lat === null) || (lon === null) || (r === null)){
         res.send(400, { error: 'Insufficient arguments' });
     }else{
         Message.findByRadius(r, lat, lon, null, null, null, function(err, message) {
-            if (err)
+            if (err){
                 res.send(err);
+            }
             res.json(message);
         });
     }
@@ -49,13 +50,15 @@ exports.getAllMessageByFilter = function(req, res) {
     var lon = Number(req.query.longitude) || null;
     var r = Number(req.query.radius) || null;
 
-    if((lat == null) || (lon == null) || (r == null)){
+    if((lat === null) || (lon === null) || (r === null)){
         res.send(400, { error: 'Insufficient arguments' });
     }else{
         Message.findByRadius(r, lat, lon, req.body.skip,
             req.body.limit, req.body.time, function(err, message) {
-                if (err)
+                if (err){
                     res.send(err);
+                }
+
                 res.json(message);
             });
     }
@@ -64,8 +67,10 @@ exports.getAllMessageByFilter = function(req, res) {
 //Get all messages
 exports.getAllMessage = function(req, res) {
     Message.find({}).populate('author').exec(function(err, message) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
+
         res.json(message);
     });
 };

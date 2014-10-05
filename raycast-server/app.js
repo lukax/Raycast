@@ -44,5 +44,5 @@ app.use(function(err, req, res, next){
 // START THE SERVER
 // =============================================================================
 app.listen(port, function(){
-    log.info('Express server listening on port: ' + port + ' with the db: ' + dbUrl);
+    log.info('\nExpress server running \nPort: ' + port + ' \nDb: ' + dbUrl);
 });
