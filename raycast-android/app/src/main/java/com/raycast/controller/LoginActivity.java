@@ -16,6 +16,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 
 import com.raycast.R;
+import com.raycast.controller.base.PlusBaseActivity;
 
 
 /**
