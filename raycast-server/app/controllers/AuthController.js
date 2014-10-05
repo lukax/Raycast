@@ -45,7 +45,7 @@ passport.use(new BearerStrategy(
             if (err) { return done(err); }
             if (!token) { return done(null, false); }
 
-            if( Math.round((Date.now()-token.created)/1000) > config.get('security:tokenLife') ) {
+            if( Math.round((Date.now()-token.created)/1000) > config.security.tokenLife ) {
                 AccessToken.remove({ token: accessToken }, function (err) {
                     if (err) return done(err);
                 });
@@ -64,4 +64,4 @@ passport.use(new BearerStrategy(
 ));
 
 // basic auth endpoint
-exports.isAuthenticated = passport.authenticate('basic', { session : false });
+exports.isAuthenticated = passport.authenticate('bearer', { session : false });

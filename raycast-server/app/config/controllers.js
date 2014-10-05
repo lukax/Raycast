@@ -19,6 +19,9 @@ module.exports = function(router){
         .post(userController.addUser)
         .get(userController.getUsers);
 
+    router.route('/user/info')
+        .get(authController.isAuthenticated, userController.getUserInfo);
+
     router.route('/user/id/:user_id')
         .get(userController.getUserById)
         .put(userController.updateUser)

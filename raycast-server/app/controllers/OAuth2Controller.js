@@ -37,7 +37,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
         var info = { scope: '*' };
         token.save(function (err, token) {
             if (err) { return done(err); }
-            done(null, tokenValue, refreshTokenValue, { 'expires_in': config.get('security:tokenLife') });
+            done(null, tokenValue, refreshTokenValue, { 'expires_in': config.security.tokenLife });
         });
     });
 }));
@@ -70,7 +70,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
             var info = { scope: '*' };
             token.save(function (err, token) {
                 if (err) { return done(err); }
-                done(null, tokenValue, refreshTokenValue, { 'expires_in': config.get('security:tokenLife') });
+                done(null, tokenValue, refreshTokenValue, { 'expires_in': config.security.tokenLife });
             });
         });
     });
