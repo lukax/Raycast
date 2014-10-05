@@ -78,11 +78,13 @@ exports.getAllMessage = function(req, res) {
 //Get a message by id
 exports.getMessageById = function(req, res) {
     Message.findById(req.params.message_id).populate('author').exec(function(err, message) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
-        if(message == null)
+        if(message === null) {
             res.json({error: 'No message found'});
+        }
 
         res.json(message);
     });
@@ -93,10 +95,11 @@ exports.removeMessage = function(req, res) {
     Message.remove({
         _id: req.params.message_id
     }, function(err, message) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
-        if(message == 0){
+        if(message === null){
             res.json({error: 'No message found'});
         }else{
             res.json({ message: 'Success' });
@@ -107,11 +110,13 @@ exports.removeMessage = function(req, res) {
 //Get all messages from a user
 exports.getAllMessageByUser = function(req, res) {
     Message.findByAuthor(req.params.user_username, function(err, message) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
-        if(message == null)
+        if(message === null) {
             res.json({error: 'No message found'});
+        }
 
         res.json(message);
     });

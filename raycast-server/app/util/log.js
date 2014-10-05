@@ -1,6 +1,5 @@
-/**
- * Created by lucas on 10/4/14.
- */
+'use strict';
+
 var winston = require('winston');
 
 function getLogger(module) {

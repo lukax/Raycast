@@ -4,7 +4,7 @@ module.exports = function (req, res){
     var validator = require('validator');
     var ok = true;
 
-    if(req.body.username.trim() == ''){
+    if(req.body.username.trim() === ''){
         ok = false;
         res.send(412, { error: 'No username set' });
     }else{
@@ -14,12 +14,12 @@ module.exports = function (req, res){
         }
     }
 
-    if(req.body.name.trim() == ''){
+    if(req.body.name.trim() === ''){
         ok = false;
         res.send(412, { error: 'No name set' });
     }
 
-    if(req.body.email.trim() == ''){
+    if(req.body.email.trim() === ''){
         ok = false;
         res.send(412, { error: 'No email set' });
     }else{
