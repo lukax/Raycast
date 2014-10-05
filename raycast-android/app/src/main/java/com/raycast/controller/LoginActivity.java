@@ -4,19 +4,27 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 
 import com.raycast.R;
 import com.raycast.controller.base.PlusBaseActivity;
+
+import java.io.IOException;
 
 
 /**
@@ -34,6 +42,8 @@ public class LoginActivity extends PlusBaseActivity {
     private SignInButton mPlusSignInButton;
     private View mSignOutButtons;
     private View mLoginFormView;
+    private static final String SCOPE =
+            "oauth2:https://www.googleapis.com/auth/userinfo.profile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +113,7 @@ public class LoginActivity extends PlusBaseActivity {
         //Set up sign out and disconnect buttons.
         Intent i = new Intent(this, FeedActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
+        new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE).execute();
         startActivity(i);
         finish();
         Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
@@ -158,6 +169,60 @@ public class LoginActivity extends PlusBaseActivity {
     private boolean supportsGooglePlayServices() {
         return GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) ==
                 ConnectionResult.SUCCESS;
+    }
+
+    public class GetTokenTask extends AsyncTask<Void, Void, Void> {
+        Activity mActivity;
+        String mScope;
+        String mEmail;
+
+        GetTokenTask(Activity activity, String name, String scope) {
+            this.mActivity = activity;
+            this.mScope = scope;
+            this.mEmail = name;
+        }
+
+        /**
+         * Executes the asynchronous job. This runs when you call execute()
+         * on the AsyncTask instance.
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                String token = fetchToken();
+                if (token != null) {
+                    Log.d(this.getClass().getSimpleName(), token);
+                    // Insert the good stuff here.
+                    // Use the token to access the user's Google data.
+                    //TODO
+                }
+            } catch (IOException e) {
+                // The fetchToken() method handles Google-specific exceptions,
+                // so this indicates something went wrong at a higher level.
+                // TIP: Check for network connectivity before starting the AsyncTask.
+                //TODO
+            }
+            return null;
+        }
+
+        /**
+         * Gets an authentication token from Google and handles any
+         * GoogleAuthException that may occur.
+         */
+        protected String fetchToken() throws IOException {
+            try {
+                return GoogleAuthUtil.getToken(mActivity, mEmail, mScope);
+            } catch (UserRecoverableAuthException userRecoverableException) {
+                // GooglePlayServices.apk is either old, disabled, or not present
+                // so we need to show the user some UI in the activity to recover.
+                //mActivity.handleException(userRecoverableException);
+            } catch (GoogleAuthException fatalException) {
+                // Some other type of unrecoverable exception has occurred.
+                // Report and log the error as appropriate for your app.
+                //TODO
+            }
+            return null;
+        }
     }
 }
 
