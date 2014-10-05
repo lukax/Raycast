@@ -1,12 +1,12 @@
 'use strict';
 
-var user = require('../models/User');
+var User = require('../models/User');
 var userValidator = require('../validators/UserValidator');
 
 //Add a new user
 exports.addUser = function(req, res) {
     if(userValidator(req, res)){
-        var usr = new user();
+        var usr = new User();
         usr.username = req.body.username;
         usr.password = req.body.password;
         usr.name = req.body.name;
@@ -26,7 +26,7 @@ exports.addUser = function(req, res) {
 
 //Get all users
 exports.getUsers = function(req, res) {
-    user.find(function(err, users) {
+    User.find(function(err, users) {
         if (err)
             res.send(err);
 
@@ -36,7 +36,7 @@ exports.getUsers = function(req, res) {
 
 //Get a user by id
 exports.getUserById = function(req, res) {
-    user.findById(req.params.user_id, function(err, user) {
+    User.findById(req.params.user_id, function(err, user) {
         if (err)
             res.send(err);
         res.json(user);
@@ -45,7 +45,7 @@ exports.getUserById = function(req, res) {
 
 //Update a user by id
 exports.updateUser = function(req, res) {
-    user.findById(req.params.user_id, function(err, user) {
+    User.findById(req.params.user_id, function(err, user) {
         if (err)
             res.send(err);
 
@@ -69,7 +69,7 @@ exports.updateUser = function(req, res) {
 
 //Delete a user by id
 exports.removeUser = function(req, res) {
-    user.remove({
+    User.remove({
         _id: req.params.user_id
     }, function(err, user) {
         if (err)
@@ -81,7 +81,7 @@ exports.removeUser = function(req, res) {
 
 //Get a user by username
 exports.getUserByUsername = function(req, res) {
-    user.findByUsername(req.params.user_username, function(err, user) {
+    User.findByUsername(req.params.user_username, function(err, user) {
         if (err)
             res.send(err);
         res.json(user);
@@ -90,9 +90,19 @@ exports.getUserByUsername = function(req, res) {
 
 //Get a user by username
 exports.getUserByEmail = function(req, res) {
-    user.findByEmail(req.params.user_email, function(err, user) {
+    User.findByEmail(req.params.user_email, function(err, user) {
         if (err)
             res.send(err);
         res.json(user);
     });
+};
+
+
+//Get current user info
+exports.getUserInfo = function(req, res) {
+    // req.authInfo is set using the `info` argument supplied by
+    // `BearerStrategy`.  It is typically used to indicate scope of the token,
+    // and used in access control checks.  For illustrative purposes, this
+    // example simply returns the scope in the response.
+    res.json({ user_id: req.user.userId, name: req.user.username, scope: req.authInfo.scope })
 };

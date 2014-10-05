@@ -13,23 +13,16 @@ var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strateg
 var BearerStrategy          = require('passport-http-bearer').Strategy;
 
 passport.use(new BasicStrategy(
-    function(username, password, callback) {
+    function(username, password, done) {
         User.findOne({ username: username }, function (err, user) {
-            if (err) { return callback(err); }
-
-            // No user found with that username
-            if (!user) { return callback(null, false); }
-
-            // Make sure the password is correct
-            user.verifyPassword(password, function(err, isMatch) {
-                if (err) { return callback(err); }
-
+            if (err) { return done(err); }
+            if (!user) { return done(null, false); }
+            if(!user.checkPassword(password)){
                 // Password did not match
-                if (!isMatch) { return callback(null, false); }
+                return done(null, false);
+            }
 
-                // Success
-                return callback(null, user);
-            });
+            return done(null, user);
         });
     }
 ));
@@ -63,11 +56,12 @@ passport.use(new BearerStrategy(
                 if (err) { return done(err); }
                 if (!user) { return done(null, false, { message: 'Unknown user' }); }
 
-                var info = { scope: '*' }
+                var info = { scope: '*' };
                 done(null, user, info);
             });
         });
     }
 ));
 
+// basic auth endpoint
 exports.isAuthenticated = passport.authenticate('basic', { session : false });

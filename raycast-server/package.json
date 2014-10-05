@@ -15,10 +15,10 @@
     "node": "0.10.x"
   },
   "dependencies": {
-    "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
     "mongoose": "~3.8.15",
+    "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",
     "passport-http": "^0.2.2",
     "passport-http-bearer": "^1.0.1",
@@ -26,6 +26,7 @@
     "validator": "~3.17.0"
   },
   "devDependencies": {
+    "faker": "^2.0.1",
     "grunt": "~0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-watch": "~0.6.1",
