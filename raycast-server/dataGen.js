@@ -3,7 +3,7 @@
  */
 var mongoose            = require('mongoose');
 var faker               = require('faker');
-var log                 = require('./app/util/log');
+var log                 = require('./app/util/log')(module);
 var config              = require('./app/config/config');
 var User                = require('./app/models/User');
 var Client              = require('./app/models/Client');

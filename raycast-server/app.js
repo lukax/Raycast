@@ -1,12 +1,14 @@
 // BASE SETUP
 // =============================================================================
 
-var express    = require('express');
-var bodyParser = require('body-parser');
-var passport   = require('passport');
-var mongoose   = require('mongoose');
-var config     = require('./app/config/config');
-var log        = require('./app/util/log')(module);
+var express         = require('express');
+var bodyParser      = require('body-parser');
+var passport        = require('passport');
+var mongoose        = require('mongoose');
+var config          = require('./app/config/config');
+var log             = require('./app/util/log')(module);
+var controllers     = require('./app/config/controllers');
+
 var port = process.env.PORT || config.port;
 var dbUrl = process.env.MONGOLAB_URI || config.mongoose.uri;
 
@@ -22,8 +24,8 @@ app.use(passport.initialize());
 // =============================================================================
 var router = express.Router();
 
-// Register our routes
-app.use('/', require('./app/config/controllers')(router));
+// Register api routes
+app.use('/', controllers(router));
 
 // Exception handler
 app.use(function(req, res, next){

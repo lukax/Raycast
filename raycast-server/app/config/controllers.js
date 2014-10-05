@@ -2,6 +2,7 @@
  * Created by lucas on 9/27/14.
  */
 
+var log                 = require('../util/log')(module);
 var authController      = require('../controllers/AuthController');
 var oAuth2Controller    = require('../controllers/OAuth2Controller');
 var messageController   = require('../controllers/MessageController');
@@ -11,12 +12,20 @@ var clientController    = require('../controllers/ClientController');
 
 module.exports = function(router){
 
+    router.route('/oauth/token')
+        .post(oAuth2Controller.token);
+
+    // -----------------------------------------------------------------------
+    // AUTHENTICATION REQUIRED REQUESTS
+    // -----------------------------------------------------------------------
+    router.use(authController.isAuthenticated, function(req, res, next) {
+        log.info('New API request');
+        next();
+    });
+
     router.get('/', function(req, res) {
         res.json({ message: 'Raycast API' });
     });
-
-    router.route('/oauth/token')
-        .post(oAuth2Controller.token);
 
     // --------- Users ----------
     router.route('/user')
@@ -24,7 +33,7 @@ module.exports = function(router){
         .get(userController.getUsers);
 
     router.route('/user/info')
-        .get(authController.isAuthenticated, userController.getUserInfo);
+        .get(userController.getUserInfo);
 
     router.route('/user/id/:user_id')
         .get(userController.getUserById)
@@ -39,12 +48,12 @@ module.exports = function(router){
 
     // --------- Clients ----------
     router.route('/client')
-        .post(authController.isAuthenticated, clientController.addClient)
-        .get(authController.isAuthenticated, clientController.getClients);
+        .post(clientController.addClient)
+        .get(clientController.getClients);
 
     // --------- Messages ----------
     router.route('/message')
-        .post(authController.isAuthenticated, messageController.addMessage)
+        .post(messageController.addMessage)
         .get(messageController.getAllMessageByLocation);
 
     router.route('/message/filter')
@@ -62,7 +71,7 @@ module.exports = function(router){
 
     // --------- Comments ----------
     router.route('/comment')
-        .post(authController.isAuthenticated, commentController.addComment)
+        .post(commentController.addComment)
         .get(commentController.getAllComment);
 
     router.route('/comment/:comment_id')
