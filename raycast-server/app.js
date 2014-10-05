@@ -6,8 +6,11 @@ var bodyParser = require('body-parser');
 var passport   = require('passport');
 var mongoose   = require('mongoose');
 var config     = require('./app/config/config');
+var log        = require('./app/util/log')(module);
+var port = process.env.PORT || config.port;
+var dbUrl = process.env.MONGOLAB_URI || config.mongoose.uri;
 
-mongoose.connect((process.env.MONGOLAB_URI || config.mongoose.uri));
+mongoose.connect(dbUrl);
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,7 +23,7 @@ app.use(passport.initialize());
 var router = express.Router();
 
 router.use(function(req, res, next) {
-	console.log('New API request');
+	log.info('New API request');
 	next();
 });
 
@@ -34,4 +37,6 @@ app.use('/', require('./app/config/controllers')(router));
 
 // START THE SERVER
 // =============================================================================
-app.listen(process.env.PORT || config.port);
+app.listen(port, function(){
+    log.info('Express server listening on port: ' + port + ' with the db: ' + dbUrl);
+});

@@ -3,6 +3,7 @@
  */
 var mongoose            = require('mongoose');
 var faker               = require('faker');
+var log                 = require('./app/util/log');
 var config              = require('./app/config/config');
 var User                = require('./app/models/User');
 var Client              = require('./app/models/Client');
@@ -18,8 +19,8 @@ User.remove({}, function(err) {
         email: 'espdlucas@gmail.com'
     });
     user.save(function(err, user) {
-        if(err) return console.log(err);
-        else console.log('New user - %s:%s',user.username,user.password);
+        if(err) return log.error(err);
+        else log.info('New user - %s:%s',user.username,user.password);
     });
 
     for(var i=0; i<4; i++) {
@@ -29,8 +30,8 @@ User.remove({}, function(err) {
             email: faker.internet.email()
         });
         user.save(function(err, user) {
-            if(err) return console.log(err);
-            else console.log('New user - %s:%s',user.username,user.password);
+            if(err) return log.error(err);
+            else log.info('New user - %s:%s',user.username,user.password);
         });
     }
 });
@@ -38,15 +39,15 @@ User.remove({}, function(err) {
 Client.remove({}, function(err) {
     var client = new Client({ name: 'Android client', clientId: 'raycast', clientSecret:'android' });
     client.save(function(err, client) {
-        if(err) return console.log(err);
-        else console.log('New client - %s:%s',client.clientId,client.clientSecret);
+        if(err) return log.error(err);
+        else log.info('New client - %s:%s',client.clientId,client.clientSecret);
     });
 });
 AccessToken.remove({}, function (err) {
-    if (err) return console.log(err);
+    if (err) return log.error(err);
 });
 RefreshToken.remove({}, function (err) {
-    if (err) return console.log(err);
+    if (err) return log.error(err);
 });
 
 setTimeout(function() {
