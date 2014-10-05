@@ -22,17 +22,21 @@ app.use(passport.initialize());
 // =============================================================================
 var router = express.Router();
 
-router.use(function(req, res, next) {
-	log.info('New API request');
-	next();
-});
-
-router.get('/', function(req, res) {
-	res.json({ message: 'Raycast API' });
-});
-
-// REGISTER OUR ROUTES -------------------------------
+// Register our routes
 app.use('/', require('./app/config/controllers')(router));
+
+// Exception handler
+app.use(function(req, res, next){
+    res.status(404);
+    log.debug('Not found URL: %s',req.url);
+    res.send({ error: 'Not found' });
+});
+
+app.use(function(err, req, res, next){
+    res.status(err.status || 500);
+    log.error('Internal error(%d): %s',res.statusCode,err.message);
+    res.send({ error: err.message });
+});
 
 
 // START THE SERVER

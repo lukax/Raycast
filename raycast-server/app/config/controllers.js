@@ -11,6 +11,10 @@ var clientController    = require('../controllers/ClientController');
 
 module.exports = function(router){
 
+    router.get('/', function(req, res) {
+        res.json({ message: 'Raycast API' });
+    });
+
     router.route('/oauth/token')
         .post(oAuth2Controller.token);
 
