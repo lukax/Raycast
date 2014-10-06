@@ -17,6 +17,7 @@
   "dependencies": {
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
+    "googleapis": "^1.0.14",
     "mongoose": "~3.8.15",
     "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",

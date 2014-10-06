@@ -9,11 +9,15 @@ var messageController   = require('../controllers/MessageController');
 var userController      = require('../controllers/UserController');
 var commentController   = require('../controllers/CommentController');
 var clientController    = require('../controllers/ClientController');
+var accountController   = require('../controllers/AccountController');
 
 module.exports = function(router){
 
     router.route('/oauth/token')
         .post(oAuth2Controller.token);
+
+    router.route('/account/login')
+        .post(accountController.token);
 
     // -----------------------------------------------------------------------
     // AUTHENTICATION REQUIRED REQUESTS

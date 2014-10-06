@@ -1,20 +1,29 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 20
-    buildToolsVersion "20.0.0"
-
+    signingConfigs {
+        config {
+            keyAlias 'raycast'
+            keyPassword 'raycastftw'
+            storeFile file('/home/lucas/dev/Raycast/raycast-android/raycast-keystore.jks')
+            storePassword 'raycastftw'
+        }
+    }
+    compileSdkVersion 19
+    buildToolsVersion '20.0.0'
     defaultConfig {
-        applicationId "com.raycast"
+        applicationId 'com.raycast'
         minSdkVersion 15
         targetSdkVersion 20
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
         }
     }
     packagingOptions {
@@ -24,11 +33,13 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/notice.txt'
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.google.android.gms:play-services:5.2.08'
+    compile 'com.google.android.gms:play-services:5.2.+'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'

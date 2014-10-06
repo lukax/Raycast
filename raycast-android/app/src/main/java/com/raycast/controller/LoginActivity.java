@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -47,10 +46,11 @@ public class LoginActivity extends PlusBaseActivity {
     private View mLoginFormView;
 
     static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
-    static final String GOOGLE_PLUS_SERVER_CLIENT_ID = "663385753631-k7upude609jtj186t0bmvo7h6p08e596.apps.googleusercontent.com";
+    static final String SCOPE_CLIENT_ID = "client_id:663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com";
+    static final String SCOPE_AUDIENCE = "audience:server:" + SCOPE_CLIENT_ID;
+    static final String SCOPE_SCOPES = Scopes.PLUS_LOGIN + " " + Scopes.PLUS_ME;
 
-    String scopesString = Scopes.PLUS_LOGIN + " " + Scopes.PLUS_ME;
-    String scopes = "oauth2:" + scopesString;
+    static final String GOOGLE_AUTH_SCOPE = "audience:server:client_id:663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com"  ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +117,8 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
-        new GetTokenTask(this, getPlusClient().getAccountName(), scopes).execute();
-
+        new GetTokenTask(this, getPlusClient().getAccountName(), GOOGLE_AUTH_SCOPE).execute();
+        //TODO if token ok go to feed
         //Intent i = new Intent(this, FeedActivity.class);
         //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
         //startActivity(i);
@@ -159,7 +159,7 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientRevokeAccess() {
-        // TODO: Access to the user's G+ account has been revoked.  Per the developer terms, delete
+        // TODO: Access t o the user's G+ account has been revoked.  Per the developer terms, delete
         // any stored user data here.
     }
 
