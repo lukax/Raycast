@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -16,9 +17,11 @@ import android.widget.Button;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 
 import com.raycast.R;
@@ -42,8 +45,12 @@ public class LoginActivity extends PlusBaseActivity {
     private SignInButton mPlusSignInButton;
     private View mSignOutButtons;
     private View mLoginFormView;
-    private static final String SCOPE =
-            "oauth2:https://www.googleapis.com/auth/userinfo.profile";
+
+    static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
+    static final String GOOGLE_PLUS_SERVER_CLIENT_ID = "663385753631-k7upude609jtj186t0bmvo7h6p08e596.apps.googleusercontent.com";
+
+    String scopesString = Scopes.PLUS_LOGIN + " " + Scopes.PLUS_ME;
+    String scopes = "oauth2:" + scopesString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,12 +117,13 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
+        new GetTokenTask(this, getPlusClient().getAccountName(), scopes).execute();
+
+        //Intent i = new Intent(this, FeedActivity.class);
+        //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
+        //startActivity(i);
+        //finish();
         //Set up sign out and disconnect buttons.
-        Intent i = new Intent(this, FeedActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
-        new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE).execute();
-        startActivity(i);
-        finish();
         Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
         signOutButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -171,60 +179,94 @@ public class LoginActivity extends PlusBaseActivity {
                 ConnectionResult.SUCCESS;
     }
 
-    public class GetTokenTask extends AsyncTask<Void, Void, Void> {
-        Activity mActivity;
-        String mScope;
-        String mEmail;
-
-        GetTokenTask(Activity activity, String name, String scope) {
-            this.mActivity = activity;
-            this.mScope = scope;
-            this.mEmail = name;
-        }
-
-        /**
-         * Executes the asynchronous job. This runs when you call execute()
-         * on the AsyncTask instance.
-         */
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                String token = fetchToken();
-                if (token != null) {
-                    Log.d(this.getClass().getSimpleName(), token);
-                    // Insert the good stuff here.
-                    // Use the token to access the user's Google data.
-                    //TODO
+    /**
+     * This method is a hook for background threads and async tasks that need to
+     * provide the user a response UI when an exception occurs.
+     */
+    public void handleException(final Exception e) {
+        // Because this call comes from the AsyncTask, we must ensure that the following
+        // code instead executes on the UI thread.
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (e instanceof GooglePlayServicesAvailabilityException) {
+                    // The Google Play services APK is old, disabled, or not present.
+                    // Show a dialog created by Google Play services that allows
+                    // the user to update the APK
+                    int statusCode = ((GooglePlayServicesAvailabilityException)e)
+                            .getConnectionStatusCode();
+                    Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
+                            LoginActivity.this,
+                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                    dialog.show();
+                } else if (e instanceof UserRecoverableAuthException) {
+                    // Unable to authenticate, such as when the user has not yet granted
+                    // the app access to the account, but the user can fix this.
+                    // Forward the user to an activity in Google Play services.
+                    Intent intent = ((UserRecoverableAuthException)e).getIntent();
+                    startActivityForResult(intent,
+                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
                 }
-            } catch (IOException e) {
-                // The fetchToken() method handles Google-specific exceptions,
-                // so this indicates something went wrong at a higher level.
-                // TIP: Check for network connectivity before starting the AsyncTask.
-                //TODO
             }
-            return null;
-        }
-
-        /**
-         * Gets an authentication token from Google and handles any
-         * GoogleAuthException that may occur.
-         */
-        protected String fetchToken() throws IOException {
-            try {
-                return GoogleAuthUtil.getToken(mActivity, mEmail, mScope);
-            } catch (UserRecoverableAuthException userRecoverableException) {
-                // GooglePlayServices.apk is either old, disabled, or not present
-                // so we need to show the user some UI in the activity to recover.
-                //mActivity.handleException(userRecoverableException);
-            } catch (GoogleAuthException fatalException) {
-                // Some other type of unrecoverable exception has occurred.
-                // Report and log the error as appropriate for your app.
-                //TODO
-            }
-            return null;
-        }
+        });
     }
 }
 
+class GetTokenTask extends AsyncTask<Void, Void, Void> {
+    LoginActivity mActivity;
+    String mScope;
+    String mEmail;
+
+    GetTokenTask(LoginActivity activity, String name, String scope) {
+        this.mActivity = activity;
+        this.mScope = scope;
+        this.mEmail = name;
+    }
+
+    /**
+     * Executes the asynchronous job. This runs when you call execute()
+     * on the AsyncTask instance.
+     */
+    @Override
+    protected Void doInBackground(Void... params) {
+        try {
+            String token = fetchToken();
+            if (token != null) {
+                Log.d(this.getClass().getSimpleName(), token);
+                // Insert the good stuff here.
+                // Use the token to access the user's Google data.
+                //TODO
+            }
+        } catch (IOException e) {
+            // The fetchToken() method handles Google-specific exceptions,
+            // so this indicates something went wrong at a higher level.
+            // TIP: Check for network connectivity before starting the AsyncTask.
+            //TODO
+            Log.e(getClass().getSimpleName(), e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Gets an authentication token from Google and handles any
+     * GoogleAuthException that may occur.
+     */
+    protected String fetchToken() throws IOException {
+        try {
+            return GoogleAuthUtil.getToken(mActivity, mEmail, mScope);
+        } catch (UserRecoverableAuthException userRecoverableException) {
+            // GooglePlayServices.apk is either old, disabled, or not present
+            // so we need to show the user some UI in the activity to recover.
+            //mActivity.handleException(userRecoverableException);
+            mActivity.handleException(userRecoverableException);
+        } catch (GoogleAuthException fatalException) {
+            // Some other type of unrecoverable exception has occurred.
+            // Report and log the error as appropriate for your app.
+            //TODO
+            Log.e(getClass().getSimpleName(), fatalException.getMessage());
+        }
+        return null;
+    }
+}
 
 
