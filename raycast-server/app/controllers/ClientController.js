@@ -1,6 +1,5 @@
-/**
- * Created by lucas on 10/4/14.
- */
+'use strict';
+
 var Client = require('../models/Client');
 
 // POST
@@ -14,8 +13,9 @@ exports.addClient = function(req, res) {
     client.userId = req.user._id;
 
     client.save(function(err) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
         res.json({ message: 'Client added to the locker!', data: client });
     });
@@ -25,8 +25,9 @@ exports.addClient = function(req, res) {
 // return list of Clients
 exports.getClients = function(req, res) {
     Client.find({ userId: req.user._id }, function(err, clients) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
         res.json(clients);
     });

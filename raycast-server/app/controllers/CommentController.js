@@ -26,8 +26,9 @@ exports.addComment = function(req, res) {
 //Get all comments
 exports.getAllComment = function(req, res) {
     Comment.find({}).populate('author').exec(function(err, comment) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
         res.json(comment);
     });
@@ -36,11 +37,13 @@ exports.getAllComment = function(req, res) {
 //Get a comment by id
 exports.getCommentById = function(req, res) {
     Comment.findById(req.params.comment_id).populate('author').exec(function(err, comment) {
-        if (err)
+        if (err) {
             res.send(err);
+        }
 
-        if(comment == null)
+        if(comment === null) {
             res.json({error: 'No comment found'});
+        }
 
         res.json(comment);
     });
@@ -50,9 +53,10 @@ exports.getCommentById = function(req, res) {
 exports.removeComment = function(req, res) {
     Comment.remove({
         _id: req.params.comment_id
-    }, function(err, comment) {
-        if (err)
+    }, function(err) {
+        if (err) {
             res.send(err);
+        }
 
         res.json({ message: 'Success' });
     });
@@ -61,8 +65,10 @@ exports.removeComment = function(req, res) {
 //Get all comments from a message
 exports.getAllCommentByMessage = function(req, res) {
     Comment.findByMessage(req.params.message_id, function(err, message) {
-        if (err)
+        if (err){
             res.send(err);
+        }
+
         res.json(message);
     });
 };

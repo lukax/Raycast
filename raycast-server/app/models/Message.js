@@ -26,7 +26,7 @@ MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip
     limit = Number(limit) || 100;
     time = Number(time) || Date.now();
 
-    if((lat == null) || (lon == null) || (r == null)){
+    if((lat === null) || (lon === null) || (r === null)){
         return null;
     }
 

@@ -12,7 +12,7 @@ module.exports = function (req, res){
         res.send(412, { error: 'No author set' });
     }
 
-    if(!req.body.message || req.body.message.trim() == ''){
+    if(!req.body.message || req.body.message.trim() === ''){
         ok = false;
         res.send(412, { error: 'The message is empty' });
     }

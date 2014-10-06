@@ -12,7 +12,7 @@ module.exports = function (req, res){
         res.send(412, { error: 'No author set' });
     }
 
-    if(!req.body.messageId || req.body.messageId.trim() == ''){
+    if(!req.body.messageId || req.body.messageId.trim() === ''){
         ok = false;
         if(!validator.isAlphanumeric(req.body.to)){
             res.send(412, { error: 'Not a valid message id' });
@@ -20,7 +20,7 @@ module.exports = function (req, res){
         res.send(412, { error: 'No message set' });
     }
 
-    if(!req.body.comment || req.body.comment.trim() == ''){
+    if(!req.body.comment || req.body.comment.trim() === ''){
         ok = false;
         res.send(412, { error: 'The comment is empty' });
     }
