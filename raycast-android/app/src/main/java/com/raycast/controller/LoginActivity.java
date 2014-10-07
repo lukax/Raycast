@@ -46,11 +46,11 @@ public class LoginActivity extends PlusBaseActivity {
     private View mLoginFormView;
 
     static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
-    static final String SCOPE_CLIENT_ID = "client_id:663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com";
-    static final String SCOPE_AUDIENCE = "audience:server:" + SCOPE_CLIENT_ID;
-    static final String SCOPE_SCOPES = Scopes.PLUS_LOGIN + " " + Scopes.PLUS_ME;
+    static final String CLIENT_ID = "663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com";
+    static final String SCOPES_STRING = Scopes.PLUS_LOGIN + " " + Scopes.PLUS_ME;
 
-    static final String GOOGLE_AUTH_SCOPE = "audience:server:client_id:663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com"  ;
+    static final String SCOPE_AUDIENCE = "audience:server:client_id:" + CLIENT_ID;
+    static final String SCOPE_AUTHCODE = "oauth2:server:client_id:" + CLIENT_ID + ":api_scope:" + SCOPES_STRING;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +117,7 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
-        new GetTokenTask(this, getPlusClient().getAccountName(), GOOGLE_AUTH_SCOPE).execute();
+        new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
         //TODO if token ok go to feed
         //Intent i = new Intent(this, FeedActivity.class);
         //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
