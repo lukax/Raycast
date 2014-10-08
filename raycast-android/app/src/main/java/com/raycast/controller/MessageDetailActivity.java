@@ -44,7 +44,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     }
 
     private void loadMessage(){
-        new MessageService().get(messageId, new AbstractCrudService.ServiceResponseListener<Message>() {
+        new MessageService().get(messageId, new AbstractCrudService.ResponseListener<Message>() {
             @Override
             public void onSuccess(Message message) {
                 TextView msgText = (TextView) findViewById(R.id.messagedetail_message);

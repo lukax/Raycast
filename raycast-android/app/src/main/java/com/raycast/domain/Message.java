@@ -2,7 +2,6 @@ package com.raycast.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raycast.domain.base.AbstractEntity;
-import com.raycast.domain.util.CustomLocation;
 
 import java.util.Date;
 

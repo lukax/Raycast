@@ -187,7 +187,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     private void listMessages() {
-        new MessageService().list(myLocation, myFeedRadius, new AbstractCrudService.ServiceResponseListener<List<Message>>() {
+        new MessageService().list(myLocation, myFeedRadius, new AbstractCrudService.ResponseListener<List<Message>>() {
             @Override
             public void onSuccess(List<Message> message) {
                 if (message.size() == 0) {

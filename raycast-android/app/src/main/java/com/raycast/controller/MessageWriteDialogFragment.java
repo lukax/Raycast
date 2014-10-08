@@ -3,18 +3,14 @@ package com.raycast.controller;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,8 +18,7 @@ import android.widget.TextView;
 import com.raycast.R;
 import com.raycast.domain.Message;
 import com.raycast.domain.User;
-import com.raycast.domain.util.Coordinates;
-import com.raycast.domain.util.CustomLocation;
+import com.raycast.domain.CustomLocation;
 import com.raycast.service.MessageService;
 import com.raycast.service.base.AbstractCrudService;
 
@@ -96,7 +91,7 @@ public class MessageWriteDialogFragment extends DialogFragment {
         msg.setMessage(((EditText) getDialog().findViewById(R.id.dialogmessagewrite_messagetext)).getText().toString());
         msg.setLocation(CustomLocation.fromLocation(myLocation));
         //TODO make sure dialog can't be dismissable until message is sent
-        new MessageService().add(msg, new AbstractCrudService.ServiceResponseListener<Message>() {
+        new MessageService().add(msg, new AbstractCrudService.ResponseListener<Message>() {
             @Override
             public void onSuccess(Message t) {
 
