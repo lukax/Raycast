@@ -21,15 +21,13 @@ var oauth2Client = new google.auth.OAuth2(config.security.clientId, config.secur
 var server = oauth2orize.createServer();
 
 // Exchange g+ token for access token
-server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, done) {
-
-    var code = username;
+server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, done) {
 
     oauth2Client.getToken(code, function(err, tokens) {
         // Now tokens contains an access_token and an optional refresh_token. Save them.
         if(err) {
             log.error('AccountController oauth2Client.getToken', err);
-            return done(err);
+            return done(null, false);
         }
         oauth2Client.setCredentials(tokens);
         requestUserInfo();
