@@ -1,6 +1,7 @@
 /**
  * Created by lucas on 10/4/14.
  */
+'use strict';
 var log                 = require('../util/log')(module);
 var oauth2orize         = require('oauth2orize');
 var passport            = require('passport');
@@ -14,7 +15,7 @@ var RefreshToken        = require('../models/RefreshToken');
 var google = require('googleapis');
 var plus = google.plus('v1');
 var goauth2 = google.oauth2('v1');
-//var oauth2Client = new google.auth.OAuth2(config.security.clientId, config.security.clientSecret, '');
+var oauth2Client = new google.auth.OAuth2(config.security.clientId, config.security.clientSecret);
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -22,46 +23,70 @@ var server = oauth2orize.createServer();
 // Exchange g+ token for access token
 server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, done) {
 
-    goauth2.tokeninfo({ id_token: username }, function(err, response){
-        if(!err) { return done(err); }
-        return done('ok');
+    var code = username;
+
+    oauth2Client.getToken(code, function(err, tokens) {
+        // Now tokens contains an access_token and an optional refresh_token. Save them.
+        if(err) {
+            log.error('AccountController oauth2Client.getToken', err);
+            return done(err);
+        }
+        oauth2Client.setCredentials(tokens);
+        requestUserInfo();
     });
 
-    // Retrieve tokens via token exchange explained above or set them:
-    // oauth2Client.setCredentials({
-    //   access_token: username
-    // });
+    function requestUserInfo(){
+        plus.people.get({ userId: 'me', auth: oauth2Client }, function(err, response) {
+            if(err) {
+                log.error('AccountController requestUserInfo', err);
+                return done(err);
+            }
+            log.info('AccountController login', response);
 
-    // plus.people.get({ userId: 'me', auth: oauth2Client }, function(err, response) {
-    //     if(err) { return done(err); }
-    //     return response;
-    // });
+            var foundEmail = response.emails.some(function(email){
+                if(email.type === 'account'){
+                    generateAuthToken(email.value);
+                    return true;
+                }
+            });
 
-    // User.findOne({ username: username }, function(err, user) {
-    //     if (err) { return done(err); }
-    //     if (!user) { return done(null, false); }
-    //     if (!user.checkPassword(password)) { return done(null, false); }
+            if(!foundEmail){
+                return done({ message: 'No account email found' });
+            }
+        });
+    }
 
-    //     RefreshToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
-    //         if (err) return done(err);
-    //     });
-    //     AccessToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
-    //         if (err) return done(err);
-    //     });
+    function generateAuthToken(email){
+        User.findOne({ email: email }, function(err, user) {
+            if (err) { return done(err); }
+            if (!user) { return done(null, false); }
 
-    //     var tokenValue = crypto.randomBytes(32).toString('base64');
-    //     var refreshTokenValue = crypto.randomBytes(32).toString('base64');
-    //     var token = new AccessToken({ token: tokenValue, clientId: client.clientId, userId: user.userId });
-    //     var refreshToken = new RefreshToken({ token: refreshTokenValue, clientId: client.clientId, userId: user.userId });
-    //     refreshToken.save(function (err) {
-    //         if (err) { return done(err); }
-    //     });
-    //     var info = { scope: '*' };
-    //     token.save(function (err, token) {
-    //         if (err) { return done(err); }
-    //         done(null, tokenValue, refreshTokenValue, { 'expires_in': config.security.tokenLife });
-    //     });
-    // });
+            RefreshToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
+                if (err) {
+                    return done(err);
+                }
+            });
+            AccessToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
+                if (err) {
+                    return done(err);
+                }
+            });
+
+            var tokenValue = crypto.randomBytes(32).toString('base64');
+            var refreshTokenValue = crypto.randomBytes(32).toString('base64');
+            var token = new AccessToken({ token: tokenValue, clientId: client.clientId, userId: user.userId });
+            var refreshToken = new RefreshToken({ token: refreshTokenValue, clientId: client.clientId, userId: user.userId });
+            refreshToken.save(function (err) {
+                if (err) { return done(err); }
+            });
+            var info = { scope: '*' };
+            token.save(function (err, token) {
+                if (err) { return done(err); }
+                done(null, tokenValue, refreshTokenValue, { 'expires_in': config.security.tokenLife });
+            });
+        });
+    }
+
 }));
 
 // token endpoint
