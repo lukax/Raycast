@@ -183,32 +183,36 @@ public class LoginActivity extends PlusBaseActivity {
      * This method is a hook for background threads and async tasks that need to
      * provide the user a response UI when an exception occurs.
      */
+    int handleExceptionAttempts = 0;
     public void handleException(final Exception e) {
         // Because this call comes from the AsyncTask, we must ensure that the following
         // code instead executes on the UI thread.
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (e instanceof GooglePlayServicesAvailabilityException) {
-                    // The Google Play services APK is old, disabled, or not present.
-                    // Show a dialog created by Google Play services that allows
-                    // the user to update the APK
-                    int statusCode = ((GooglePlayServicesAvailabilityException)e)
-                            .getConnectionStatusCode();
-                    Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
-                            LoginActivity.this,
-                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
-                    dialog.show();
-                } else if (e instanceof UserRecoverableAuthException) {
-                    // Unable to authenticate, such as when the user has not yet granted
-                    // the app access to the account, but the user can fix this.
-                    // Forward the user to an activity in Google Play services.
-                    Intent intent = ((UserRecoverableAuthException)e).getIntent();
-                    startActivityForResult(intent,
-                            REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+        if(handleExceptionAttempts < 1){
+            handleExceptionAttempts ++;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (e instanceof GooglePlayServicesAvailabilityException) {
+                        // The Google Play services APK is old, disabled, or not present.
+                        // Show a dialog created by Google Play services that allows
+                        // the user to update the APK
+                        int statusCode = ((GooglePlayServicesAvailabilityException)e)
+                                .getConnectionStatusCode();
+                        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
+                                LoginActivity.this,
+                                REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                        dialog.show();
+                    } else if (e instanceof UserRecoverableAuthException) {
+                        // Unable to authenticate, such as when the user has not yet granted
+                        // the app access to the account, but the user can fix this.
+                        // Forward the user to an activity in Google Play services.
+                        Intent intent = ((UserRecoverableAuthException)e).getIntent();
+                        startActivityForResult(intent,
+                                REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }
 
@@ -231,6 +235,7 @@ class GetTokenTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... params) {
         try {
             String token = fetchToken();
+            //GoogleAuthUtil.invalidateToken(mActivity, token);
             if (token != null) {
                 Log.d(this.getClass().getSimpleName(), token);
                 // Insert the good stuff here.
