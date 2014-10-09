@@ -32,6 +32,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
         requestUserInfo();
     });
 
+    var foundEmail = null;
     function requestUserInfo(){
         plus.people.get({ userId: 'me', auth: oauth2Client }, function(err, response) {
             if(err) {
@@ -40,47 +41,60 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
             }
             log.info('AccountController login', response);
 
-            var foundEmail = response.emails.some(function(email){
-                if(email.type === 'account'){
-                    generateAuthToken(email.value);
-                    return true;
+            for(var i = 0; i < response.emails.length; i++){
+                if(response.emails[i].type === 'account'){
+                    foundEmail = response.emails[i].value;
+                    break;
                 }
-            });
-
+            }
             if(!foundEmail){
                 return done({ message: 'No account email found' });
             }
+
+            User.findOne({ email: foundEmail }, function(err, user) {
+                updateUserInfo(err, user, response);
+            });
         });
     }
 
-    function generateAuthToken(email){
-        User.findOne({ email: email }, function(err, user) {
+    function updateUserInfo(isNewUser, raycastUser, googleUser){
+        if(isNewUser || !raycastUser){
+            raycastUser = new User();
+            raycastUser.username = foundEmail;
+            raycastUser.name = googleUser.displayName;
+        }
+        raycastUser.image = googleUser.image.url;
+
+        raycastUser.save(function(err){
+            if(err) { return done(err); }
+
+            generateAuthToken(raycastUser);
+        });
+    }
+
+    function generateAuthToken(raycastUser){
+        RefreshToken.remove({ userId: raycastUser.userId, clientId: client.clientId }, function (err) {
+            if (err) {
+                return done(err);
+            }
+        });
+        AccessToken.remove({ userId: raycastUser.userId, clientId: client.clientId }, function (err) {
+            if (err) {
+                return done(err);
+            }
+        });
+
+        var tokenValue = crypto.randomBytes(32).toString('base64');
+        var refreshTokenValue = crypto.randomBytes(32).toString('base64');
+        var token = new AccessToken({ token: tokenValue, clientId: client.clientId, userId: raycastUser.userId });
+        var refreshToken = new RefreshToken({ token: refreshTokenValue, clientId: client.clientId, userId: raycastUser.userId });
+        refreshToken.save(function (err) {
             if (err) { return done(err); }
-            if (!user) { return done(null, false); }
-
-            RefreshToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
-                if (err) {
-                    return done(err);
-                }
-            });
-            AccessToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
-                if (err) {
-                    return done(err);
-                }
-            });
-
-            var tokenValue = crypto.randomBytes(32).toString('base64');
-            var refreshTokenValue = crypto.randomBytes(32).toString('base64');
-            var token = new AccessToken({ token: tokenValue, clientId: client.clientId, userId: user.userId });
-            var refreshToken = new RefreshToken({ token: refreshTokenValue, clientId: client.clientId, userId: user.userId });
-            refreshToken.save(function (err) {
-                if (err) { return done(err); }
-            });
-            var info = { scope: '*' };
-            token.save(function (err, token) {
-                if (err) { return done(err); }
-                done(null, tokenValue, refreshTokenValue, { 'expires_in': config.security.tokenLife });
-            });
+        });
+        var info = { scope: '*' };
+        token.save(function (err, token) {
+            if (err) { return done(err); }
+            done(null, tokenValue, refreshTokenValue, { 'expires_in': config.security.tokenLife });
         });
     }
 
