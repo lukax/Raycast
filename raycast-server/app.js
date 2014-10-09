@@ -1,38 +1,48 @@
 // BASE SETUP
 // =============================================================================
 
-var express    = require('express');
-var app        = express();
-var bodyParser = require('body-parser');
-var mongoose   = require('mongoose');
-mongoose.connect((process.env.MONGOLAB_URI || 'mongodb://localhost/raycast'));
+var express         = require('express');
+var bodyParser      = require('body-parser');
+var passport        = require('passport');
+var mongoose        = require('mongoose');
+var config          = require('./app/config/config');
+var log             = require('./app/util/log')(module);
+var controllers     = require('./app/config/controllers');
 
+var port = process.env.PORT || config.port;
+var dbUrl = process.env.MONGOLAB_URI || config.mongoose.uri;
+
+mongoose.connect(dbUrl);
+
+var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(passport.initialize());
 
-var port = process.env.PORT || 4000;
 
 // ROUTES
 // =============================================================================
 var router = express.Router();
 
-router.use(function(req, res, next) {
-	console.log('New API request');
-	next();
+// Register api routes
+app.use('/', controllers(router));
+
+// Exception handler
+app.use(function(req, res, next){
+    res.status(404);
+    log.debug('Not found URL: %s',req.url);
+    res.send({ error: 'Not found' });
 });
 
-router.get('/', function(req, res) {
-	res.json({ message: 'Raycast API' });
+app.use(function(err, req, res, next){
+    res.status(err.status || 500);
+    log.error('Internal error(%d): %s',res.statusCode,err.message);
+    res.send({ error: err.message });
 });
 
-require('./app/routes/Users')(router);
-require('./app/routes/Messages')(router);
-require('./app/routes/Comments')(router);
-
-// REGISTER OUR ROUTES -------------------------------
-app.use('/', router);
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log('Running on port ' + port);
+app.listen(port, function(){
+    log.info('\nExpress server running \nPort: ' + port + ' \nDb: ' + dbUrl);
+});

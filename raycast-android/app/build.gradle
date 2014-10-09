@@ -1,20 +1,45 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+def AAVersion = '3.1'
+
+apt {
+    arguments {
+        androidManifestFile variant.processResources.manifestFile
+        resourcePackageName android.defaultConfig.applicationId
+
+        // If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
+        // resourcePackageName android.defaultConfig.packageName
+
+        // You can set optional annotation processing options here, like these commented options:
+        // logLevel 'INFO'
+        // logFile '/var/log/aa.log'
+    }
+}
 
 android {
-    compileSdkVersion 20
-    buildToolsVersion "20.0.0"
-
+    signingConfigs {
+        config {
+            keyAlias 'raycast'
+            keyPassword 'raycastftw'
+            storeFile file('/home/lucas/dev/Raycast/raycast-android/raycast-keystore.jks')
+            storePassword 'raycastftw'
+        }
+    }
+    compileSdkVersion 19
+    buildToolsVersion '20.0.0'
     defaultConfig {
-        applicationId "com.raycast"
+        applicationId 'com.raycast'
         minSdkVersion 15
         targetSdkVersion 20
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
         }
     }
     packagingOptions {
@@ -24,12 +49,27 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/notice.txt'
     }
+    productFlavors {
+    }
+    // This is only needed if you project structure doesn't fit the one found here
+    // http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Project-Structure
+    sourceSets {
+        main {
+            // manifest.srcFile 'src/main/AndroidManifest.xml'
+            // java.srcDirs = ['src/main/java', 'build/generated/source/apt/${variant.dirName}']
+            // resources.srcDirs = ['src/main/resources']
+            // res.srcDirs = ['src/main/res']
+            // assets.srcDirs = ['src/main/assets']
+        }
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.google.android.gms:play-services:4.2.+'
+    compile 'com.google.android.gms:play-services:5.2.+'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
 }

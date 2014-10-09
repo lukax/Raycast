@@ -1,8 +1,10 @@
+'use strict';
+
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var MessageSchema   = new Schema({
-    author: { type: String, ref: 'Users' },
+    author: { type: String, ref: 'User' },
 	message: String,
 	time: Number,
 	loc: { type: { type: String } , coordinates: [Number]  },
@@ -24,12 +26,12 @@ MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip
     limit = Number(limit) || 100;
     time = Number(time) || Date.now();
 
-    if((lat == null) || (lon == null) || (r == null)){
+    if((lat === null) || (lon === null) || (r === null)){
         return null;
     }
 
     return this.find(
-        {"loc":{"$geoWithin":{"$centerSphere":[[ lon , lat ], r]}}},
+        {'loc':{'$geoWithin':{'$centerSphere':[[ lon , lat ], r]}}},
         null,
         {sort: {time: -1}, skip: Number(skip), limit: Number(limit)}
     )
@@ -38,4 +40,4 @@ MessageSchema.static('findByRadius', function (radius, latitude, longitude, skip
     .exec(callback);
 });
 
-module.exports = mongoose.model('Messages', MessageSchema);
+module.exports = mongoose.model('Message', MessageSchema);

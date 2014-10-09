@@ -1,58 +1,54 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.raycast.controller.MessageCompact">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:text="@string/message_author"
-        android:gravity="center_vertical|center_horizontal"
-        android:textStyle="bold"
-        android:layout_toEndOf="@+id/profile_image"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/profile_image"
-        android:id="@+id/message_creator"
-        android:layout_above="@+id/message_distance"
-        android:background="@android:color/holo_blue_bright" />
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout">
 
     <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:id="@+id/profile_image"
         android:src="@drawable/ic_launcher"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="@android:color/holo_green_dark" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/message_message"
-        android:id="@+id/message_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/message_creator"
-        android:layout_toEndOf="@+id/message_creator"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/profile_image"
-        android:background="@android:color/holo_blue_light" />
-
-    <TextView
-        android:layout_width="100dp"
-        android:layout_height="30dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/message_distance"
         android:id="@+id/message_distance"
-        android:layout_alignBottom="@+id/message_content"
         android:layout_toRightOf="@+id/profile_image"
-        android:layout_toEndOf="@+id/profile_image"
-        android:background="@android:color/holo_green_light"
-        android:layout_alignRight="@+id/message_creator"
-        android:layout_alignEnd="@+id/message_creator" />
+        android:layout_below="@+id/message_creator"
+        android:textSize="14sp"
+        android:layout_marginLeft="25dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/message_author"
+        android:gravity="center_vertical|center_horizontal"
+        android:id="@+id/message_creator"
+        android:layout_toRightOf="@+id/profile_image"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/message_message"
+        android:id="@+id/message_content"
+        android:layout_toRightOf="@+id/profile_image"
+        android:layout_below="@+id/profile_image"
+        android:textSize="16sp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp" />
 </RelativeLayout>

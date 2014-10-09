@@ -1,6 +1,6 @@
 package com.raycast.domain;
 
-import com.raycast.domain.util.AuthInfo;
+import com.raycast.domain.auth.Token;
 
 /**
  * Created by Lucas on 29/08/2014.
@@ -9,7 +9,7 @@ public class UserDetail {
     private String email;
     private String site;
     private String description;
-    private AuthInfo authInfo;
+    private Token authInfo;
 
     public String getEmail() {
         return email;
@@ -35,11 +35,11 @@ public class UserDetail {
         this.description = description;
     }
 
-    public AuthInfo getAuthInfo() {
+    public Token getAuthInfo() {
         return authInfo;
     }
 
-    public void setAuthInfo(AuthInfo authInfo) {
+    public void setAuthInfo(Token authInfo) {
         this.authInfo = authInfo;
     }
 }

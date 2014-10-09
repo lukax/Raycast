@@ -1,0 +1,11 @@
+{
+    "port" : 4000,
+    "security": {
+        "tokenLife": 36000,
+        "clientId": "663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com",
+        "clientSecret": "dKnGfqT5xQl71qIsLWVAaq3g"
+    },
+    "mongoose": {
+        "uri": "mongodb://localhost/raycast"
+    }
+}

@@ -1,4 +1,4 @@
-package com.raycast.domain.util;
+package com.raycast.domain;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Iterator;
 
 /**

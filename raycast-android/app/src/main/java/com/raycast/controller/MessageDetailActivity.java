@@ -1,6 +1,5 @@
 package com.raycast.controller;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,6 +10,7 @@ import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Message;
 import com.raycast.service.MessageService;
+import com.raycast.service.base.AbstractCrudService;
 
 public class MessageDetailActivity extends RaycastBaseActivity {
     String messageId;
@@ -23,9 +23,9 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        new HttpRequestTask().execute();
+    protected void onStart() {
+        super.onStart();
+        loadMessage();
     }
 
     @Override
@@ -43,21 +43,20 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class HttpRequestTask extends AsyncTask<Void, Void, Message> {
-        @Override
-        protected Message doInBackground(Void... params) {
-            return new MessageService().get(messageId);
-        }
+    private void loadMessage(){
+        new MessageService().get(messageId, new AbstractCrudService.ResponseListener<Message>() {
+            @Override
+            public void onSuccess(Message message) {
+                TextView msgText = (TextView) findViewById(R.id.messagedetail_message);
+                msgText.setText(message.getMessage());
+            }
 
-        @Override
-        protected void onPostExecute(Message message) {
-            if (message == null) {
+            @Override
+            public void onFail() {
                 //TODO properly show an error
                 Log.e(getClass().toString(), "couldn't get message");
             }
-
-            TextView msgText = (TextView) findViewById(R.id.messagedetail_message);
-            msgText.setText(message.getMessage());
-        }
+        });
     }
+
 }

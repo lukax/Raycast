@@ -22,18 +22,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.FeedActivity"
+            android:name=".controller.FeedActivity_"
             android:label="@string/title_activity_feed" >
         </activity>
         <activity
             android:name=".controller.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".controller.FeedActivity" >
+            android:label="@string/title_activity_settings" >
         </activity>
         <activity
             android:name=".controller.MessageDetailActivity"
-            android:label="@string/title_activity_message_detail"
-            android:parentActivityName=".controller.FeedActivity" >
+            android:label="@string/title_activity_message_detail" >
         </activity>
     </application>
     <!-- To access Google+ APIs: -->
