@@ -42,6 +42,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.rest.RestService;
+import org.springframework.web.client.RestClientException;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -196,11 +197,13 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @Background
     void listMessages() {
-        messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
-        if(messages == null){
+        try {
+            messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+        }catch(RestClientException ex){
             Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
+            return;
         }
-        else if (messages.size() == 0) {
+        if (messages.size() == 0) {
             //TODO: get message string from 'strings'
             Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
         } else {
@@ -267,8 +270,6 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
             return rowView;
         }
-
-
 
         @Override
         public long getItemId(int position) {

@@ -6,8 +6,11 @@ import android.util.Log;
 import com.raycast.domain.auth.CodeAuthCredential;
 import com.raycast.domain.auth.PasswordAuthCredential;
 import com.raycast.domain.auth.Token;
+import com.raycast.service.auth.RaycastAuthStore;
 import com.raycast.service.base.AbstractCrudService;
 
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClientException;
@@ -16,9 +19,11 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Created by Lucas on 08/10/2014.
  */
+@EBean(scope = EBean.Scope.Singleton)
 public class AccountService extends AbstractCrudService {
-    private static final String CLIENT_ID = "raycast";
-    private static final String CLIENT_SECRET = "android";
+
+    @Bean
+    RaycastAuthStore authStore;
 
     public AccountService(){
         super("account");
@@ -35,7 +40,7 @@ public class AccountService extends AbstractCrudService {
                     Log.d(getClass().getName(), "attempting get request on: " + url);
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                    CodeAuthCredential credential = new CodeAuthCredential(code, CLIENT_ID, CLIENT_SECRET);
+                    CodeAuthCredential credential = new CodeAuthCredential(code, authStore.getClientId(), authStore.getClientSecret());
                     ResponseEntity<Token> responseEntity = restTemplate.postForEntity(url, credential, Token.class);
                     Log.d(getClass().getName(), "result was: " + responseEntity.getBody().toString());
                     return responseEntity.getBody();
@@ -43,6 +48,7 @@ public class AccountService extends AbstractCrudService {
 
                 @Override
                 protected void onPostExecute(Token token) {
+                    authStore.setToken(token);
                     if(token != null) {
                         listener.onSuccess(token);
                     }
@@ -68,7 +74,7 @@ public class AccountService extends AbstractCrudService {
                     Log.d(getClass().getName(), "attempting get request on: " + url);
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                    PasswordAuthCredential credential = new PasswordAuthCredential(username, password, CLIENT_ID, CLIENT_SECRET);
+                    PasswordAuthCredential credential = new PasswordAuthCredential(username, password, authStore.getClientId(), authStore.getClientSecret());
                     ResponseEntity<Token> responseEntity = restTemplate.postForEntity(url, credential, Token.class);
                     Log.d(getClass().getName(), "result was: " + responseEntity.getBody().toString());
                     return responseEntity.getBody();
@@ -76,6 +82,7 @@ public class AccountService extends AbstractCrudService {
 
                 @Override
                 protected void onPostExecute(Token token) {
+                    authStore.setToken(token);
                     if(token != null) {
                         listener.onSuccess(token);
                     }
@@ -91,6 +98,6 @@ public class AccountService extends AbstractCrudService {
     }
 
     public boolean isLoggedIn(){
-        return false;
+        return authStore.getToken() != null;
     }
 }
