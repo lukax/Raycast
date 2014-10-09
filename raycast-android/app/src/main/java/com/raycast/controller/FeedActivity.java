@@ -35,9 +35,13 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Message;
-import com.raycast.service.MessageService;
-import com.raycast.service.base.AbstractCrudService;
+import com.raycast.service.base.RaycastRESTClient;
 import com.raycast.util.Preferences;
+
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.rest.RestService;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -45,15 +49,19 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+@EActivity
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
+    @RestService RaycastRESTClient raycastRESTClient;
+
     LocationClient locationClient;
+    DisplayImageOptions options;
+
     Location myLocation;
     float myFeedRadius;
-
-    DisplayImageOptions options;
+    List<Message> messages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,33 +194,33 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         listMessages();
     }
 
-    private void listMessages() {
-        new MessageService().list(myLocation, myFeedRadius, new AbstractCrudService.ResponseListener<List<Message>>() {
+    @Background
+    void listMessages() {
+        messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+        if(messages == null){
+            Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
+        }
+        else if (messages.size() == 0) {
+            //TODO: get message string from 'strings'
+            Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
+        } else {
+            listMessagesUI();
+        }
+    }
+
+    @UiThread
+    void listMessagesUI(){
+        final ListView listView = (ListView) findViewById(R.id.feed);
+        final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.message_compact, messages);
+        listView.setAdapter(feedAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onSuccess(List<Message> message) {
-                if (message.size() == 0) {
-                    //TODO: get message string from 'strings'
-                    Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
-                } else {
-                    //Build ListView in here so it doesn't block the UI because doInBackground() takes too long to complete
-                    final ListView listView = (ListView) findViewById(R.id.feed);
-                    final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.message_compact, message);
-                    listView.setAdapter(feedAdapter);
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            final Message msg = (Message) adapterView.getItemAtPosition(i);
-                            Intent msgDetailIntent = new Intent(FeedActivity.this, MessageDetailActivity.class);
-                            msgDetailIntent.putExtra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId());
-                            startActivity(msgDetailIntent);
-                            //TODO: Load MessageActivity or Popup and populate it with item data.
-                        }
-                    });
-                }
-            }
-            @Override
-            public void onFail() {
-                Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final Message msg = (Message) adapterView.getItemAtPosition(i);
+                Intent msgDetailIntent = new Intent(FeedActivity.this, MessageDetailActivity.class);
+                msgDetailIntent.putExtra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId());
+                startActivity(msgDetailIntent);
+                //TODO: Load MessageActivity or Popup and populate it with item data.
             }
         });
     }

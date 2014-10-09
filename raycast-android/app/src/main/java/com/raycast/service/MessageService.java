@@ -7,7 +7,9 @@ import android.util.Log;
 
 import com.raycast.domain.Message;
 import com.raycast.service.base.AbstractCrudService;
+import com.raycast.service.base.RaycastRESTClient;
 
+import org.androidannotations.annotations.rest.RestService;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestExecution;

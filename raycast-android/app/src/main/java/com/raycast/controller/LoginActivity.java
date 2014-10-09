@@ -117,12 +117,10 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
-        new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
+        //new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
         //TODO if token ok go to feed
-        //Intent i = new Intent(this, FeedActivity.class);
-        //i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY); //Back button won't return to login page
-        //startActivity(i);
-        //finish();
+        FeedActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
+        finish();
         //Set up sign out and disconnect buttons.
         Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
         signOutButton.setOnClickListener(new OnClickListener() {
