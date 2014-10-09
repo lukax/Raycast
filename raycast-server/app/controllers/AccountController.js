@@ -14,7 +14,6 @@ var RefreshToken        = require('../models/RefreshToken');
 
 var google = require('googleapis');
 var plus = google.plus('v1');
-var goauth2 = google.oauth2('v1');
 var oauth2Client = new google.auth.OAuth2(config.security.clientId, config.security.clientSecret);
 
 // create OAuth 2.0 server
