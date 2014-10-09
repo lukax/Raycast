@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.raycast.domain.auth.Token;
+import com.raycast.domain.svo.RaycastMessageSVO;
 import com.raycast.service.auth.RaycastAuthStore;
 import com.raycast.service.base.AbstractCrudService;
 
@@ -105,7 +106,35 @@ public class AccountService extends AbstractCrudService {
         }
     }
 
-    public boolean isLoggedIn(){
-        return authStore.getToken() != null;
+    public void isLoggedIn(final ResponseListener<Boolean> listener){
+        if(authStore.getToken() == null) {
+            listener.onSuccess(false);
+            return;
+        }
+
+        try {
+            new AsyncTask<Void, Void, RaycastMessageSVO>() {
+                @Override
+                protected RaycastMessageSVO doInBackground(Void... voids) {
+                    RestTemplate restTemplate = new RestTemplate();
+                    restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                    ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.getForEntity(contextUrl.toString(), RaycastMessageSVO.class);
+                    return responseEntity.getBody();
+                }
+
+                @Override
+                protected void onPostExecute(RaycastMessageSVO msg) {
+                    if(msg != null) {
+                        listener.onSuccess(true);
+                    }
+                    else{
+                        listener.onSuccess(false);
+                    }
+                }
+            }.execute();
+        } catch (RestClientException ex){
+            Log.e(getClass().getName(), ex.getMessage(), ex);
+            listener.onSuccess(false);
+        }
     }
 }
