@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -25,6 +26,12 @@ import com.google.android.gms.common.SignInButton;
 
 import com.raycast.R;
 import com.raycast.controller.base.PlusBaseActivity;
+import com.raycast.domain.auth.Token;
+import com.raycast.service.AccountService;
+import com.raycast.service.base.AbstractCrudService;
+
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EActivity;
 
 import java.io.IOException;
 
@@ -37,6 +44,7 @@ import java.io.IOException;
  * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
  * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
  */
+@EActivity
 public class LoginActivity extends PlusBaseActivity {
 
     // UI references.
@@ -51,6 +59,9 @@ public class LoginActivity extends PlusBaseActivity {
 
     static final String SCOPE_AUDIENCE = "audience:server:client_id:" + CLIENT_ID;
     static final String SCOPE_AUTHCODE = "oauth2:server:client_id:" + CLIENT_ID + ":api_scope:" + SCOPES_STRING;
+
+    @Bean
+    AccountService accountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,25 +128,8 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
-        //new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
+        new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
         //TODO if token ok go to feed
-        FeedActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
-        finish();
-        //Set up sign out and disconnect buttons.
-        Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
-        signOutButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signOut();
-            }
-        });
-        Button disconnectButton = (Button) findViewById(R.id.plus_disconnect_button);
-        disconnectButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                revokeAccess();
-            }
-        });
     }
 
     @Override
@@ -175,6 +169,36 @@ public class LoginActivity extends PlusBaseActivity {
     private boolean supportsGooglePlayServices() {
         return GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) ==
                 ConnectionResult.SUCCESS;
+    }
+
+    public void onTokenRetrieval(String token){
+        accountService.login(token, new AbstractCrudService.ResponseListener<Token>() {
+            @Override
+            public void onSuccess(Token t) {
+                FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
+                finish();
+                //Set up sign out and disconnect buttons.
+                Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
+                signOutButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        signOut();
+                    }
+                });
+                Button disconnectButton = (Button) findViewById(R.id.plus_disconnect_button);
+                disconnectButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        revokeAccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(LoginActivity.this, "Error could not login", Toast.LENGTH_LONG);
+            }
+        });
     }
 
     /**
@@ -235,6 +259,7 @@ class GetTokenTask extends AsyncTask<Void, Void, Void> {
             String token = fetchToken();
             //GoogleAuthUtil.invalidateToken(mActivity, token);
             if (token != null) {
+                mActivity.onTokenRetrieval(token);
                 Log.d(this.getClass().getSimpleName(), token);
                 // Insert the good stuff here.
                 // Use the token to access the user's Google data.
