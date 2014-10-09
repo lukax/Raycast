@@ -17,7 +17,6 @@
             android:windowSoftInputMode="adjustResize|stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -30,7 +29,7 @@
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name=".controller.MessageDetailActivity"
+            android:name=".controller.MessageDetailActivity_"
             android:label="@string/title_activity_message_detail" >
         </activity>
     </application>

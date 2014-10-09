@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +18,17 @@ import com.raycast.R;
 import com.raycast.domain.Message;
 import com.raycast.domain.User;
 import com.raycast.domain.CustomLocation;
-import com.raycast.service.MessageService;
-import com.raycast.service.base.AbstractCrudService;
+import com.raycast.service.base.RaycastRESTClient;
+
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.rest.RestService;
 
 /**
  * Created by Lucas on 13/09/2014.
  */
+@EFragment
 public class MessageWriteDialogFragment extends DialogFragment {
 
     public interface MessageWriteDialogListener {
@@ -33,6 +37,9 @@ public class MessageWriteDialogFragment extends DialogFragment {
 
     public static final String ARGUMENT_MYLOCATION = "com.raycast.messagewritedialogfragment.mylocation";
     public static final String ARGUMENT_USERID = "com.raycast.messagewritedialogfragment.userid";
+
+    @RestService
+    RaycastRESTClient raycastRESTClient;
 
     private Location myLocation;
     private String userId;
@@ -83,7 +90,8 @@ public class MessageWriteDialogFragment extends DialogFragment {
         return dialog;
     }
 
-    private void sendMessage(){
+    @Background
+    void sendMessage(){
         User usr = new User();
         usr.setId(userId);
         Message msg = new Message();
@@ -91,18 +99,12 @@ public class MessageWriteDialogFragment extends DialogFragment {
         msg.setMessage(((EditText) getDialog().findViewById(R.id.dialogmessagewrite_messagetext)).getText().toString());
         msg.setLocation(CustomLocation.fromLocation(myLocation));
         //TODO make sure dialog can't be dismissable until message is sent
-        new MessageService().add(msg, new AbstractCrudService.ResponseListener<Message>() {
-            @Override
-            public void onSuccess(Message t) {
+        raycastRESTClient.addMessage(msg);
+        dismissDialog();
+    }
 
-            }
-
-            @Override
-            public void onFail() {
-                //TODO properly show an error
-                Log.e(getClass().toString(), "couldn't save message");
-            }
-        });
+    @UiThread
+    void dismissDialog(){
         ((MessageWriteDialogListener)getActivity()).onFinishedDialog(); // Call onFinishedDialog on the guy that called this
         this.dismiss();
     }

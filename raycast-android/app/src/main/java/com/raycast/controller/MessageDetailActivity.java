@@ -9,11 +9,19 @@ import android.widget.TextView;
 import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Message;
-import com.raycast.service.MessageService;
 import com.raycast.service.base.AbstractCrudService;
+import com.raycast.service.base.RaycastRESTClient;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.rest.RestService;
+
+@EActivity
 public class MessageDetailActivity extends RaycastBaseActivity {
     String messageId;
+
+    @RestService
+    RaycastRESTClient raycastRESTClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +33,6 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        loadMessage();
     }
 
     @Override
@@ -43,20 +50,10 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadMessage(){
-        new MessageService().get(messageId, new AbstractCrudService.ResponseListener<Message>() {
-            @Override
-            public void onSuccess(Message message) {
-                TextView msgText = (TextView) findViewById(R.id.messagedetail_message);
-                msgText.setText(message.getMessage());
-            }
-
-            @Override
-            public void onFail() {
-                //TODO properly show an error
-                Log.e(getClass().toString(), "couldn't get message");
-            }
-        });
+    @AfterViews
+    void afterViews(){
+        Message msg = raycastRESTClient.getMessageById(messageId);
+        TextView msgText = (TextView) findViewById(R.id.messagedetail_message);
+        msgText.setText(msg.getMessage());
     }
-
 }

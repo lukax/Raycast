@@ -55,7 +55,8 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
-    @RestService RaycastRESTClient raycastRESTClient;
+    @RestService
+    RaycastRESTClient raycastRESTClient;
 
     LocationClient locationClient;
     DisplayImageOptions options;
@@ -220,9 +221,8 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final Message msg = (Message) adapterView.getItemAtPosition(i);
-                Intent msgDetailIntent = new Intent(FeedActivity.this, MessageDetailActivity.class);
-                msgDetailIntent.putExtra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId());
-                startActivity(msgDetailIntent);
+
+                MessageDetailActivity_.intent(FeedActivity.this).extra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
                 //TODO: Load MessageActivity or Popup and populate it with item data.
             }
         });
