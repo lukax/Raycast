@@ -11,7 +11,9 @@ public class AbstractCrudService {
         void onFail();
     }
 
-    protected final Uri rootUrl = Uri.parse("http://api.raycastapp.com/");
+    public static final String ROOT_URL = "https://raycast.herokuapp.com/";
+
+    protected final Uri rootUrl = Uri.parse(ROOT_URL);
     protected final Uri contextUrl;
 
     public AbstractCrudService(String contextPath){

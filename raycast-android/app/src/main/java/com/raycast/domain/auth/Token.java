@@ -2,10 +2,12 @@ package com.raycast.domain.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+
 /**
  * Created by Lucas on 29/08/2014.
  */
-public class Token {
+public class Token implements Serializable {
     @JsonProperty("access_token") private String accessToken;
     @JsonProperty("refresh_token") private String refreshToken;
     @JsonProperty("expires_in") private int expiresIn;

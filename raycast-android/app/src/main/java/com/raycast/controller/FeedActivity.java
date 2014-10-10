@@ -42,6 +42,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.rest.RestService;
+import org.springframework.web.client.RestClientException;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -54,7 +55,8 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
-    @RestService RaycastRESTClient raycastRESTClient;
+    @RestService
+    RaycastRESTClient raycastRESTClient;
 
     LocationClient locationClient;
     DisplayImageOptions options;
@@ -76,7 +78,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
                 Bundle dialogArgs = new Bundle();
                 dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
                 dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
-                DialogFragment dialog = new MessageWriteDialogFragment();
+                DialogFragment dialog = new MessageWriteDialogFragment_();
                 dialog.setArguments(dialogArgs);
                 dialog.show(getFragmentManager(), "MessageWriteDialog");
             }
@@ -184,8 +186,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(this, String.valueOf(connectionResult.getErrorCode()),
-                    Toast.LENGTH_SHORT).show();
+            notifyUser(String.valueOf(connectionResult.getErrorCode()));
         }
     }
 
@@ -196,13 +197,15 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @Background
     void listMessages() {
-        messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
-        if(messages == null){
-            Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
+        try {
+            messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+        }catch(RestClientException ex){
+            notifyUser("Error while loading messages");
+            return;
         }
-        else if (messages.size() == 0) {
+        if (messages.size() == 0) {
             //TODO: get message string from 'strings'
-            Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
+            notifyUser("No new messages!");
         } else {
             listMessagesUI();
         }
@@ -217,14 +220,17 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final Message msg = (Message) adapterView.getItemAtPosition(i);
-                Intent msgDetailIntent = new Intent(FeedActivity.this, MessageDetailActivity.class);
-                msgDetailIntent.putExtra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId());
-                startActivity(msgDetailIntent);
+
+                MessageDetailActivity_.intent(FeedActivity.this).extra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
                 //TODO: Load MessageActivity or Popup and populate it with item data.
             }
         });
     }
 
+    @UiThread
+    void notifyUser(String msg){
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
 
     private class FeedAdapter extends ArrayAdapter<Message> {
         private HashMap<Message, Integer> idMap = new HashMap<Message, Integer>();
@@ -267,8 +273,6 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
             return rowView;
         }
-
-
 
         @Override
         public long getItemId(int position) {
