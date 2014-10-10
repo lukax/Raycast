@@ -48,6 +48,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
                 }
             }
             if(!foundEmail){
+                log.error('AccountController', 'could not find account email of user');
                 return done({ message: 'No account email found' });
             }
 
@@ -65,7 +66,9 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
     function forNewUser(user, plusPeopleMe){
         log.info('AccountController creating new user', foundEmail);
         user = new User();
-        user.username = foundEmail;
+        user.username = foundEmail.split('@')[0];
+        user.password = crypto.randomBytes(32).toString('base64');
+        user.email = foundEmail;
         user.name = plusPeopleMe.displayName;
         user.description = 'Novo usuário Raycast';
         user.image = plusPeopleMe.image.url;
