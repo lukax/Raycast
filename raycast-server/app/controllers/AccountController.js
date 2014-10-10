@@ -33,13 +33,13 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
     });
 
     var foundEmail = null;
+
     function requestUserInfo(){
         plus.people.get({ userId: 'me', auth: oauth2Client }, function(err, response) {
             if(err) {
                 log.error('AccountController requestUserInfo', err);
                 return done(err);
             }
-            log.info('AccountController login', response);
 
             for(var i = 0; i < response.emails.length; i++){
                 if(response.emails[i].type === 'account'){
@@ -52,33 +52,41 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
             }
 
             User.findOne({ email: foundEmail }, function(err, user) {
-                updateUserInfo(err, user, response);
+                if(err || !user){
+                    forNewUser(user, response);
+                }
+                else{
+                    forExistantUser(user);
+                }
             });
         });
     }
 
-    function updateUserInfo(isNewUser, raycastUser, googleUser){
-        if(isNewUser || !raycastUser){
-            raycastUser = new User();
-            raycastUser.username = foundEmail;
-            raycastUser.name = googleUser.displayName;
-        }
-        raycastUser.image = googleUser.image.url;
-
-        raycastUser.save(function(err){
+    function forNewUser(user, plusPeopleMe){
+        log.info('AccountController creating new user', foundEmail);
+        user = new User();
+        user.username = foundEmail;
+        user.name = plusPeopleMe.displayName;
+        user.description = 'Novo usuário Raycast';
+        user.image = plusPeopleMe.image.url;
+        user.save(function(err){
             if(err) { return done(err); }
-
-            generateAuthToken(raycastUser);
+            generateAuthToken(user);
         });
     }
 
-    function generateAuthToken(raycastUser){
-        RefreshToken.remove({ userId: raycastUser.userId, clientId: client.clientId }, function (err) {
+    function forExistantUser(user){
+        log.info('AccountController authenticating user', foundEmail);
+        generateAuthToken(user);
+    }
+
+    function generateAuthToken(user){
+        RefreshToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
             if (err) {
                 return done(err);
             }
         });
-        AccessToken.remove({ userId: raycastUser.userId, clientId: client.clientId }, function (err) {
+        AccessToken.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
             if (err) {
                 return done(err);
             }
@@ -86,8 +94,8 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
 
         var tokenValue = crypto.randomBytes(32).toString('base64');
         var refreshTokenValue = crypto.randomBytes(32).toString('base64');
-        var token = new AccessToken({ token: tokenValue, clientId: client.clientId, userId: raycastUser.userId });
-        var refreshToken = new RefreshToken({ token: refreshTokenValue, clientId: client.clientId, userId: raycastUser.userId });
+        var token = new AccessToken({ token: tokenValue, clientId: client.clientId, userId: user.userId });
+        var refreshToken = new RefreshToken({ token: refreshTokenValue, clientId: client.clientId, userId: user.userId });
         refreshToken.save(function (err) {
             if (err) { return done(err); }
         });
