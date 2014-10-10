@@ -24,7 +24,7 @@ public interface RaycastRESTClient {
     List<Message> getMessages(double latitude, double longitude, double radius);
 
     @Post("/message")
-    Message addMessage(Message message);
+    void addMessage(Message message);
 
     @Get("/message/{id}")
     Message getMessageById(String id);

@@ -28,10 +28,12 @@ import com.raycast.R;
 import com.raycast.controller.base.PlusBaseActivity;
 import com.raycast.domain.auth.Token;
 import com.raycast.service.AccountService;
+import com.raycast.service.auth.RaycastAuthStore;
 import com.raycast.service.base.AbstractCrudService;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.InstanceState;
 
 import java.io.IOException;
 
@@ -62,6 +64,12 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Bean
     AccountService accountService;
+
+    @InstanceState
+    Token previousToken;
+
+    @Bean
+    RaycastAuthStore authStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +136,12 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
-        new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
-        //TODO if token ok go to feed
+        if(previousToken == null){
+            new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
+        }
+        else{
+            onTokenRetrieval(previousToken);
+        }
     }
 
     @Override
@@ -171,10 +183,11 @@ public class LoginActivity extends PlusBaseActivity {
                 ConnectionResult.SUCCESS;
     }
 
-    public void onTokenRetrieval(String token){
+    public void onTokenRetrieval(final String token){
         accountService.login(token, new AbstractCrudService.ResponseListener<Token>() {
             @Override
             public void onSuccess(Token t) {
+                LoginActivity.this.previousToken = t;
                 FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
                 finish();
                 //Set up sign out and disconnect buttons.
@@ -196,9 +209,17 @@ public class LoginActivity extends PlusBaseActivity {
 
             @Override
             public void onFail() {
-                Toast.makeText(LoginActivity.this, "Error could not login", Toast.LENGTH_LONG);
+                GoogleAuthUtil.invalidateToken(LoginActivity.this, token);
+                previousToken = null;
+                onPlusClientSignIn();
             }
         });
+    }
+
+    public void onTokenRetrieval(Token token){
+        authStore.setToken(token);
+        FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
+        finish();
     }
 
     /**

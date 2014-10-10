@@ -78,7 +78,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
                 Bundle dialogArgs = new Bundle();
                 dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
                 dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
-                DialogFragment dialog = new MessageWriteDialogFragment();
+                DialogFragment dialog = new MessageWriteDialogFragment_();
                 dialog.setArguments(dialogArgs);
                 dialog.show(getFragmentManager(), "MessageWriteDialog");
             }
@@ -186,8 +186,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(this, String.valueOf(connectionResult.getErrorCode()),
-                    Toast.LENGTH_SHORT).show();
+            notifyUser(String.valueOf(connectionResult.getErrorCode()));
         }
     }
 
@@ -201,12 +200,12 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         try {
             messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
         }catch(RestClientException ex){
-            Toast.makeText(getApplicationContext(), "Error while loading messages", Toast.LENGTH_SHORT).show();
+            notifyUser("Error while loading messages");
             return;
         }
         if (messages.size() == 0) {
             //TODO: get message string from 'strings'
-            Toast.makeText(getApplicationContext(), "No new messages!", Toast.LENGTH_SHORT).show();
+            notifyUser("No new messages!");
         } else {
             listMessagesUI();
         }
@@ -228,6 +227,10 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         });
     }
 
+    @UiThread
+    void notifyUser(String msg){
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
 
     private class FeedAdapter extends ArrayAdapter<Message> {
         private HashMap<Message, Integer> idMap = new HashMap<Message, Integer>();

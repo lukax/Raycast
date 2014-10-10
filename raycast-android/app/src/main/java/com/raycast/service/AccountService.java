@@ -32,10 +32,10 @@ public class AccountService extends AbstractCrudService {
     }
 
     public void login(final String code, final ResponseListener<Token> listener){
-        try {
-            new AsyncTask<Void, Void, Token>() {
-                @Override
-                protected Token doInBackground(Void... voids) {
+        new AsyncTask<Void, Void, Token>() {
+            @Override
+            protected Token doInBackground(Void... voids) {
+                try {
                     final String url = contextUrl.buildUpon()
                             .appendPath("login")
                             .build().toString();
@@ -49,30 +49,30 @@ public class AccountService extends AbstractCrudService {
                     credendial.add("code", code);
                     ResponseEntity<Token> responseEntity = restTemplate.postForEntity(url, credendial, Token.class);
                     return responseEntity.getBody();
+                } catch (Exception ex){
+                    Log.e(getClass().getName(), ex.getMessage(), ex);
+                    return null;
                 }
+            }
 
-                @Override
-                protected void onPostExecute(Token token) {
-                    authStore.setToken(token);
-                    if(token != null) {
-                        listener.onSuccess(token);
-                    }
-                    else{
-                        listener.onFail();
-                    }
+            @Override
+            protected void onPostExecute(Token token) {
+                authStore.setToken(token);
+                if(token != null) {
+                    listener.onSuccess(token);
                 }
-            }.execute();
-        } catch (RestClientException ex){
-            Log.e(getClass().getName(), ex.getMessage(), ex);
-            listener.onFail();
-        }
+                else{
+                    listener.onFail();
+                }
+            }
+        }.execute();
     }
 
     public void login(final String username, final String password, final ResponseListener<Token> listener){
-        try {
-            new AsyncTask<Void, Void, Token>() {
-                @Override
-                protected Token doInBackground(Void... voids) {
+        new AsyncTask<Void, Void, Token>() {
+            @Override
+            protected Token doInBackground(Void... voids) {
+                try {
                     final String url = contextUrl.buildUpon()
                             .appendPath("login")
                             .build().toString();
@@ -88,22 +88,23 @@ public class AccountService extends AbstractCrudService {
                     ResponseEntity<Token> responseEntity = restTemplate.postForEntity(url, credendial, Token.class);
                     return responseEntity.getBody();
                 }
-
-                @Override
-                protected void onPostExecute(Token token) {
-                    authStore.setToken(token);
-                    if(token != null) {
-                        listener.onSuccess(token);
-                    }
-                    else{
-                        listener.onFail();
-                    }
+                catch (Exception ex){
+                    Log.e(getClass().getName(), ex.getMessage(), ex);
+                    return null;
                 }
-            }.execute();
-        } catch (RestClientException ex){
-            Log.e(getClass().getName(), ex.getMessage(), ex);
-            listener.onFail();
-        }
+            }
+
+            @Override
+            protected void onPostExecute(Token token) {
+                authStore.setToken(token);
+                if(token != null) {
+                    listener.onSuccess(token);
+                }
+                else{
+                    listener.onFail();
+                }
+            }
+        }.execute();
     }
 
     public void isLoggedIn(final ResponseListener<Boolean> listener){
@@ -112,29 +113,30 @@ public class AccountService extends AbstractCrudService {
             return;
         }
 
-        try {
-            new AsyncTask<Void, Void, RaycastMessageSVO>() {
-                @Override
-                protected RaycastMessageSVO doInBackground(Void... voids) {
+        new AsyncTask<Void, Void, RaycastMessageSVO>() {
+            @Override
+            protected RaycastMessageSVO doInBackground(Void... voids) {
+                try {
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                     ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.getForEntity(contextUrl.toString(), RaycastMessageSVO.class);
                     return responseEntity.getBody();
                 }
-
-                @Override
-                protected void onPostExecute(RaycastMessageSVO msg) {
-                    if(msg != null) {
-                        listener.onSuccess(true);
-                    }
-                    else{
-                        listener.onSuccess(false);
-                    }
+                catch(Exception ex) {
+                    Log.e(getClass().getName(), ex.getMessage(), ex);
+                    return null;
                 }
-            }.execute();
-        } catch (RestClientException ex){
-            Log.e(getClass().getName(), ex.getMessage(), ex);
-            listener.onSuccess(false);
-        }
+            }
+
+            @Override
+            protected void onPostExecute(RaycastMessageSVO msg) {
+                if(msg != null) {
+                    listener.onSuccess(true);
+                }
+                else{
+                    listener.onSuccess(false);
+                }
+            }
+        }.execute();
     }
 }
