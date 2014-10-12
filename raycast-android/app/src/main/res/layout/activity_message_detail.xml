@@ -10,14 +10,43 @@
 
 
     <TextView
+        android:id="@+id/messagedetail_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/messagedetail_message"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:text="Large Text"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+    <EditText
+        android:id="@+id/messagedetail_editcomment"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/messagedetail_message"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/messagedetail_sendcomment"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_action_send_now"
+        android:layout_below="@+id/messagedetail_message"
+        android:layout_alignRight="@id/messagedetail_editcomment"
+        android:layout_alignEnd="@id/messagedetail_editcomment"
+        />
+
+    <ListView
+        android:id="@+id/messagedetail_commentlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/messagedetail_editcomment"
         android:layout_alignParentBottom="true" />
+
+
 </RelativeLayout>

@@ -3,7 +3,6 @@ package com.raycast.controller;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -213,7 +212,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     @UiThread
     void listMessagesUI(){
         final ListView listView = (ListView) findViewById(R.id.feed);
-        final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.message_compact, messages);
+        final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.item_message, messages);
         listView.setAdapter(feedAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -251,7 +250,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            View rowView = inflater.inflate(R.layout.message_compact, parent, false);
+            View rowView = inflater.inflate(R.layout.item_message, parent, false);
 
             ImageView profileImage = (ImageView) rowView.findViewById(R.id.profile_image);
 
