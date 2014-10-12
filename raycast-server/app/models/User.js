@@ -51,6 +51,12 @@ UserSchema.methods.checkPassword = function(password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
 
+UserSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  delete obj.salt;
+  delete obj.hashedPassword;
+  return obj;
+};
 
 UserSchema.static('findByUsername', function (username, callback) {
     return this.find({ username: username }, callback);
