@@ -6,7 +6,10 @@ var Schema       = mongoose.Schema;
 var MessageSchema   = new Schema({
     author: { type: String, ref: 'User' },
 	message: String,
-	time: Number,
+	time: {
+        type: Date,
+        default: Date.now
+    },
 	loc: { type: { type: String } , coordinates: [Number]  },
 	ip: String
 });

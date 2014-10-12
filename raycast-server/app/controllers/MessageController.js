@@ -10,7 +10,6 @@ exports.addMessage = function(req, res) {
         var message = new Message();
         message.author = req.user._id;
         message.message = req.body.message.substr(0, 160);
-        message.time = Date.now();
         message.loc = {
             type : 'Point',
             coordinates : req.body.loc.coordinates

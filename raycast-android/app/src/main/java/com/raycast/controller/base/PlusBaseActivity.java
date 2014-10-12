@@ -32,7 +32,7 @@ public abstract class PlusBaseActivity extends Activity
     public boolean mPlusClientIsConnecting = false;
 
     // This is the helper object that connects to Google Play Services.
-    private PlusClient mPlusClient;
+    protected PlusClient mPlusClient;
 
     // The saved result from {@link #onConnectionFailed(ConnectionResult)}.  If a connection
     // attempt has been made, this is non-null.
@@ -59,7 +59,11 @@ public abstract class PlusBaseActivity extends Activity
      * Called when the {@link PlusClient} is blocking the UI.  If you have a progress bar widget,
      * this tells you when to show or hide it.
      */
-    protected abstract void onPlusClientBlockingUI(boolean show);
+    protected void onPlusClientBlockingUI(boolean show){
+        showProgress(show);
+    }
+
+    protected abstract void showProgress(boolean show);
 
     /**
      * Called when there is a change in connection state.  If you have "Sign in"/ "Connect",
@@ -67,17 +71,6 @@ public abstract class PlusBaseActivity extends Activity
      * need to be updated.
      */
     protected abstract void updateConnectButtonState();
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Initialize the PlusClient connection.
-        // Scopes indicate the information about the user your application will be able to access.
-        mPlusClient =
-                new PlusClient.Builder(this, this, this).setScopes(Scopes.PLUS_LOGIN,
-                        Scopes.PLUS_ME).build();
-    }
 
     /**
      * Try to sign in the user.

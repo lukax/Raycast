@@ -72,17 +72,13 @@ module.exports = function(router){
         .get(messageController.getAllMessageByUser);
 
     // --------- Comments ----------
-    router.route('/comment')
+    router.route('/message/:message_id/comment')
         .post(commentController.addComment)
-        .get(commentController.getAllComment);
+        .get(commentController.getAllCommentByMessage);
 
     router.route('/comment/:comment_id')
         .get(commentController.getCommentById)
         .delete(commentController.removeComment);
-
-    router.route('/comment/message/:message_id')
-        .get(commentController.getAllCommentByMessage);
-
 
     return router;
 };

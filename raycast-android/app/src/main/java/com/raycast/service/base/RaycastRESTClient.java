@@ -1,5 +1,6 @@
 package com.raycast.service.base;
 
+import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
 import com.raycast.service.auth.RaycastAuthHttpRequestInterceptor;
 
@@ -26,6 +27,12 @@ public interface RaycastRESTClient {
     @Post("/message")
     void addMessage(Message message);
 
-    @Get("/message/{id}")
-    Message getMessageById(String id);
+    @Get("/message/{messageId}")
+    Message getMessageById(String messageId);
+
+    @Get("/message/{messageId}/comment")
+    List<Comment> getComments(String messageId);
+
+    @Post("/message/{messageId}/comment")
+    void addComment(String messageId);
 }
