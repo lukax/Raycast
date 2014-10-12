@@ -5,7 +5,7 @@ import android.net.Uri;
 /**
  * Created by Lucas on 29/08/2014.
  */
-public class AbstractCrudService {
+public abstract class AbstractCrudService {
     public interface ResponseListener<TResult>{
         void onSuccess(TResult t);
         void onFail();

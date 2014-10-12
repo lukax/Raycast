@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -24,16 +23,18 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 
+import com.google.android.gms.plus.PlusClient;
 import com.raycast.R;
 import com.raycast.controller.base.PlusBaseActivity;
 import com.raycast.domain.auth.Token;
 import com.raycast.service.AccountService;
-import com.raycast.service.auth.RaycastAuthStore;
 import com.raycast.service.base.AbstractCrudService;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.ViewById;
 
 import java.io.IOException;
 
@@ -46,38 +47,29 @@ import java.io.IOException;
  * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
  * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
  */
-@EActivity
+@EActivity(R.layout.activity_login)
 public class LoginActivity extends PlusBaseActivity {
-
-    // UI references.
-    private View mProgressView;
-    private SignInButton mPlusSignInButton;
-    private View mSignOutButtons;
-    private View mLoginFormView;
 
     static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1001;
     static final String CLIENT_ID = "663385753631-negeq0ad0h0ln09jhnjurisacb4r0a19.apps.googleusercontent.com";
     static final String SCOPES_STRING = Scopes.PLUS_LOGIN + " " + Scopes.PLUS_ME;
-
     static final String SCOPE_AUDIENCE = "audience:server:client_id:" + CLIENT_ID;
     static final String SCOPE_AUTHCODE = "oauth2:server:client_id:" + CLIENT_ID + ":api_scope:" + SCOPES_STRING;
 
-    @Bean
-    AccountService accountService;
+    @ViewById(R.id.login_progress) View mProgressView;
+    @ViewById(R.id.plus_sign_in_button) SignInButton mPlusSignInButton;
+    @ViewById(R.id.plus_sign_out_buttons) View mSignOutButtons;
+    @ViewById(R.id.login_form) View mLoginFormView;
 
-    @InstanceState
-    Token previousToken;
+    @Bean AccountService accountService;
+    @InstanceState Token previousToken;
 
-    @Bean
-    RaycastAuthStore authStore;
+    @AfterViews
+    void afterViews(){
+        // Initialize the PlusClient connection.
+        // Scopes indicate the information about the user your application will be able to access.
+        mPlusClient = new PlusClient.Builder(this, this, this).setScopes(Scopes.PLUS_LOGIN, Scopes.PLUS_ME).build();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        // Find the Google+ sign in button.
-        mPlusSignInButton = (SignInButton) findViewById(R.id.plus_sign_in_button);
         if (supportsGooglePlayServices()) {
             // Set a listener to connect the user when the G+ button is clicked.
             mPlusSignInButton.setOnClickListener(new OnClickListener() {
@@ -92,10 +84,6 @@ public class LoginActivity extends PlusBaseActivity {
             mPlusSignInButton.setVisibility(View.GONE);
             return;
         }
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-        mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
     }
 
     /**
@@ -145,17 +133,11 @@ public class LoginActivity extends PlusBaseActivity {
     }
 
     @Override
-    protected void onPlusClientBlockingUI(boolean show) {
-        showProgress(show);
-    }
-
-    @Override
     protected void updateConnectButtonState() {
         boolean connected = getPlusClient().isConnected();
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
-
         //TODO: remove this button completely
         mSignOutButtons.setVisibility(View.GONE/*connected ? View.VISIBLE : View.GONE*/);
         mPlusSignInButton.setVisibility(connected ? View.GONE : View.VISIBLE);
@@ -217,7 +199,7 @@ public class LoginActivity extends PlusBaseActivity {
     }
 
     public void onTokenRetrieval(Token token){
-        authStore.setToken(token);
+        accountService.setToken(token);
         FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
         finish();
     }
@@ -281,7 +263,7 @@ class GetTokenTask extends AsyncTask<Void, Void, Void> {
             //GoogleAuthUtil.invalidateToken(mActivity, token);
             if (token != null) {
                 mActivity.onTokenRetrieval(token);
-                Log.d(this.getClass().getSimpleName(), token);
+                Log.d(getClass().getSimpleName(), token);
                 // Insert the good stuff here.
                 // Use the token to access the user's Google data.
                 //TODO

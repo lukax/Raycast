@@ -15,6 +15,7 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,9 +37,6 @@ public class AccountService extends AbstractCrudService {
             @Override
             protected Token doInBackground(Void... voids) {
                 try {
-                    final String url = contextUrl.buildUpon()
-                            .appendPath("login")
-                            .build().toString();
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -47,14 +45,13 @@ public class AccountService extends AbstractCrudService {
                     credendial.add("client_secret", authStore.getClientSecret());
                     credendial.add("grant_type", "authorization_code");
                     credendial.add("code", code);
-                    ResponseEntity<Token> responseEntity = restTemplate.postForEntity(url, credendial, Token.class);
+                    ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/account/login", credendial, Token.class);
                     return responseEntity.getBody();
                 } catch (Exception ex){
                     Log.e(getClass().getName(), ex.getMessage(), ex);
                     return null;
                 }
             }
-
             @Override
             protected void onPostExecute(Token token) {
                 authStore.setToken(token);
@@ -73,9 +70,6 @@ public class AccountService extends AbstractCrudService {
             @Override
             protected Token doInBackground(Void... voids) {
                 try {
-                    final String url = contextUrl.buildUpon()
-                            .appendPath("login")
-                            .build().toString();
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -85,7 +79,7 @@ public class AccountService extends AbstractCrudService {
                     credendial.add("grant_type", "password");
                     credendial.add("username", username);
                     credendial.add("password", password);
-                    ResponseEntity<Token> responseEntity = restTemplate.postForEntity(url, credendial, Token.class);
+                    ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/account/login", credendial, Token.class);
                     return responseEntity.getBody();
                 }
                 catch (Exception ex){
@@ -93,7 +87,6 @@ public class AccountService extends AbstractCrudService {
                     return null;
                 }
             }
-
             @Override
             protected void onPostExecute(Token token) {
                 authStore.setToken(token);
@@ -112,31 +105,58 @@ public class AccountService extends AbstractCrudService {
             listener.onSuccess(false);
             return;
         }
-
-        new AsyncTask<Void, Void, RaycastMessageSVO>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected RaycastMessageSVO doInBackground(Void... voids) {
+            protected Boolean doInBackground(Void... voids) {
                 try {
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                    ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.getForEntity(contextUrl.toString(), RaycastMessageSVO.class);
-                    return responseEntity.getBody();
+                    ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.getForEntity(ROOT_URL + "/test", RaycastMessageSVO.class);
+                    return (responseEntity.getBody() != null);
+                }
+                catch(HttpClientErrorException ex){
+                    //Forbidden
+                    Log.d(getClass().getName(), "access forbidden", ex);
+                    Token newToken = exchangeRefreshToken();
+                    if(newToken != null){
+                        authStore.setToken(newToken);
+                        Log.d(getClass().getName(), "successfully exchanged the refresh token");
+                        return true;
+                    }
+                    return false;
                 }
                 catch(Exception ex) {
                     Log.e(getClass().getName(), ex.getMessage(), ex);
-                    return null;
+                    return false;
                 }
             }
-
             @Override
-            protected void onPostExecute(RaycastMessageSVO msg) {
-                if(msg != null) {
-                    listener.onSuccess(true);
-                }
-                else{
-                    listener.onSuccess(false);
-                }
+            protected void onPostExecute(Boolean done) {
+                listener.onSuccess(done);
             }
         }.execute();
     }
+
+    public void setToken(Token token){
+        authStore.setToken(token);
+    }
+
+    private Token exchangeRefreshToken(){
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
+            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+            MultiValueMap<String, String> credendial = new LinkedMultiValueMap<String, String>();
+            credendial.add("client_id", authStore.getClientId());
+            credendial.add("client_secret", authStore.getClientSecret());
+            credendial.add("refresh_token", authStore.getToken().getRefreshToken());
+            ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/oauth/token", credendial, Token.class);
+            return responseEntity.getBody();
+        }
+        catch(Exception ex){
+            Log.e(getClass().getName(), "error while trying to exchange refresh token", ex);
+        }
+        return null;
+    }
+
 }
