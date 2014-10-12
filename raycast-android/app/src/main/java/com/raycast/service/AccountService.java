@@ -10,6 +10,8 @@ import com.raycast.service.base.AbstractCrudService;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -41,10 +43,10 @@ public class AccountService extends AbstractCrudService {
                     restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                     MultiValueMap<String, String> credendial = new LinkedMultiValueMap<String, String>();
-                    credendial.add("client_id", authStore.getClientId());
-                    credendial.add("client_secret", authStore.getClientSecret());
                     credendial.add("grant_type", "authorization_code");
                     credendial.add("code", code);
+                    credendial.add("client_id", authStore.getClientId());
+                    credendial.add("client_secret", authStore.getClientSecret());
                     ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/account/login", credendial, Token.class);
                     return responseEntity.getBody();
                 } catch (Exception ex){
@@ -74,11 +76,11 @@ public class AccountService extends AbstractCrudService {
                     restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                     MultiValueMap<String, String> credendial = new LinkedMultiValueMap<String, String>();
-                    credendial.add("client_id", authStore.getClientId());
-                    credendial.add("client_secret", authStore.getClientSecret());
                     credendial.add("grant_type", "password");
                     credendial.add("username", username);
                     credendial.add("password", password);
+                    credendial.add("client_id", authStore.getClientId());
+                    credendial.add("client_secret", authStore.getClientSecret());
                     ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/account/login", credendial, Token.class);
                     return responseEntity.getBody();
                 }
@@ -100,9 +102,9 @@ public class AccountService extends AbstractCrudService {
         }.execute();
     }
 
-    public void isLoggedIn(final ResponseListener<Boolean> listener){
+    public void isLoggedIn(final ResponseListener<Token> listener){
         if(authStore.getToken() == null) {
-            listener.onSuccess(false);
+            listener.onFail();
             return;
         }
         new AsyncTask<Void, Void, Boolean>() {
@@ -111,7 +113,10 @@ public class AccountService extends AbstractCrudService {
                 try {
                     RestTemplate restTemplate = new RestTemplate();
                     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                    ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.getForEntity(ROOT_URL + "/test", RaycastMessageSVO.class);
+                    MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
+                    headers.add("Authorization", authStore.getToken().getAuthorizationHeader());
+                    HttpEntity httpEntity = new HttpEntity(headers);
+                    ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.exchange(ROOT_URL, HttpMethod.GET, httpEntity, RaycastMessageSVO.class);
                     return (responseEntity.getBody() != null);
                 }
                 catch(HttpClientErrorException ex){
@@ -131,8 +136,14 @@ public class AccountService extends AbstractCrudService {
                 }
             }
             @Override
-            protected void onPostExecute(Boolean done) {
-                listener.onSuccess(done);
+            protected void onPostExecute(Boolean ok) {
+                if(ok){
+                    listener.onSuccess(authStore.getToken());
+                }
+                else{
+                    listener.onFail();
+                }
+
             }
         }.execute();
     }
@@ -147,9 +158,10 @@ public class AccountService extends AbstractCrudService {
             restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             MultiValueMap<String, String> credendial = new LinkedMultiValueMap<String, String>();
+            credendial.add("grant_type", "refresh_token");
+            credendial.add("refresh_token", authStore.getToken().getRefreshToken());
             credendial.add("client_id", authStore.getClientId());
             credendial.add("client_secret", authStore.getClientSecret());
-            credendial.add("refresh_token", authStore.getToken().getRefreshToken());
             ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/oauth/token", credendial, Token.class);
             return responseEntity.getBody();
         }
