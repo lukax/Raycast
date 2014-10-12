@@ -17,31 +17,31 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 
 @EActivity(R.layout.activity_message_detail)
+@OptionsMenu(R.menu.message_detail)
 public class MessageDetailActivity extends RaycastBaseActivity {
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
-    @ViewById(R.id.messagedetail_message)
-    TextView msgText;
     @Extra(EXTRA_MESSAGEDETAIL_MESSAGEID)
     String messageId;
-
+    @ViewById(R.id.messagedetail_message)
+    TextView msgText;
     @RestService
     RaycastRESTClient raycastRESTClient;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.message_detail, menu);
-        return true;
-    }
-
     @AfterViews
     void afterViews(){
+        new GetMessageAsyncTask().execute(messageId);
+    }
+
+    @OptionsItem(R.id.action_refresh)
+    void actionRefresh(){
         new GetMessageAsyncTask().execute(messageId);
     }
 

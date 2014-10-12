@@ -11,7 +11,7 @@ public class AbstractCrudService {
         void onFail();
     }
 
-    public static final String ROOT_URL = "https://raycast.herokuapp.com/";
+    public static final String ROOT_URL = "https://raycast.herokuapp.com";
 
     protected final Uri rootUrl = Uri.parse(ROOT_URL);
     protected final Uri contextUrl;
