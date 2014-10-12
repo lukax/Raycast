@@ -34,5 +34,5 @@ public interface RaycastRESTClient {
     List<Comment> getComments(String messageId);
 
     @Post("/message/{messageId}/comment")
-    void addComment(String messageId);
+    void addComment(String messageId, Comment comment);
 }

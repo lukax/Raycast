@@ -17,9 +17,11 @@ import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
 import com.raycast.service.base.RaycastRESTClient;
+import com.raycast.util.FormatUtil;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EViewGroup;
@@ -47,15 +49,21 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @AfterViews
     void afterViews(){
-        new GetMessageAsyncTask().execute(messageId);
+        new GetMessageTask().execute(messageId);
     }
 
     @OptionsItem(R.id.action_refresh)
     void actionRefresh(){
-        new GetMessageAsyncTask().execute(messageId);
+        new GetMessageTask().execute(messageId);
     }
 
-    class GetMessageAsyncTask extends AsyncTask<String, Void, Void>{
+    @Click(R.id.messagedetail_sendcomment)
+    void sendComment(){
+        new SaveCommentTask().execute(messageId);
+    }
+
+
+    class GetMessageTask extends AsyncTask<String, Void, Void>{
         @Override
         protected Void doInBackground(String... params) {
             message = raycastRESTClient.getMessageById(params[0]);
@@ -65,6 +73,22 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         @Override
         protected void onPostExecute(Void param) {
             msgText.setText(message.getMessage());
+            commentListAdapter.bind(comments);
+            commentList.setAdapter(commentListAdapter);
+        }
+    }
+
+    class SaveCommentTask extends AsyncTask<String, Void, Void>{
+        @Override
+        protected Void doInBackground(String... params) {
+            Comment comment = new Comment();
+            comment.setComment(editComment.getText().toString());
+            raycastRESTClient.addComment(params[0], comment);
+            comments = raycastRESTClient.getComments(params[0]);
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
             commentListAdapter.bind(comments);
             commentList.setAdapter(commentListAdapter);
         }
@@ -87,7 +111,7 @@ class CommentListAdapter extends BaseAdapter {
 
     @Override
     public Comment getItem(int position) {
-        return comments.get(position);
+        return comments.get((comments.size() -1) - position);
     }
 
     @Override
@@ -110,9 +134,11 @@ class CommentListAdapter extends BaseAdapter {
 
 @EViewGroup(R.layout.item_comment)
 class CommentItemView extends RelativeLayout{
-    @ViewById(R.id.author) TextView authorView;
+    @Bean FormatUtil formatUtil;
+    @ViewById(R.id.comment_author) TextView authorView;
     @ViewById(R.id.comment_text) TextView commentView;
-    @ViewById(R.id.profile_image) ImageView profileImageView;
+    @ViewById(R.id.comment_image) ImageView imageView;
+    @ViewById(R.id.comment_time) TextView timeView;
 
     public CommentItemView(Context context) {
         super(context);
@@ -121,6 +147,7 @@ class CommentItemView extends RelativeLayout{
     public void bind(Comment comment){
         authorView.setText(comment.getAuthor().getName());
         commentView.setText(comment.getComment());
-        ImageLoader.getInstance().displayImage(comment.getAuthor().getImage(), profileImageView, null, null);
+        timeView.setText(formatUtil.dateFormat.format(comment.getTime()));
+        ImageLoader.getInstance().displayImage(comment.getAuthor().getImage(), imageView, null, null);
     }
 }

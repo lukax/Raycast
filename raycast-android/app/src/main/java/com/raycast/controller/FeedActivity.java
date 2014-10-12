@@ -35,9 +35,11 @@ import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Message;
 import com.raycast.service.base.RaycastRESTClient;
+import com.raycast.util.FormatUtil;
 import com.raycast.util.Preferences;
 
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.rest.RestService;
@@ -53,8 +55,8 @@ import java.util.List;
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
 
-    @RestService
-    RaycastRESTClient raycastRESTClient;
+    @RestService RaycastRESTClient raycastRESTClient;
+    @Bean FormatUtil formatUtil;
 
     LocationClient locationClient;
     DisplayImageOptions options;
@@ -249,26 +251,19 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
             View rowView = inflater.inflate(R.layout.item_message, parent, false);
-
-            ImageView profileImage = (ImageView) rowView.findViewById(R.id.profile_image);
-
-            TextView name = (TextView) rowView.findViewById(R.id.message_creator);
+            ImageView profileImage = (ImageView) rowView.findViewById(R.id.message_image);
+            TextView name = (TextView) rowView.findViewById(R.id.message_author);
             TextView content = (TextView) rowView.findViewById(R.id.message_content);
             TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
-
+            TextView time = (TextView) rowView.findViewById(R.id.message_time);
             ImageLoader.getInstance().displayImage(messages.get(position).getAuthor().getImage(), profileImage, options, animateFirstListener);
-
             name.setText(messages.get(position).getAuthor().getName());
-
             content.setText(messages.get(position).getMessage());
-
+            time.setText(formatUtil.dateFormat.format(messages.get(position).getTime()));
             Location messageLocation = messages.get(position).getLocation().toLocation();
-
             double distanceInKm = messageLocation.distanceTo(myLocation) / 1000;
             distance.setText(new DecimalFormat("#.#").format(distanceInKm)+" km");
-
             return rowView;
         }
 
