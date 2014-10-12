@@ -53,7 +53,6 @@ import java.util.List;
 @EActivity
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
-    public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
 
     @RestService
     RaycastRESTClient raycastRESTClient;
@@ -221,7 +220,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final Message msg = (Message) adapterView.getItemAtPosition(i);
 
-                MessageDetailActivity_.intent(FeedActivity.this).extra(EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
+                MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
                 //TODO: Load MessageActivity or Popup and populate it with item data.
             }
         });

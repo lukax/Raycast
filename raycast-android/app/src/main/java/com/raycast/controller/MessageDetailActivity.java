@@ -1,5 +1,6 @@
 package com.raycast.controller;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,27 +14,24 @@ import com.raycast.service.base.AbstractCrudService;
 import com.raycast.service.base.RaycastRESTClient;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 
-@EActivity
+@EActivity(R.layout.activity_message_detail)
 public class MessageDetailActivity extends RaycastBaseActivity {
+    public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
+
+    @ViewById(R.id.messagedetail_message)
+    TextView msgText;
+    @Extra(EXTRA_MESSAGEDETAIL_MESSAGEID)
     String messageId;
 
     @RestService
     RaycastRESTClient raycastRESTClient;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_message_detail);
-        messageId = getIntent().getStringExtra(FeedActivity.EXTRA_MESSAGEDETAIL_MESSAGEID);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -42,18 +40,20 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return super.onOptionsItemSelected(item);
-    }
-
     @AfterViews
     void afterViews(){
-        Message msg = raycastRESTClient.getMessageById(messageId);
-        TextView msgText = (TextView) findViewById(R.id.messagedetail_message);
-        msgText.setText(msg.getMessage());
+        new GetMessageAsyncTask().execute(messageId);
+    }
+
+    class GetMessageAsyncTask extends AsyncTask<String, Void, Message>{
+        @Override
+        protected Message doInBackground(String... params) {
+            Message message = raycastRESTClient.getMessageById(params[0]);
+            return message;
+        }
+        @Override
+        protected void onPostExecute(Message message) {
+            msgText.setText(message.getMessage());
+        }
     }
 }
