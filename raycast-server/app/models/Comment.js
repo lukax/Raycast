@@ -7,7 +7,10 @@ var CommentSchema   = new Schema({
 	messageId: { type: String, ref: 'Message' },
     author: { type: String, ref: 'User' },
 	comment: String,
-	time: Number,
+	time: {
+        type: Date,
+        default: Date.now
+    },
 	ip: String
 });
 
