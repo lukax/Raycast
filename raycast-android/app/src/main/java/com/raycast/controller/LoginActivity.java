@@ -3,9 +3,7 @@ package com.raycast.controller;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,7 +11,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
@@ -24,13 +21,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
-
 import com.google.android.gms.plus.PlusClient;
 import com.raycast.R;
 import com.raycast.controller.base.PlusBaseActivity;
-import com.raycast.domain.auth.Token;
 import com.raycast.service.AccountService;
-import com.raycast.service.base.AbstractCrudService;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -38,9 +32,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ViewById;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 
@@ -61,14 +52,13 @@ public class LoginActivity extends PlusBaseActivity {
     static final String SCOPE_AUDIENCE = "audience:server:client_id:" + CLIENT_ID;
     static final String SCOPE_AUTHCODE = "oauth2:server:client_id:" + CLIENT_ID + ":api_scope:" + SCOPES_STRING;
 
-
+    private boolean handlingException;
     @ViewById(R.id.login_progress) View mProgressView;
     @ViewById(R.id.plus_sign_in_button) SignInButton mPlusSignInButton;
     @ViewById(R.id.plus_sign_out_buttons) View mSignOutButtons;
     @ViewById(R.id.login_form) View mLoginFormView;
-
     @Bean AccountService accountService;
-    @InstanceState Token previousToken;
+    @InstanceState String mEmail;
 
     @AfterViews
     void afterViews(){
@@ -130,11 +120,10 @@ public class LoginActivity extends PlusBaseActivity {
 
     @Override
     protected void onPlusClientSignIn() {
-        if(previousToken == null && (previousToken = Token.getFromFile(TOKEN_FILE_NAME, this)) == null){
-            new GetTokenTask(this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
-        }
-        else{
-            onTokenRetrieval(previousToken);
+        showProgress(true);
+        if(!handlingException){
+            mEmail = getPlusClient().getAccountName();
+            new DoLoginTask(LoginActivity.this, mEmail, SCOPE_AUTHCODE).execute();
         }
     }
 
@@ -160,6 +149,17 @@ public class LoginActivity extends PlusBaseActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
+        super.onActivityResult(requestCode, responseCode, intent);
+        if(responseCode == 0){
+            Toast.makeText(this, "não foi possível fazer login :(", Toast.LENGTH_LONG).show();
+        }
+        else{
+            new DoLoginTask(LoginActivity.this,  mEmail, SCOPE_AUTHCODE).execute();
+        }
+    }
+
     /**
      * Check if the device supports Google Play Services.  It's best
      * practice to check first rather than handling this as an error case.
@@ -171,118 +171,67 @@ public class LoginActivity extends PlusBaseActivity {
                 ConnectionResult.SUCCESS;
     }
 
-    public void onTokenRetrieval(final String token){
-        accountService.login(token, new AbstractCrudService.ResponseListener<Token>() {
-            @Override
-            public void onSuccess(Token t) {
-                previousToken = t;
-                Token.saveToFile(previousToken, TOKEN_FILE_NAME, LoginActivity.this);
-                FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
-                finish();
-                //Set up sign out and disconnect buttons.
-                Button signOutButton = (Button) findViewById(R.id.plus_sign_out_button);
-                signOutButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        signOut();
-                    }
-                });
-                Button disconnectButton = (Button) findViewById(R.id.plus_disconnect_button);
-                disconnectButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        revokeAccess();
-                    }
-                });
-            }
-
-            @Override
-            public void onFail() {
-                GoogleAuthUtil.invalidateToken(LoginActivity.this, token);
-                previousToken = null;
-                onPlusClientSignIn();
-            }
-        });
-    }
-
-    public void onTokenRetrieval(Token token){
-        accountService.setToken(token);
-        accountService.isLoggedIn(new AbstractCrudService.ResponseListener<Token>() {
-            @Override
-            public void onSuccess(Token token) {
-                Token.saveToFile(token, TOKEN_FILE_NAME, LoginActivity.this);
-                FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
-                finish();
-            }
-            @Override
-            public void onFail() {
-                new GetTokenTask(LoginActivity.this, getPlusClient().getAccountName(), SCOPE_AUTHCODE).execute();
-            }
-        });
-    }
-
     /**
      * This method is a hook for background threads and async tasks that need to
      * provide the user a response UI when an exception occurs.
      */
-    int handleExceptionAttempts = 0;
     public void handleException(final Exception e) {
+
         // Because this call comes from the AsyncTask, we must ensure that the following
         // code instead executes on the UI thread.
-        if(handleExceptionAttempts < 1){
-            handleExceptionAttempts ++;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (e instanceof GooglePlayServicesAvailabilityException) {
-                        // The Google Play services APK is old, disabled, or not present.
-                        // Show a dialog created by Google Play services that allows
-                        // the user to update the APK
-                        int statusCode = ((GooglePlayServicesAvailabilityException)e)
-                                .getConnectionStatusCode();
-                        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
-                                LoginActivity.this,
-                                REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
-                        dialog.show();
-                    } else if (e instanceof UserRecoverableAuthException) {
-                        // Unable to authenticate, such as when the user has not yet granted
-                        // the app access to the account, but the user can fix this.
-                        // Forward the user to an activity in Google Play services.
-                        Intent intent = ((UserRecoverableAuthException)e).getIntent();
-                        startActivityForResult(intent,
-                                REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
-                    }
-                }
-            });
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            if (e instanceof GooglePlayServicesAvailabilityException) {
+                // The Google Play services APK is old, disabled, or not present.
+                // Show a dialog created by Google Play services that allows
+                // the user to update the APK
+                int statusCode = ((GooglePlayServicesAvailabilityException)e)
+                        .getConnectionStatusCode();
+                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
+                        LoginActivity.this,
+                        REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                dialog.show();
+            } else if (e instanceof UserRecoverableAuthException) {
+                // Unable to authenticate, such as when the user has not yet granted
+                // the app access to the account, but the user can fix this.
+                // Forward the user to an activity in Google Play services.
+                handlingException = true;
+                Intent intent = ((UserRecoverableAuthException)e).getIntent();
+                startActivityForResult(intent,
+                        REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+            }
+            }
+        });
     }
 
-    class GetTokenTask extends AsyncTask<Void, Void, Void> {
+    class DoLoginTask extends AsyncTask<Void, Void, Boolean> {
         LoginActivity mActivity;
         String mScope;
         String mEmail;
 
-        GetTokenTask(LoginActivity activity, String name, String scope) {
+        DoLoginTask(LoginActivity activity, String name, String scope) {
             this.mActivity = activity;
             this.mScope = scope;
             this.mEmail = name;
         }
 
-        /**
-         * Executes the asynchronous job. This runs when you call execute()
-         * on the AsyncTask instance.
-         */
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
+            boolean ok = false;
             try {
-                String token = fetchToken();
-                //GoogleAuthUtil.invalidateToken(mActivity, token);
-                if (token != null) {
-                    mActivity.onTokenRetrieval(token);
-                    Log.d(getClass().getSimpleName(), token);
-                    // Insert the good stuff here.
-                    // Use the token to access the user's Google data.
-                    //TODO
+                if(!accountService.isLoggedIn()){
+                    String token = fetchToken();
+                    if(token != null){
+                        Log.d(getClass().getSimpleName(), "trying to login with token");
+                        ok = accountService.login(token);
+                        if(!ok){
+                            GoogleAuthUtil.invalidateToken(mActivity, token);
+                        }
+                    }
+                }
+                else{
+                    ok = true;
                 }
             } catch (IOException e) {
                 // The fetchToken() method handles Google-specific exceptions,
@@ -291,13 +240,17 @@ public class LoginActivity extends PlusBaseActivity {
                 //TODO
                 Log.e(getClass().getSimpleName(), e.getMessage());
             }
-            return null;
+            return ok;
         }
 
-        /**
-         * Gets an authentication token from Google and handles any
-         * GoogleAuthException that may occur.
-         */
+        @Override
+        protected void onPostExecute(Boolean ok) {
+            if(ok){
+                FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
+                finish();
+            }
+        }
+
         protected String fetchToken() throws IOException {
             try {
                 return GoogleAuthUtil.getToken(mActivity, mEmail, mScope);
@@ -315,8 +268,5 @@ public class LoginActivity extends PlusBaseActivity {
             return null;
         }
     }
-
-
-
 }
 

@@ -88,30 +88,6 @@ public class Token implements Parcelable, Serializable {
         }
     };
 
-    public static void saveToFile(Token token, String fileName, Context context){
-        try {
-            FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(token);
-            os.close();
-        } catch (Exception e) {
-            Log.e("Token", "unable to save token to file", e);
-        }
-    }
-
-    public static Token getFromFile(String fileName, Context context){
-        try {
-            FileInputStream fis = context.openFileInput(fileName);
-            ObjectInputStream is = new ObjectInputStream(fis);
-            Token t = (Token) is.readObject();
-            is.close();
-            return t;
-        } catch (Exception e) {
-            Log.e("Token", "unable to retrieve token from file", e);
-        }
-        return null;
-    }
-
     public String getAuthorizationHeader(){
         return "Bearer " + getAccessToken();
     }
