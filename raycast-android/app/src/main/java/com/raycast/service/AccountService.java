@@ -72,7 +72,7 @@ public class AccountService extends AbstractCrudService {
             credendial.add("password", password);
             credendial.add("client_id", authStore.getClientId());
             credendial.add("client_secret", authStore.getClientSecret());
-            ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/account/login", credendial, Token.class);
+            ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/oauth/token", credendial, Token.class);
             Token token = responseEntity.getBody();
             if(token != null){
                 authStore.setToken(token);

@@ -7,11 +7,11 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -28,6 +28,7 @@ import com.raycast.service.AccountService;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.ViewById;
@@ -57,6 +58,9 @@ public class LoginActivity extends PlusBaseActivity {
     @ViewById(R.id.plus_sign_in_button) SignInButton mPlusSignInButton;
     @ViewById(R.id.plus_sign_out_buttons) View mSignOutButtons;
     @ViewById(R.id.login_form) View mLoginFormView;
+    @ViewById(R.id.user_username) EditText usernameView;
+    @ViewById(R.id.user_password) EditText passwordView;
+    @ViewById(R.id.error_text) TextView errorView;
     @Bean AccountService accountService;
     @InstanceState String mEmail;
 
@@ -80,6 +84,11 @@ public class LoginActivity extends PlusBaseActivity {
             mPlusSignInButton.setVisibility(View.GONE);
             return;
         }
+    }
+
+    @Click(R.id.send_login)
+    void sendLogin(){
+        new AuthenticateLoginPasswordTask().execute();
     }
 
     /**
@@ -153,7 +162,9 @@ public class LoginActivity extends PlusBaseActivity {
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
         super.onActivityResult(requestCode, responseCode, intent);
         if(responseCode == 0){
-            Toast.makeText(this, "não foi possível fazer login :(", Toast.LENGTH_LONG).show();
+            errorView.setText("Não foi possível fazer login :(");
+            showProgress(false);
+            mPlusSignInButton.setVisibility(View.VISIBLE);
         }
         else{
             new DoLoginTask(LoginActivity.this,  mEmail, SCOPE_AUTHCODE).execute();
@@ -176,7 +187,6 @@ public class LoginActivity extends PlusBaseActivity {
      * provide the user a response UI when an exception occurs.
      */
     public void handleException(final Exception e) {
-
         // Because this call comes from the AsyncTask, we must ensure that the following
         // code instead executes on the UI thread.
         runOnUiThread(new Runnable() {
@@ -200,6 +210,9 @@ public class LoginActivity extends PlusBaseActivity {
                 Intent intent = ((UserRecoverableAuthException)e).getIntent();
                 startActivityForResult(intent,
                         REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
+            }
+            else{
+                errorView.setText("Erro ao fazer login :(");
             }
             }
         });
@@ -227,6 +240,7 @@ public class LoginActivity extends PlusBaseActivity {
                         ok = accountService.login(token);
                         if(!ok){
                             GoogleAuthUtil.invalidateToken(mActivity, token);
+                            handleException(null);
                         }
                     }
                 }
@@ -266,6 +280,25 @@ public class LoginActivity extends PlusBaseActivity {
                 Log.e(getClass().getSimpleName(), fatalException.getMessage());
             }
             return null;
+        }
+    }
+
+    class AuthenticateLoginPasswordTask extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            boolean ok = accountService.login(usernameView.getText().toString(), passwordView.getText().toString());
+            return ok;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean ok) {
+            if(ok){
+                FeedActivity_.intent(LoginActivity.this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
+                finish();
+            }
+            else{
+                handleException(null);
+            }
         }
     }
 }
