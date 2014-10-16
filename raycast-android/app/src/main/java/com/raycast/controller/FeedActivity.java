@@ -263,7 +263,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             time.setText(formatUtil.dateFormat.format(messages.get(position).getTime()));
             Location messageLocation = messages.get(position).getLocation().toLocation();
             double distanceInKm = messageLocation.distanceTo(myLocation) / 1000;
-            distance.setText(new DecimalFormat("#.#").format(distanceInKm)+" km");
+            distance.setText(formatUtil.rayFormat.format(distanceInKm)+" km");
             return rowView;
         }
 
