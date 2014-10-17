@@ -1,24 +1,23 @@
 package com.raycast.service.auth;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.SharedPreferences;
 
 import com.raycast.domain.auth.Token;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 /**
  * Created by Lucas on 08/10/2014.
  */
 @EBean(scope = EBean.Scope.Singleton)
 public class RaycastAuthStore {
-    private static final String TOKEN_FILE_NAME = "RAYCAST_TOKEN";
+    private static final String FILE_NAME = "RAYCAST_TOKEN";
+    private static final String FILE_ACCESS_TOKEN = "access_token";
+    private static final String FILE_REFRESH_TOKEN = "refresh_token";
+    private static final String FILE_EXPIRES_IN = "expires_in";
+    private static final String FILE_TOKEN_TYPE = "token_type";
     private static final String CLIENT_ID = "raycast";
     private static final String CLIENT_SECRET = "android";
     @RootContext Context context;
@@ -33,36 +32,33 @@ public class RaycastAuthStore {
 
     public Token getToken() {
         if(token == null){
-            token = getFromFile(TOKEN_FILE_NAME);
+            token = getFromFile(FILE_NAME);
         }
         return token;
     }
     public void setToken(Token token) {
         this.token = token;
-        saveToFile(token, TOKEN_FILE_NAME);
+        saveToFile(token, FILE_NAME);
     }
 
+
     private void saveToFile(Token token, String fileName){
-        try {
-            FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(token);
-            os.close();
-        } catch (Exception e) {
-            Log.e("Token", "unable to save token to file", e);
-        }
+        SharedPreferences pref = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        pref.edit()
+            .putString(FILE_ACCESS_TOKEN, token.getAccessToken())
+            .putString(FILE_REFRESH_TOKEN, token.getRefreshToken())
+            .putString(FILE_TOKEN_TYPE, token.getTokenType())
+            .putInt(FILE_EXPIRES_IN, token.getExpiresIn())
+            .commit();
     }
 
     private Token getFromFile(String fileName){
-        try {
-            FileInputStream fis = context.openFileInput(fileName);
-            ObjectInputStream is = new ObjectInputStream(fis);
-            Token t = (Token) is.readObject();
-            is.close();
-            return t;
-        } catch (Exception e) {
-            Log.e("Token", "unable to retrieve token from file", e);
-        }
-        return null;
+        SharedPreferences pref = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        Token token = new Token();
+        token.setAccessToken(pref.getString(FILE_ACCESS_TOKEN, ""));
+        token.setRefreshToken(pref.getString(FILE_REFRESH_TOKEN, ""));
+        token.setTokenType(pref.getString(FILE_TOKEN_TYPE, ""));
+        token.setExpiresIn(pref.getInt(FILE_EXPIRES_IN, 0));
+        return token;
     }
 }

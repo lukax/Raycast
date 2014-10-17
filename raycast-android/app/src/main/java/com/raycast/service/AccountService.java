@@ -1,6 +1,7 @@
 package com.raycast.service;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.raycast.domain.auth.Token;
@@ -19,6 +20,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Text;
 
 /**
  * Created by Lucas on 08/10/2014.
@@ -34,7 +36,7 @@ public class AccountService extends AbstractCrudService {
     }
 
     public boolean login(final String code){
-        if(code == null){
+        if(TextUtils.isEmpty(code)){
             return false;
         }
         try {
@@ -59,7 +61,7 @@ public class AccountService extends AbstractCrudService {
     }
 
     public boolean login(final String username, final String password){
-        if(username == null || password == null){
+        if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             return false;
         }
         try {
@@ -86,7 +88,7 @@ public class AccountService extends AbstractCrudService {
     }
 
     public boolean isLoggedIn(){
-        if(authStore.getToken() == null) {
+        if(authStore.getToken() == null || TextUtils.isEmpty(authStore.getToken().getAccessToken())) {
             return false;
         }
         try {
