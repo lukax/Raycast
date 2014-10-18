@@ -117,6 +117,10 @@ public class AccountService extends AbstractCrudService {
         }
     }
 
+    public void logout(){
+        authStore.setToken(null);
+    }
+
     private Token exchangeRefreshToken(){
         try {
             RestTemplate restTemplate = new RestTemplate();

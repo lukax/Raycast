@@ -32,17 +32,19 @@ public class RaycastAuthStore {
 
     public Token getToken() {
         if(token == null){
-            token = getFromFile(FILE_NAME);
+            token = getFromFile();
         }
         return token;
     }
     public void setToken(Token token) {
         this.token = token;
-        saveToFile(token, FILE_NAME);
+        saveToFile(token);
     }
 
 
-    private void saveToFile(Token token, String fileName){
+    private void saveToFile(Token token){
+        if(token == null)
+            token = new Token();
         SharedPreferences pref = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         pref.edit()
             .putString(FILE_ACCESS_TOKEN, token.getAccessToken())
@@ -52,7 +54,7 @@ public class RaycastAuthStore {
             .commit();
     }
 
-    private Token getFromFile(String fileName){
+    private Token getFromFile(){
         SharedPreferences pref = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         Token token = new Token();
         token.setAccessToken(pref.getString(FILE_ACCESS_TOKEN, ""));
