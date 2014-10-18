@@ -35,13 +35,19 @@ import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.domain.Message;
 import com.raycast.service.base.RaycastRESTClient;
+import com.raycast.util.CachedImageLoader;
+import com.raycast.util.CachedImageLoader_;
 import com.raycast.util.FormatUtil;
 import com.raycast.util.Preferences;
 
+import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 import org.springframework.web.client.RestClientException;
 
@@ -51,12 +57,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-@EActivity
+@EActivity(R.layout.activity_feed)
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
 
     @RestService RaycastRESTClient raycastRESTClient;
+
     @Bean FormatUtil formatUtil;
+    @Bean CachedImageLoader loader;
+
+    @ViewById(R.id.feed) ListView feed;
 
     LocationClient locationClient;
     DisplayImageOptions options;
@@ -65,36 +75,24 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     float myFeedRadius;
     List<Message> messages;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
+    @Click(R.id.feed_messagewrite)
+    void writeMessageButton() {
+        Bundle dialogArgs = new Bundle();
+        dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
+        dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
+        DialogFragment dialog = new MessageWriteDialogFragment_();
+        dialog.setArguments(dialogArgs);
+        dialog.show(getFragmentManager(), "MessageWriteDialog");
+    }
+
+    @AfterInject
+    void getImageDisplayOptions() {
+        options = loader.getImageDisplayOptions();
+    }
+
+    @AfterViews
+    void startLocationRequests() {
         locationClient = new LocationClient(this, this, this);
-        Button msgWriteBtn = (Button) findViewById(R.id.feed_messagewrite);
-        msgWriteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Create an instance of the dialog fragment and show it
-                Bundle dialogArgs = new Bundle();
-                dialogArgs.putString(MessageWriteDialogFragment.ARGUMENT_USERID, "54051e25a3d4380200c795d2");
-                dialogArgs.putParcelable(MessageWriteDialogFragment.ARGUMENT_MYLOCATION, myLocation);
-                DialogFragment dialog = new MessageWriteDialogFragment_();
-                dialog.setArguments(dialogArgs);
-                dialog.show(getFragmentManager(), "MessageWriteDialog");
-            }
-        });
-        if (!ImageLoader.getInstance().isInited()) {
-            RaycastApp.initImageLoader(this);
-        }
-        options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_action_refresh)
-                .showImageForEmptyUri(R.drawable.ic_plusone_small_off_client)
-                .showImageOnFail(R.drawable.ic_launcher)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .considerExifParams(true)
-                .displayer(new RoundedBitmapDisplayer(20))
-                .build();
     }
 
     @Override
@@ -216,10 +214,9 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @UiThread
     void listMessagesUI(){
-        final ListView listView = (ListView) findViewById(R.id.feed);
-        final FeedAdapter feedAdapter = new FeedAdapter(listView.getContext(), R.layout.item_message, messages);
-        listView.setAdapter(feedAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        final FeedAdapter feedAdapter = new FeedAdapter(feed.getContext(), R.layout.item_message, messages);
+        feed.setAdapter(feedAdapter);
+        feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final Message msg = (Message) adapterView.getItemAtPosition(i);
@@ -240,7 +237,8 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         private final Context context;
         private final List<Message> messages;
 
-        private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+        CachedImageLoader loader = new CachedImageLoader(getApplicationContext());
+        private ImageLoadingListener animateFirstListener;
 
         public FeedAdapter(Context context, int textViewResourceId, List<Message> messages) {
             super(context, textViewResourceId, messages);
@@ -260,6 +258,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             TextView content = (TextView) rowView.findViewById(R.id.message_content);
             TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
             TextView time = (TextView) rowView.findViewById(R.id.message_time);
+            animateFirstListener = loader.getAnimateFirstListener();
             ImageLoader.getInstance().displayImage(messages.get(position).getAuthor().getImage(), profileImage, options, animateFirstListener);
             name.setText(messages.get(position).getAuthor().getName());
             content.setText(messages.get(position).getMessage());
