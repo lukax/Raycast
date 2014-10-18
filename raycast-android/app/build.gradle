@@ -17,22 +17,14 @@ apt {
 }
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'raycast'
-            keyPassword 'raycastftw'
-            storeFile file('/home/lucas/dev/Raycast/raycast-android/raycast-keystore.jks')
-            storePassword 'raycastftw'
-        }
-    }
     compileSdkVersion 19
     buildToolsVersion '20.0.0'
     defaultConfig {
         applicationId 'com.raycast'
         minSdkVersion 15
         targetSdkVersion 20
-        versionCode 2
-        versionName '1.1'
+        versionCode 3
+        versionName '1.2'
     }
     buildTypes {
         release {
