@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,7 +34,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.io.IOException;
 
-@EActivity(R.layout.activity_login)
+@EActivity
 public class LoginActivity extends Activity {
     public static final int REQUEST_ACCOUNT_CODE = 1001;
     public static final int RESULT_CANCELLED_CODE = 0;
@@ -45,10 +46,15 @@ public class LoginActivity extends Activity {
     ArrayAdapter<String> adapter;
     SharedPreferences pref;
 
-    @AfterViews
-    void afterViews() {
+    @Override
+    protected void onResume() {
+        super.onResume();
         checkIfAlreadyLoggedIn();
         /////////////////////////
+    }
+
+    @AfterViews
+    void afterViews() {
         avail_accounts = getAccountNames();
         adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, avail_accounts);
@@ -110,12 +116,20 @@ public class LoginActivity extends Activity {
         if(accountService.isLoggedIn()){
             onLoginSuccess();
         }
+        else{
+            onLoginFail();
+        }
     }
 
     @UiThread
     void onLoginSuccess(){
         FeedActivity_.intent(this).flags(Intent.FLAG_ACTIVITY_CLEAR_TOP).start();
         finish();
+    }
+
+    @UiThread
+    void onLoginFail(){
+        setContentView(R.layout.activity_login);
     }
 
     @UiThread
