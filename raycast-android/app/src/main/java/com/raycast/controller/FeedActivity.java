@@ -138,7 +138,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_feed_refresh:
-                listMessages();
+                listMessages(true);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -169,7 +169,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             myLocation.setLongitude(-43.1970773);
         }
         //Get List of messages
-        listMessages();
+        listMessages(false);
     }
 
     @Override
@@ -192,22 +192,25 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @Override
     public void onFinishedDialog() {
-        listMessages();
+        listMessages(true);
     }
 
     @Background
-    void listMessages() {
-        try {
-            messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
-        }catch(RestClientException ex){
-            notifyUser("Error while loading messages");
-            return;
-        }
-        if (messages.size() == 0) {
-            //TODO: get message string from 'strings'
-            notifyUser("No new messages!");
-        } else {
-            listMessagesUI();
+    void listMessages(boolean reload) {
+        if(reload || messages == null){
+            try {
+
+                    messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+            }catch(RestClientException ex){
+                notifyUser("Error while loading messages");
+                return;
+            }
+            if (messages.size() == 0) {
+                //TODO: get message string from 'strings'
+                notifyUser("No new messages!");
+            } else {
+                listMessagesUI();
+            }
         }
     }
 
