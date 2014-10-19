@@ -8,13 +8,16 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -66,7 +69,7 @@ import java.util.List;
 
 @EActivity(R.layout.activity_feed)
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener,LocationListener, MessageWriteDialogFragment.MessageWriteDialogListener {
+        GooglePlayServicesClient.OnConnectionFailedListener, LocationListener, MessageWriteDialogFragment.MessageWriteDialogListener {
 
     @RestService RaycastRESTClient raycastRESTClient;
 
@@ -75,6 +78,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     @Bean CachedImageLoader loader;
 
     @ViewById(R.id.feed) ListView feed;
+    @ViewById(R.id.swipe_container) SwipeRefreshLayout swipeView;
 
     LocationClient locationClient;
     DisplayImageOptions options;
@@ -231,8 +235,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     void listMessages(boolean reload) {
         if(reload || messages == null){
             try {
-
-                    messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+                messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
             }catch(RestClientException ex){
                 notifyUser("Error while loading messages");
                 return;
@@ -252,6 +255,21 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         messageFeedAdapter.setMyLocation(myLocation);
 
         feed.setAdapter(messageFeedAdapter);
+
+        swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeView.setRefreshing(true);
+                ( new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeView.setRefreshing(false);
+                        listMessages(true);
+                    }
+                }, 3000);
+            }
+        });
+
         feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -259,6 +277,22 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
                 MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
                 //TODO: Load MessageActivity or Popup and populate it with item data.
+            }
+        });
+
+        feed.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem == 0) {
+                    swipeView.setEnabled(true);
+                } else {
+                    swipeView.setEnabled(false);
+                }
             }
         });
     }
