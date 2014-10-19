@@ -41,6 +41,7 @@ import java.util.List;
 @EActivity(R.layout.activity_message_detail)
 @OptionsMenu(R.menu.message_detail)
 public class MessageDetailActivity extends RaycastBaseActivity {
+
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
     @Extra(EXTRA_MESSAGEDETAIL_MESSAGEID) String messageId;
     @RestService RaycastRESTClient raycastRESTClient;
@@ -68,12 +69,14 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
 
     class GetMessageTask extends AsyncTask<String, Void, Void>{
+
         @Override
         protected Void doInBackground(String... params) {
             message = raycastRESTClient.getMessageById(params[0]);
             comments = raycastRESTClient.getComments(params[0]);
             return null;
         }
+
         @Override
         protected void onPostExecute(Void param) {
             msgText.setText(message.getMessage());
@@ -83,6 +86,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     }
 
     class SaveCommentTask extends AsyncTask<String, Void, Void>{
+
         @Override
         protected Void doInBackground(String... params) {
             Comment comment = new Comment();
@@ -91,6 +95,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
             comments = raycastRESTClient.getComments(params[0]);
             return null;
         }
+
         @Override
         protected void onPostExecute(Void aVoid) {
             commentListAdapter.bind(comments);
@@ -101,6 +106,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
 @EBean
 class CommentListAdapter extends BaseAdapter {
+
     @RootContext Context context;
     List<Comment> comments;
 
@@ -115,7 +121,7 @@ class CommentListAdapter extends BaseAdapter {
 
     @Override
     public Comment getItem(int position) {
-        return comments.get((comments.size() -1) - position);
+        return comments.get((comments.size() - 1) - position);
     }
 
     @Override
@@ -125,21 +131,27 @@ class CommentListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         CommentItemView commentItemView;
+
         if (convertView == null) {
             commentItemView = CommentItemView_.build(context);
         } else {
             commentItemView = (CommentItemView) convertView;
         }
+
         commentItemView.bind(getItem(position));
+
         return commentItemView;
     }
 }
 
 @EViewGroup(R.layout.item_comment)
 class CommentItemView extends RelativeLayout{
+
     @Bean FormatUtil formatUtil;
     @Bean CachedImageLoader loader;
+
     @ViewById(R.id.comment_author) TextView authorView;
     @ViewById(R.id.comment_text) TextView commentView;
     @ViewById(R.id.comment_image) ImageView imageView;

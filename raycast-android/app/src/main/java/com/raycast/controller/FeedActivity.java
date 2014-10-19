@@ -16,9 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +48,9 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.EViewGroup;
+import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
@@ -63,6 +68,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @RestService RaycastRESTClient raycastRESTClient;
 
+    @Bean MessageFeedAdapter messageFeedAdapter;
     @Bean FormatUtil formatUtil;
     @Bean CachedImageLoader loader;
 
@@ -214,8 +220,10 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @UiThread
     void listMessagesUI(){
-        final FeedAdapter feedAdapter = new FeedAdapter(feed.getContext(), R.layout.item_message, messages);
-        feed.setAdapter(feedAdapter);
+        messageFeedAdapter.bind(messages);
+        messageFeedAdapter.setMyLocation(myLocation);
+
+        feed.setAdapter(messageFeedAdapter);
         feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -231,70 +239,99 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     void notifyUser(String msg){
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
+}
 
-    private class FeedAdapter extends ArrayAdapter<Message> {
-        private HashMap<Message, Integer> idMap = new HashMap<Message, Integer>();
-        private final Context context;
-        private final List<Message> messages;
+@EBean
+class MessageFeedAdapter extends BaseAdapter {
 
-        CachedImageLoader loader = new CachedImageLoader(getApplicationContext());
-        private ImageLoadingListener animateFirstListener;
+    @RootContext Context context;
 
-        public FeedAdapter(Context context, int textViewResourceId, List<Message> messages) {
-            super(context, textViewResourceId, messages);
-            this.context = context;
-            this.messages = messages;
-            for (int i = 0; i < messages.size(); i++) {
-                idMap.put(messages.get(i), i);
-            }
-        }
+    Location myLocation;
+    List<Message> messages;
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.item_message, parent, false);
-            ImageView profileImage = (ImageView) rowView.findViewById(R.id.message_image);
-            TextView name = (TextView) rowView.findViewById(R.id.message_author);
-            TextView content = (TextView) rowView.findViewById(R.id.message_content);
-            TextView distance = (TextView) rowView.findViewById(R.id.message_distance);
-            TextView time = (TextView) rowView.findViewById(R.id.message_time);
-            animateFirstListener = loader.getAnimateFirstListener();
-            ImageLoader.getInstance().displayImage(messages.get(position).getAuthor().getImage(), profileImage, options, animateFirstListener);
-            name.setText(messages.get(position).getAuthor().getName());
-            content.setText(messages.get(position).getMessage());
-            time.setText(formatUtil.dateFormat.format(messages.get(position).getTime()));
-            Location messageLocation = messages.get(position).getLocation().toLocation();
-            double distanceInKm = messageLocation.distanceTo(myLocation) / 1000;
-            distance.setText(formatUtil.rayFormat.format(distanceInKm)+" km");
-            return rowView;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            Message item = getItem(position);
-            return idMap.get(item);
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
+    public void bind(List<Message> messages) {
+        this.messages = messages;
     }
 
-    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+    public void setMyLocation(Location myLocation) {
+        this.myLocation = myLocation;
+    }
 
-        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        MessageFeedItemView messageItem;
 
-        @Override
-        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-            if (loadedImage != null) {
-                ImageView imageView = (ImageView) view;
-                boolean firstDisplay = !displayedImages.contains(imageUri);
-                if (firstDisplay) {
-                    FadeInBitmapDisplayer.animate(imageView, 500);
-                    displayedImages.add(imageUri);
-                }
-            }
+        if (convertView == null) {
+            messageItem = MessageFeedItemView_.build(context);
+        } else {
+            messageItem = (MessageFeedItemView) convertView;
         }
+
+        messageItem.setLocation(myLocation);
+        messageItem.bind(getItem(position));
+
+        return messageItem;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public Message getItem(int position) {
+        return messages.get(position);
+    }
+
+    @Override
+    public int getCount() {
+        return messages.size();
+    }
+}
+
+@EViewGroup(R.layout.item_message)
+class MessageFeedItemView extends RelativeLayout {
+
+    @Bean FormatUtil formatUtil;
+    @Bean CachedImageLoader loader;
+
+    @ViewById(R.id.message_image) ImageView profileImage;
+    @ViewById(R.id.message_author) TextView name;
+    @ViewById(R.id.message_content) TextView content;
+    @ViewById(R.id.message_distance) TextView distance;
+    @ViewById(R.id.message_time) TextView time;
+
+    Location myLocation;
+    DisplayImageOptions options;
+    ImageLoadingListener animateFirstListener;
+
+    @AfterInject
+    void afterInjection() {
+        options = loader.getImageDisplayOptions();
+        animateFirstListener = loader.getAnimateFirstListener();
+    }
+
+    public MessageFeedItemView(Context context) {
+        super(context);
+    }
+
+    public void setLocation(Location myLocation) {
+        this.myLocation = myLocation;
+    }
+
+    public void bind(Message message) {
+        ImageLoader.getInstance().displayImage(message.getAuthor().getImage(), profileImage, options, animateFirstListener);
+
+        name.setText(message.getAuthor().getName());
+        content.setText(message.getMessage());
+        distance.setText(calculateMessageDistanceFromMyLocation(message));
+        time.setText(formatUtil.dateFormat.format(message.getTime()));
+    }
+
+    private String calculateMessageDistanceFromMyLocation(Message message) {
+        Location messageLocation = message.getLocation().toLocation();
+        double distanceInKm = messageLocation.distanceTo(myLocation) / 1000.0;
+
+        return formatUtil.rayFormat.format(distanceInKm) + " km";
     }
 }
