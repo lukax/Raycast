@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -64,7 +66,7 @@ import java.util.List;
 
 @EActivity(R.layout.activity_feed)
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener, MessageWriteDialogFragment.MessageWriteDialogListener {
+        GooglePlayServicesClient.OnConnectionFailedListener,LocationListener, MessageWriteDialogFragment.MessageWriteDialogListener {
 
     @RestService RaycastRESTClient raycastRESTClient;
 
@@ -99,6 +101,32 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     @AfterViews
     void startLocationRequests() {
         locationClient = new LocationClient(this, this, this);
+
+        LocationRequest locationRequest = LocationRequest.create();
+
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(300000); // 5 minutes
+        locationRequest.setFastestInterval(10000); // 1 minute
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d(provider, " changed to status: " + status);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        myLocation = location;
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d(provider, " enabled");
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d(provider, " disabled");
     }
 
     @Override
