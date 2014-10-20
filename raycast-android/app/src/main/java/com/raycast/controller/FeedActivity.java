@@ -4,7 +4,6 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -12,16 +11,11 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -34,16 +28,13 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
+import com.raycast.controller.component.MessageFeedAdapter;
 import com.raycast.domain.Message;
 import com.raycast.service.base.RaycastRESTClient;
 import com.raycast.util.CachedImageLoader;
-import com.raycast.util.CachedImageLoader_;
 import com.raycast.util.FormatUtil;
 import com.raycast.util.Preferences;
 
@@ -53,18 +44,12 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EViewGroup;
-import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 import org.springframework.web.client.RestClientException;
 
-import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 @EActivity(R.layout.activity_feed)
@@ -303,97 +288,3 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 }
 
-@EBean
-class MessageFeedAdapter extends BaseAdapter {
-
-    @RootContext Context context;
-
-    Location myLocation;
-    List<Message> messages;
-
-    public void bind(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    public void setMyLocation(Location myLocation) {
-        this.myLocation = myLocation;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        MessageFeedItemView messageItem;
-
-        if (convertView == null) {
-            messageItem = MessageFeedItemView_.build(context);
-        } else {
-            messageItem = (MessageFeedItemView) convertView;
-        }
-
-        messageItem.setLocation(myLocation);
-        messageItem.bind(getItem(position));
-
-        return messageItem;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public Message getItem(int position) {
-        return messages.get(position);
-    }
-
-    @Override
-    public int getCount() {
-        return messages.size();
-    }
-}
-
-@EViewGroup(R.layout.item_message)
-class MessageFeedItemView extends RelativeLayout {
-
-    @Bean FormatUtil formatUtil;
-    @Bean CachedImageLoader loader;
-
-    @ViewById(R.id.message_image) ImageView profileImage;
-    @ViewById(R.id.message_author) TextView name;
-    @ViewById(R.id.message_content) TextView content;
-    @ViewById(R.id.message_distance) TextView distance;
-    @ViewById(R.id.message_time) TextView time;
-
-    Location myLocation;
-    DisplayImageOptions options;
-    ImageLoadingListener animateFirstListener;
-
-    @AfterInject
-    void afterInjection() {
-        options = loader.getImageDisplayOptions();
-        animateFirstListener = loader.getAnimateFirstListener();
-    }
-
-    public MessageFeedItemView(Context context) {
-        super(context);
-    }
-
-    public void setLocation(Location myLocation) {
-        this.myLocation = myLocation;
-    }
-
-    public void bind(Message message) {
-        ImageLoader.getInstance().displayImage(message.getAuthor().getImage(), profileImage, options, animateFirstListener);
-
-        name.setText(message.getAuthor().getName());
-        content.setText(message.getMessage());
-        distance.setText(calculateMessageDistanceFromMyLocation(message));
-        time.setText(formatUtil.dateFormat.format(message.getTime()));
-    }
-
-    private String calculateMessageDistanceFromMyLocation(Message message) {
-        Location messageLocation = message.getLocation().toLocation();
-        double distanceInKm = messageLocation.distanceTo(myLocation) / 1000.0;
-
-        return formatUtil.rayFormat.format(distanceInKm) + " km";
-    }
-}
