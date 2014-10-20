@@ -60,8 +60,8 @@ public class CachedImageLoader {
     private void setImageDisplayOptions() {
         options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.ic_action_refresh)
-                .showImageForEmptyUri(R.drawable.ic_plusone_small_off_client)
-                .showImageOnFail(R.drawable.ic_launcher)
+                .showImageForEmptyUri(R.drawable.ic_action_person)
+                .showImageOnFail(R.drawable.ic_action_person)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .considerExifParams(true)
