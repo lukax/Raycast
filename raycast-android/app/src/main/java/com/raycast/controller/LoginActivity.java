@@ -210,6 +210,7 @@ class PlusLoginTask extends AsyncTask<Void, Void, Boolean> {
             // so this indicates something went wrong at a higher level.
             // TIP: Check for network connectivity before starting the AsyncTask.
             //TODO
+            mActivity.handleException(e);
             Log.e("AuthException", e.getMessage());
         } catch (UserRecoverableAuthException e) {
             // GooglePlayServices.apk is either old, disabled, or not present
@@ -219,6 +220,7 @@ class PlusLoginTask extends AsyncTask<Void, Void, Boolean> {
         } catch (GoogleAuthException e) {
             // Some other type of unrecoverable exception has occurred.
             // Report and log the error as appropriate for your app.
+            mActivity.handleException(e);
             Log.e("AuthException", e.getMessage());
         }
         return null;
