@@ -63,8 +63,14 @@ public class MessageFeedItemView extends RelativeLayout {
 
     private String calculateMessageDistanceFromMyLocation(Message message) {
         Location messageLocation = message.getLocation().toLocation();
-        double distanceInKm = messageLocation.distanceTo(myLocation) / 1000.0;
+        double distance = messageLocation.distanceTo(myLocation);
 
-        return formatUtil.rayFormat.format(distanceInKm) + " km";
+        if (distance < 1000.0) {
+            return formatUtil.rayFormat.format(distance) + " m";
+        } else {
+            distance /= 1000.0;
+
+            return formatUtil.rayFormat.format(distance) + " km";
+        }
     }
 }
