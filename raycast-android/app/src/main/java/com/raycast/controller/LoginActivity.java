@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,6 +35,7 @@ import java.io.IOException;
 
 @EActivity
 public class LoginActivity extends Activity {
+    public static final String TAG = "LoginActivity";
     public static final int REQUEST_ACCOUNT_CODE = 1001;
     public static final int RESULT_CANCELLED_CODE = 0;
     @ViewById(R.id.user_username) EditText usernameView;
@@ -134,6 +134,7 @@ public class LoginActivity extends Activity {
 
     @UiThread
     void handleException(Exception ex){
+        Log.e(TAG, ex.getMessage(), ex);
         if(ex instanceof GoogleAuthException){
             startActivityForResult(((UserRecoverableAuthException) ex).getIntent(), 1001);
         }

@@ -1,9 +1,10 @@
 package com.raycast.controller;
 
-import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
@@ -13,12 +14,14 @@ import com.raycast.domain.Message;
 import com.raycast.service.base.RaycastRESTClient;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 
@@ -28,6 +31,7 @@ import java.util.List;
 @OptionsMenu(R.menu.message_detail)
 public class MessageDetailActivity extends RaycastBaseActivity {
 
+    public final static String TAG = "MessageDetailActivity";
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
     @Extra(EXTRA_MESSAGEDETAIL_MESSAGEID) String messageId;
     @RestService RaycastRESTClient raycastRESTClient;
@@ -40,52 +44,53 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @AfterViews
     void afterViews(){
-        new GetMessageTask().execute(messageId);
+        fetchMessage();
     }
 
     @OptionsItem(R.id.action_refresh)
-    void actionRefresh(){
-        new GetMessageTask().execute(messageId);
+    @Background
+    void fetchMessage(){
+        try{
+            message = raycastRESTClient.getMessageById(messageId);
+            comments = raycastRESTClient.getComments(messageId);
+            updateMessageUi();
+        }catch(Exception ex){
+            handleException("Não foi possível baixar mensagem :(", ex);
+        }
     }
 
     @Click(R.id.messagedetail_sendcomment)
+    @Background
     void sendComment(){
-        new SaveCommentTask().execute(messageId);
-    }
-
-
-    class GetMessageTask extends AsyncTask<String, Void, Void>{
-
-        @Override
-        protected Void doInBackground(String... params) {
-            message = raycastRESTClient.getMessageById(params[0]);
-            comments = raycastRESTClient.getComments(params[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void param) {
-            msgText.setText(message.getMessage());
-            commentListAdapter.bind(comments);
-            commentList.setAdapter(commentListAdapter);
-        }
-    }
-
-    class SaveCommentTask extends AsyncTask<String, Void, Void>{
-
-        @Override
-        protected Void doInBackground(String... params) {
+        try{
             Comment comment = new Comment();
             comment.setComment(editComment.getText().toString());
-            raycastRESTClient.addComment(params[0], comment);
-            comments = raycastRESTClient.getComments(params[0]);
-            return null;
-        }
+            raycastRESTClient.addComment(messageId, comment);
+            comments = raycastRESTClient.getComments(messageId);
+            updateCommentUi();
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            commentListAdapter.bind(comments);
-            commentList.setAdapter(commentListAdapter);
+        }catch (Exception ex){
+            handleException("Não foi possível enviar comentário :(", ex);
         }
+    }
+
+    @UiThread
+    void updateMessageUi(){
+        msgText.setText(message.getMessage());
+        commentListAdapter.bind(comments);
+        commentList.setAdapter(commentListAdapter);
+    }
+
+    @UiThread
+    void updateCommentUi(){
+        commentListAdapter.bind(comments);
+        commentList.setAdapter(commentListAdapter);
+        editComment.setText("");
+    }
+
+    @UiThread
+    void handleException(String msg, Exception ex){
+        Log.e(TAG, ex.getMessage(), ex);
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }
