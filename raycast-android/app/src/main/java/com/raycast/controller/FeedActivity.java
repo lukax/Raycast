@@ -45,6 +45,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EViewGroup;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
@@ -53,8 +54,11 @@ import org.springframework.web.client.RestClientException;
 import java.util.List;
 
 @EActivity(R.layout.activity_feed)
+@OptionsMenu(R.menu.feed)
 public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener, MessageWriteDialogFragment.MessageWriteDialogListener {
+
+    public static final String TAG = "FeedActivity";
 
     @RestService RaycastRESTClient raycastRESTClient;
 
@@ -139,33 +143,6 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.feed, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        //Make refresh invisible if there's no location available yet
-        menu.findItem(R.id.action_feed_refresh).setVisible(myLocation != null);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_feed_refresh:
-                listMessages(true);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onBackPressed(){
         FragmentManager fm = getFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
@@ -218,6 +195,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @Background
     void listMessages(boolean reload) {
+        swipeView.setRefreshing(true);
         if(reload || messages == null){
             try {
                 messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
@@ -232,6 +210,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
                 listMessagesUI();
             }
         }
+        swipeView.setRefreshing(false);
     }
 
     @UiThread
@@ -244,14 +223,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                swipeView.setRefreshing(true);
-                ( new Handler()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeView.setRefreshing(false);
-                        listMessages(true);
-                    }
-                }, 3000);
+                listMessages(true);
             }
         });
 
