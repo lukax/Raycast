@@ -195,21 +195,19 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @Background
     void listMessages(boolean reload) {
+        if(!reload && messages != null)
+            return;
+
         swipeView.setRefreshing(true);
-        if(reload || messages == null){
-            try {
-                messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
-            }catch(RestClientException ex){
-                notifyUser("Error while loading messages");
-                return;
-            }
-            if (messages.size() == 0) {
-                //TODO: get message string from 'strings'
-                notifyUser("No new messages!");
-            } else {
-                listMessagesUI();
-            }
+        try {
+            messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+        }catch(RestClientException ex){
+            notifyUser("Erro ao carregar mensagens :(");
         }
+        if (messages.size() == 0) {
+            notifyUser("Nenhuma mensagem nova!");
+        }
+        listMessagesUI();
         swipeView.setRefreshing(false);
     }
 
