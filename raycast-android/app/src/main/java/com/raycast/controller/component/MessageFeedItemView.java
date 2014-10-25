@@ -58,6 +58,6 @@ public class MessageFeedItemView extends RelativeLayout {
         name.setText(message.getAuthor().getName());
         content.setText(message.getMessage());
         distance.setText(formatUtil.calculateMessageDistanceFromMyLocation(message, myLocation));
-        time.setText(formatUtil.dateFormat.format(message.getTime()));
+        time.setText(formatUtil.formatDate(message));
     }
 }

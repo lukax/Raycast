@@ -38,6 +38,8 @@ import com.raycast.util.CachedImageLoader;
 import com.raycast.util.FormatUtil;
 import com.raycast.util.Preferences;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -100,6 +102,11 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(300000); // 5 minutes
         locationRequest.setFastestInterval(10000); // 1 minute
+    }
+
+    @AfterViews
+    void getTimeZone() {
+        JodaTimeAndroid.init(getApplicationContext());
     }
 
     @Override
