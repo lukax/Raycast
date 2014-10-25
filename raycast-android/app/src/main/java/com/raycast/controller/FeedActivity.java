@@ -225,6 +225,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
         feed.setAdapter(messageFeedAdapter);
 
+        swipeView.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple);
         swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
