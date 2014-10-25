@@ -43,12 +43,19 @@
         android:layout_alignEnd="@id/messagedetail_editcomment"
         />
 
-    <ListView
-        android:id="@+id/messagedetail_commentlist"
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/messagedetail_editcomment"
-        android:layout_alignParentBottom="true" />
+        android:id="@+id/swipe_area">
 
+        <ListView
+            android:id="@+id/messagedetail_commentlist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/messagedetail_editcomment"
+            android:layout_alignParentBottom="true" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
