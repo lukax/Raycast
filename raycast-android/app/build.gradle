@@ -65,4 +65,5 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
+    compile 'net.danlew:android.joda:2.4.1'
 }
