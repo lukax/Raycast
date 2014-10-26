@@ -52,6 +52,14 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @AfterViews
     void afterViews(){
+        swipeArea.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple);
+        swipeArea.setEnabled(false);
+
+        fetchMessage();
+    }
+
+    @AfterViews
+    void setListeners() {
         if (editComment.getText() == null || editComment.getText().toString().length() == 0) {
             sendCommentButton.setEnabled(false);
             sendCommentButton.setVisibility(View.GONE);
@@ -79,35 +87,6 @@ public class MessageDetailActivity extends RaycastBaseActivity {
                 }
             }
         });
-
-        fetchMessage();
-    }
-
-    @AfterViews
-    void setListeners() {
-        swipeArea.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple);
-        swipeArea.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                updateCommentUi();
-            }
-        });
-
-        commentList.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem == 0) {
-                    swipeArea.setEnabled(true);
-                } else {
-                    swipeArea.setEnabled(false);
-                }
-            }
-        });
     }
 
     @OptionsItem(R.id.action_refresh)
@@ -125,6 +104,8 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     @Click(R.id.messagedetail_sendcomment)
     @Background
     void sendComment(){
+        swipeArea.setRefreshing(true);
+
         try{
             Comment comment = new Comment();
             comment.setComment(editComment.getText().toString());
@@ -133,6 +114,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
             updateCommentUi();
         }catch (Exception ex){
             handleException("Não foi possível enviar comentário :(", ex);
+            swipeArea.setRefreshing(false);
         }
     }
 
@@ -145,8 +127,6 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @UiThread
     void updateCommentUi(){
-        swipeArea.setRefreshing(true);
-
         commentListAdapter.bind(comments);
         commentList.setAdapter(commentListAdapter);
         editComment.setText("");
