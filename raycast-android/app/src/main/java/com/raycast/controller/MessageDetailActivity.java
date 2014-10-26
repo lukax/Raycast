@@ -1,8 +1,12 @@
 package com.raycast.controller;
 
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,6 +41,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     public final static String EXTRA_MESSAGEDETAIL_MESSAGEID = "com.raycast.messagedetail.messageid";
     @Extra(EXTRA_MESSAGEDETAIL_MESSAGEID) String messageId;
     @RestService RaycastRESTClient raycastRESTClient;
+    @ViewById(R.id.messagedetail_sendcomment) Button sendCommentButton;
     @ViewById(R.id.swipe_area) SwipeRefreshLayout swipeArea;
     @ViewById(R.id.messagedetail_message) TextView msgText;
     @ViewById(R.id.messagedetail_editcomment) EditText editComment;
@@ -47,6 +52,34 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @AfterViews
     void afterViews(){
+        if (editComment.getText() == null || editComment.getText().toString().length() == 0) {
+            sendCommentButton.setEnabled(false);
+            sendCommentButton.setVisibility(View.GONE);
+        }
+
+        editComment.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString() == null || s.toString().length() == 0) {
+                    sendCommentButton.setEnabled(false);
+                    sendCommentButton.setVisibility(View.GONE);
+                } else {
+                    sendCommentButton.setEnabled(true);
+                    sendCommentButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         fetchMessage();
     }
 

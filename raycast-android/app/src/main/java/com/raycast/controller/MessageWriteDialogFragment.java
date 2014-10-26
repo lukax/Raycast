@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import com.raycast.service.base.RaycastRESTClient;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 
 /**
@@ -41,8 +44,7 @@ public class MessageWriteDialogFragment extends DialogFragment {
     public static final String ARGUMENT_MYLOCATION = "com.raycast.messagewritedialogfragment.mylocation";
     public static final String ARGUMENT_USERID = "com.raycast.messagewritedialogfragment.userid";
 
-    @RestService
-    RaycastRESTClient raycastRESTClient;
+    @RestService RaycastRESTClient raycastRESTClient;
 
     private Location myLocation;
     private String userId;
@@ -62,7 +64,14 @@ public class MessageWriteDialogFragment extends DialogFragment {
         builder.setView(view);
         final Dialog dialog = builder.create();
 
+        final Button sendBtn = (Button) view.findViewById(R.id.dialogmessagewrite_sendbtn);
         EditText messageTxt = (EditText) view.findViewById(R.id.dialogmessagewrite_messagetext);
+
+        if (messageTxt.getText() == null || messageTxt.getText().toString().length() == 0) {
+            sendBtn.setEnabled(false);
+            sendBtn.setVisibility(View.GONE);
+        }
+
         messageTxt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -73,6 +82,7 @@ public class MessageWriteDialogFragment extends DialogFragment {
                 return false;
             }
         });
+
         messageTxt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -82,7 +92,29 @@ public class MessageWriteDialogFragment extends DialogFragment {
             }
         });
 
-        Button sendBtn = (Button) view.findViewById(R.id.dialogmessagewrite_sendbtn);
+        messageTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s == null || s.toString().length() == 0) {
+                    sendBtn.setEnabled(false);
+                    sendBtn.setVisibility(View.GONE);
+                } else {
+                    sendBtn.setEnabled(true);
+                    sendBtn.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
