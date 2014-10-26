@@ -34,11 +34,11 @@ public class FormatUtil {
         Date messageDate = message.getTime();
 
         if (new DateTime(messageDate).toLocalDate().equals(new DateTime().toLocalDate())) {
-            return "Hoje";
+            return new SimpleDateFormat("HH:mm").format(messageDate);
         }
 
         if (new DateTime(messageDate).toLocalDate().equals(new DateTime().minusDays(1).toLocalDate())) {
-            return "Ontem";
+            return "1d";
         }
 
         return dateFormat.format(messageDate);
