@@ -18,7 +18,7 @@ import java.util.Date;
  */
 @EBean
 public class FormatUtil {
-    public SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM HH:mm");
+    public SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
     public DecimalFormat rayFormat = new DecimalFormat("#.#");
 
     public String calculateMessageDistanceFromMyLocation(Message message, Location location) {

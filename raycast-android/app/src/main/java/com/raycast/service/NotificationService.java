@@ -76,7 +76,7 @@ public class NotificationService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle("Raycast")
-                .setContentText("You have " + notifications.size() + " unread notifications")
+                .setContentText("Você tem " + notifications.size() + " notificações não lidas")
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pendingIntent);
         notificationManager.notify(0, builder.build());
