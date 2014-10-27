@@ -45,7 +45,9 @@ public class FormatUtil {
         } else if (timeDiff.getStandardDays() < 7) {
             return timeDiff.getStandardDays() + "d";
         } else {
-            return dateFormat.format(message.getTime());
+            String date = dateFormat.format(message.getTime()); // i.e. 17/out 22:59
+
+            return date.replace(date.substring(3, 4), date.substring(3, 4).toUpperCase()); // i.e 17/Out 22:59
         }
     }
 
@@ -62,7 +64,9 @@ public class FormatUtil {
         } else if (timeDiff.getStandardDays() < 7) {
             return timeDiff.getStandardDays() + "d";
         } else {
-            return dateFormat.format(comment.getTime());
+            String date = dateFormat.format(comment.getTime()); // i.e. 17/out 22:59
+
+            return date.replace(date.substring(3, 4), date.substring(3, 4).toUpperCase()); // i.e 17/Out 22:59
         }
     }
 }
