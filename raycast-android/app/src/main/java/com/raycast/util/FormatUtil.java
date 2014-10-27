@@ -2,6 +2,7 @@ package com.raycast.util;
 
 import android.location.Location;
 
+import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
 
 import org.androidannotations.annotations.EBean;
@@ -42,5 +43,19 @@ public class FormatUtil {
         }
 
         return dateFormat.format(messageDate);
+    }
+
+    public String formatDate(Comment comment) {
+        Date commentDate = comment.getTime();
+
+        if (new DateTime(commentDate).toLocalDate().equals(new DateTime().toLocalDate())) {
+            return new SimpleDateFormat("HH:mm").format(commentDate);
+        }
+
+        if (new DateTime(commentDate).toLocalDate().equals(new DateTime().minusDays(1).toLocalDate())) {
+            return "1d";
+        }
+
+        return dateFormat.format(commentDate);
     }
 }
