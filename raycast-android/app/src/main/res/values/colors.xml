@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="raycast_purple_main">#ff733f8c</color>
+    <color name="raycast_purple_sub">#ff925ab4</color>
+    <color name="raycast_purple_dark">#ff563269</color>
+    <color name="raycast_purple_light">#ffc083eb</color>
+</resources>
