@@ -7,6 +7,7 @@ import com.raycast.domain.Message;
 
 import org.androidannotations.annotations.EBean;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -32,30 +33,36 @@ public class FormatUtil {
     }
 
     public String formatDate(Message message) {
-        Date messageDate = message.getTime();
+        DateTime now = new DateTime();
+        DateTime messageTime = new DateTime(message.getTime());
 
-        if (new DateTime(messageDate).toLocalDate().equals(new DateTime().toLocalDate())) {
-            return new SimpleDateFormat("HH:mm").format(messageDate);
+        Duration timeDiff = new Duration(messageTime, now);
+
+        if (timeDiff.getStandardMinutes() < 60) {
+            return  timeDiff.getStandardMinutes() + "m";
+        } else if (timeDiff.getStandardHours() < 24) {
+            return timeDiff.getStandardHours() + "h";
+        } else if (timeDiff.getStandardDays() < 7) {
+            return timeDiff.getStandardDays() + "d";
+        } else {
+            return dateFormat.format(message.getTime());
         }
-
-        if (new DateTime(messageDate).toLocalDate().equals(new DateTime().minusDays(1).toLocalDate())) {
-            return "1d";
-        }
-
-        return dateFormat.format(messageDate);
     }
 
     public String formatDate(Comment comment) {
-        Date commentDate = comment.getTime();
+        DateTime now = new DateTime();
+        DateTime commentTime = new DateTime(comment.getTime());
 
-        if (new DateTime(commentDate).toLocalDate().equals(new DateTime().toLocalDate())) {
-            return new SimpleDateFormat("HH:mm").format(commentDate);
+        Duration timeDiff = new Duration(commentTime, now);
+
+        if (timeDiff.getStandardMinutes() < 60) {
+            return  timeDiff.getStandardMinutes() + "m";
+        } else if (timeDiff.getStandardHours() < 24) {
+            return timeDiff.getStandardHours() + "h";
+        } else if (timeDiff.getStandardDays() < 7) {
+            return timeDiff.getStandardDays() + "d";
+        } else {
+            return dateFormat.format(comment.getTime());
         }
-
-        if (new DateTime(commentDate).toLocalDate().equals(new DateTime().minusDays(1).toLocalDate())) {
-            return "1d";
-        }
-
-        return dateFormat.format(commentDate);
     }
 }
