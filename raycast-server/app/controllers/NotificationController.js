@@ -29,7 +29,7 @@ exports.removeNotificationById = function(req, res) {
 
 // DELETE
 // remove all notifications
-exports.removeAllNotifications = function(req, res) {
+exports.removeNotifications = function(req, res) {
     Notification.remove({ user: req.user._id }, function(err, notifications) {
         if (err) {
             res.send(err);
