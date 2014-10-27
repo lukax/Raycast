@@ -92,12 +92,15 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     @OptionsItem(R.id.action_refresh)
     @Background
     void fetchMessage(){
+        swipeArea.setRefreshing(true);
+
         try{
             message = raycastRESTClient.getMessageById(messageId);
             comments = raycastRESTClient.getComments(messageId);
             updateMessageUi();
         }catch(Exception ex){
             handleException("Não foi possível baixar mensagem :(", ex);
+            swipeArea.setRefreshing(false);
         }
     }
 
@@ -123,6 +126,8 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         msgText.setText(message.getMessage());
         commentListAdapter.bind(comments);
         commentList.setAdapter(commentListAdapter);
+
+        swipeArea.setRefreshing(false);
     }
 
     @UiThread
