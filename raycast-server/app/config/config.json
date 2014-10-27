@@ -6,6 +6,6 @@
         "clientSecret": "dKnGfqT5xQl71qIsLWVAaq3g"
     },
     "mongoose": {
-        "uri": "mongodb://heroku_app28927639:abffo06scll70t5j9epkef6da5@ds051868.mongolab.com:51868/heroku_app28927639"
+        "uri": "mongodb://localhost/raycast"
     }
 }

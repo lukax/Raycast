@@ -39,9 +39,12 @@ module.exports = function(router){
         .get(userController.getUserInfo);
 
     // --------- Notifications ----------
-    router.route('/user/notifications')
+    router.route('/user/notification')
         .get(notificationsController.getNotifications)
         .delete(notificationsController.removeNotifications);
+
+    router.route('/user/notification/:notification_id')
+        .delete(notificationsController.removeNotificationById);
 
     router.route('/user/id/:user_id')
         .get(userController.getUserById)
@@ -70,12 +73,12 @@ module.exports = function(router){
     router.route('/message/all')
         .get(messageController.getAllMessage);
 
+    router.route('/message/user/:user_username')
+        .get(messageController.getAllMessageByUser);
+
     router.route('/message/:message_id')
         .get(messageController.getMessageById)
         .delete(messageController.removeMessage);
-
-    router.route('/message/user/:user_username')
-        .get(messageController.getAllMessageByUser);
 
     // --------- Comments ----------
     router.route('/message/:message_id/comment')

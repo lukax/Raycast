@@ -6,7 +6,6 @@ var Notification = require('../models/Notification');
 // GET
 // return list of Notifications
 exports.getNotifications = function(req, res) {
-    log.debug(req.user._id);
     Notification.find({ user: req.user._id }, function(err, notifications) {
         if (err) {
             res.send(err);
@@ -17,8 +16,20 @@ exports.getNotifications = function(req, res) {
 };
 
 // DELETE
+// remove a notification by id
+exports.removeNotificationById = function(req, res) {
+    Notification.remove({ _id: req.params.notification_id }, function(err, notifications) {
+        if (err) {
+            res.send(err);
+        }
+
+        res.json({ message: 'Success' });
+    });
+};
+
+// DELETE
 // remove all notifications
-exports.removeNotifications = function(req, res) {
+exports.removeAllNotifications = function(req, res) {
     Notification.remove({ user: req.user._id }, function(err, notifications) {
         if (err) {
             res.send(err);
