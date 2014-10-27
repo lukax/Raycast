@@ -10,5 +10,7 @@
     <string name="message_distance">Distance</string>
     <string name="messagewrite_title">Cast a message</string>
     <string name="title_activity_message_detail">Message</string>
+    <string name="message_detail_default_text">...</string>
+    <string name="comment_time">Time</string>
 
 </resources>

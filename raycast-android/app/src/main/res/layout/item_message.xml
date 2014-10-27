@@ -10,43 +10,58 @@
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/profile_image"
-        android:src="@drawable/ic_launcher"
+        android:id="@+id/message_image"
+        android:src="@drawable/ic_action_person"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
+        android:id="@+id/message_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/message_distance"
-        android:id="@+id/message_distance"
-        android:layout_toRightOf="@+id/profile_image"
-        android:layout_below="@+id/message_creator"
-        android:textSize="14sp"
-        android:layout_marginLeft="25dp" />
+        android:layout_below="@id/message_image"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="14sp"/>
 
     <TextView
+        android:id="@+id/message_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/message_author"
-        android:gravity="center_vertical|center_horizontal"
-        android:id="@+id/message_creator"
-        android:layout_toRightOf="@+id/profile_image"
+        android:layout_toRightOf="@+id/message_image"
+        android:layout_toEndOf="@id/message_image"
         android:textSize="18sp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="2dp" />
 
     <TextView
+        android:id="@+id/message_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/comment_time"
+        android:gravity="end"
+        android:layout_toRightOf="@+id/message_author"
+        android:layout_toEndOf="@id/message_author"
+        android:layout_alignTop="@id/message_author"
+        android:textSize="14sp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+    <TextView
+        android:id="@+id/message_content"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/message_message"
-        android:id="@+id/message_content"
-        android:layout_toRightOf="@+id/profile_image"
-        android:layout_below="@+id/profile_image"
+        android:layout_toRightOf="@+id/message_image"
+        android:layout_toEndOf="@id/message_image"
+        android:layout_below="@+id/message_author"
         android:textSize="16sp"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"

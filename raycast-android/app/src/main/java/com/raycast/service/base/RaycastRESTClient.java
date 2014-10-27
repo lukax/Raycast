@@ -2,9 +2,11 @@ package com.raycast.service.base;
 
 import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
+import com.raycast.domain.Notification;
 import com.raycast.service.auth.RaycastAuthHttpRequestInterceptor;
 
 import org.androidannotations.annotations.rest.Accept;
+import org.androidannotations.annotations.rest.Delete;
 import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Post;
 import org.androidannotations.annotations.rest.Rest;
@@ -34,5 +36,14 @@ public interface RaycastRESTClient {
     List<Comment> getComments(String messageId);
 
     @Post("/message/{messageId}/comment")
-    void addComment(String messageId);
+    void addComment(String messageId, Comment comment);
+
+    @Get("/user/notification")
+    List<Notification> getUserNotifications();
+
+    @Delete("/user/notification")
+    void removeUserNotifications();
+
+    @Delete("/user/notification/{notificationId}")
+    void removeUserNotification(String notificationId);
 }
