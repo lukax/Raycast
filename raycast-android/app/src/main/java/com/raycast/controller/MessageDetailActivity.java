@@ -52,7 +52,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @AfterViews
     void afterViews(){
-        swipeArea.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple, android.R.color.holo_purple);
+        swipeArea.setColorSchemeResources(R.color.raycast_purple_main, R.color.raycast_purple_sub, R.color.raycast_purple_dark, R.color.raycast_purple_light);
         swipeArea.setEnabled(false);
 
         fetchMessage();
