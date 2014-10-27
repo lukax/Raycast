@@ -48,7 +48,7 @@ public class CommentItemView extends RelativeLayout {
     public void bind(Comment comment){
         authorView.setText(comment.getAuthor().getName());
         commentView.setText(comment.getComment());
-        timeView.setText(formatUtil.dateFormat.format(comment.getTime()));
+        timeView.setText(formatUtil.formatDate(comment));
         ImageLoader.getInstance().displayImage(comment.getAuthor().getImage(), imageView, options, animateFirstListener);
     }
 }
