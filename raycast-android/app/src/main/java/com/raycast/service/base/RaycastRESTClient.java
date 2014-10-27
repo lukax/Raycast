@@ -2,6 +2,7 @@ package com.raycast.service.base;
 
 import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
+import com.raycast.domain.Notification;
 import com.raycast.service.auth.RaycastAuthHttpRequestInterceptor;
 
 import org.androidannotations.annotations.rest.Accept;
@@ -35,4 +36,7 @@ public interface RaycastRESTClient {
 
     @Post("/message/{messageId}/comment")
     void addComment(String messageId, Comment comment);
+
+    @Get("/user/notifications")
+    List<Notification> getNotifications();
 }
