@@ -38,12 +38,14 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 import org.springframework.web.client.RestClientException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EActivity(R.layout.activity_feed)
@@ -63,7 +65,7 @@ public class FeedActivity extends RaycastBaseActivity implements
     DisplayImageOptions options;
     Location myLocation;
     float myFeedRadius;
-    List<Message> messages;
+    @InstanceState ArrayList<Message> messages;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
@@ -183,63 +185,63 @@ public class FeedActivity extends RaycastBaseActivity implements
 
     @Override
     public void onFinishedDialog() {
-        listMessages(true);
+        //TODO When user closes write message dialog...
     }
 
     @Background
     void listMessages(boolean reload) {
-        if(!reload && messages != null)
-            return;
-
-        swipeView.setRefreshing(true);
-        try {
-            messages = raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
-        }catch(RestClientException ex){
-            notifyUser("Erro ao carregar mensagens :(");
-        }
-        if (messages.size() == 0) {
-            notifyUser("Nenhuma mensagem nova!");
+        if(reload || messages == null)
+        {
+            swipeView.setRefreshing(true);
+            try {
+                messages = (ArrayList) raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+            }catch(RestClientException ex){
+                notifyUser("Erro ao carregar mensagens :(");
+            }
+            if (messages.size() == 0) {
+                notifyUser("Nenhuma mensagem nova!");
+            }
+            swipeView.setRefreshing(false);
         }
         listMessagesUI();
-        swipeView.setRefreshing(false);
     }
 
     @UiThread
     void listMessagesUI(){
         messageFeedAdapter.bind(messages);
         messageFeedAdapter.setMyLocation(myLocation);
-
-        feed.setAdapter(messageFeedAdapter);
-        swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                listMessages(true);
-            }
-        });
-
-        feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final Message msg = (Message) adapterView.getItemAtPosition(i);
-                MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
-            }
-        });
-
-        feed.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem == 0) {
-                    swipeView.setEnabled(true);
-                } else {
-                    swipeView.setEnabled(false);
+        if(feed.getAdapter() == messageFeedAdapter){
+            messageFeedAdapter.notifyDataSetChanged();
+        }
+        else {
+            feed.setAdapter(messageFeedAdapter);
+            swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    listMessages(true);
                 }
-            }
-        });
+            });
+            feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    final Message msg = (Message) adapterView.getItemAtPosition(i);
+                    MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
+                }
+            });
+            feed.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                }
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    if (firstVisibleItem == 0) {
+                        swipeView.setEnabled(true);
+                    } else {
+                        swipeView.setEnabled(false);
+                    }
+                }
+            });
+        }
     }
 
     @UiThread
