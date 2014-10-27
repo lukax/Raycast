@@ -64,6 +64,8 @@ public class MessageWriteDialogFragment extends DialogFragment {
         builder.setView(view);
         final Dialog dialog = builder.create();
 
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+
         final Button sendBtn = (Button) view.findViewById(R.id.dialogmessagewrite_sendbtn);
         EditText messageTxt = (EditText) view.findViewById(R.id.dialogmessagewrite_messagetext);
 
