@@ -1,6 +1,5 @@
 package com.raycast.service;
 
-import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,7 +19,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Text;
 
 /**
  * Created by Lucas on 08/10/2014.

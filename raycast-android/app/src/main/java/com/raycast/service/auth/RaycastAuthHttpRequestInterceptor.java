@@ -3,7 +3,6 @@ package com.raycast.service.auth;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.springframework.http.HttpAuthentication;
-import org.springframework.http.HttpBasicAuthentication;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;

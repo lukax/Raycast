@@ -11,7 +11,6 @@ import org.joda.time.Duration;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by Lucas on 12/10/2014.

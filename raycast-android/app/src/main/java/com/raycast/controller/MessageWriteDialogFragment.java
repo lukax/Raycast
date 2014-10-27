@@ -27,7 +27,6 @@ import com.raycast.service.base.RaycastRESTClient;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
-import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 
 /**
