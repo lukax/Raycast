@@ -38,20 +38,21 @@ module.exports = function(router){
     router.route('/user/info')
         .get(userController.getUserInfo);
 
+    // --------- Notifications ----------
+    router.route('/user/notifications')
+        .get(notificationsController.getNotifications)
+        .delete(notificationsController.removeNotifications);
+
     router.route('/user/id/:user_id')
         .get(userController.getUserById)
         .put(userController.updateUser)
         .delete(userController.removeUser);
 
-    router.route('/user/:user_username')
-        .get(userController.getUserByUsername);
-
     router.route('/user/email/:user_email')
         .get(userController.getUserByEmail);
 
-    // --------- Notifications ----------
-    router.route('/user/notifications')
-        .get(notificationsController.getNotifications);
+    router.route('/user/:user_username')
+        .get(userController.getUserByUsername);
 
     // --------- Clients ----------
     router.route('/client')
