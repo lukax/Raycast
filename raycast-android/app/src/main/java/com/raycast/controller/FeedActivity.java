@@ -2,33 +2,25 @@ package com.raycast.controller;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.IntentSender;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.controller.component.MessageFeedAdapter;
@@ -46,7 +38,6 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -57,26 +48,24 @@ import java.util.List;
 
 @EActivity(R.layout.activity_feed)
 @OptionsMenu(R.menu.feed)
-public class FeedActivity extends RaycastBaseActivity implements GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener, LocationListener, MessageWriteDialogFragment.MessageWriteDialogListener {
+public class FeedActivity extends RaycastBaseActivity implements
+        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener,
+        MessageWriteDialogFragment.MessageWriteDialogListener {
 
     public static final String TAG = "FeedActivity";
-
     @RestService RaycastRESTClient raycastRESTClient;
-
     @Bean MessageFeedAdapter messageFeedAdapter;
     @Bean FormatUtil formatUtil;
     @Bean CachedImageLoader loader;
-
     @ViewById(R.id.feed) ListView feed;
     @ViewById(R.id.swipe_container) SwipeRefreshLayout swipeView;
-
-    LocationClient locationClient;
     DisplayImageOptions options;
-
     Location myLocation;
     float myFeedRadius;
     List<Message> messages;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
 
     @Click(R.id.feed_messagewrite)
     void writeMessageButton() {
@@ -94,15 +83,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     @AfterViews
-    void startLocationRequests() {
-        locationClient = new LocationClient(this, this, this);
-
-        LocationRequest locationRequest = LocationRequest.create();
-
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(300000); // 5 minutes
-        locationRequest.setFastestInterval(10000); // 1 minute
-    }
+    void setSwipeViewPrefs() { swipeView.setColorSchemeResources(R.color.raycast_purple_main, R.color.raycast_purple_sub, R.color.raycast_purple_dark, R.color.raycast_purple_light);}
 
     @AfterViews
     void getTimeZone() {
@@ -110,42 +91,31 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d(provider, " changed to status: " + status);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        myLocation = location;
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Log.d(provider, " enabled");
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Log.d(provider, " disabled");
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        locationClient.connect();
+        mGoogleApiClient.connect();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        //TODO make pref come as a float already
         myFeedRadius = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.FEED_RADIUS.toString(), "50000"));
         Log.d("FeedActivity", "radius " + myFeedRadius);
     }
 
     @Override
     protected void onStop() {
-        locationClient.disconnect();
+        mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -163,7 +133,16 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
 
     @Override
     public void onConnected(Bundle bundle) {
-        myLocation = locationClient.getLastLocation();
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(60000); // Update location every minute
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        myLocation = location;
         if (myLocation != null) {
             Log.d("FeedActivity", "Lat/Long received" + myLocation.getLatitude() + "/" + myLocation.getLongitude());
         } else {
@@ -172,6 +151,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             myLocation = new Location("");
             myLocation.setLatitude(-22.9082998);
             myLocation.setLongitude(-43.1970773);
+            notifyUser("Não foi possível pegar dados do GPS :(");
         }
         //Get List of messages
         listMessages(false);
@@ -183,7 +163,13 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
     }
 
     @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "GoogleApiClient connection has been suspend");
+    }
+
+    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.i(TAG, "GoogleApiClient connection has failed");
         if (connectionResult.hasResolution()) {
             try {
                 connectionResult.startResolutionForResult(this, 9000);
@@ -224,8 +210,6 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
         messageFeedAdapter.setMyLocation(myLocation);
 
         feed.setAdapter(messageFeedAdapter);
-
-        swipeView.setColorSchemeResources(R.color.raycast_purple_main, R.color.raycast_purple_sub, R.color.raycast_purple_dark, R.color.raycast_purple_light);
         swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -237,9 +221,7 @@ public class FeedActivity extends RaycastBaseActivity implements GooglePlayServi
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final Message msg = (Message) adapterView.getItemAtPosition(i);
-
                 MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
-                //TODO: Load MessageActivity or Popup and populate it with item data.
             }
         });
 
