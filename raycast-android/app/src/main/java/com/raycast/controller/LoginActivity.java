@@ -134,7 +134,7 @@ public class LoginActivity extends Activity {
 
     @UiThread
     void handleException(Exception ex){
-        Log.e(TAG, ex.getMessage(), ex);
+        Log.e(TAG, "trying to handle exception", ex);
         if(ex instanceof GoogleAuthException){
             startActivityForResult(((UserRecoverableAuthException) ex).getIntent(), 1001);
         }

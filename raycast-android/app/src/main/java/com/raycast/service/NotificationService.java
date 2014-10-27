@@ -1,14 +1,27 @@
 package com.raycast.service;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
-import org.androidannotations.annotations.EService;
-import org.androidannotations.annotations.UiThread;
+import com.raycast.R;
+import com.raycast.controller.FeedActivity_;
+import com.raycast.domain.Notification;
+import com.raycast.service.base.RaycastRESTClient;
 
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EService;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.rest.RestService;
+
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,9 +30,11 @@ import java.util.TimerTask;
  */
 @EService
 public class NotificationService extends Service {
-    private String TAG = "NotificationService";
-    public static final int INTERVAL = 20000;
+    private static final String TAG = "NotificationService";
+    private static final int INTERVAL = 60000;
     private Timer timer = new Timer();
+    @SystemService NotificationManager notificationManager;
+    @RestService RaycastRESTClient restClient;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -29,16 +44,11 @@ public class NotificationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        notifyUser("Raycast notification service started!");
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                doStuff();
+                doPeriodically();
             }
         }, 0, INTERVAL);
-    }
-
-    void doStuff(){
-        notifyUser("Raycast periodic task");
     }
 
     @Override
@@ -49,8 +59,26 @@ public class NotificationService extends Service {
         super.onDestroy();
     }
 
+    @Background
+    void doPeriodically(){
+        try {
+            List<Notification> userNotifications = restClient.getUserNotifications();
+            notifyUser(userNotifications);
+        } catch(Exception ex){
+            Log.d(TAG, "couldn't get notification list", ex);
+            stopSelf();
+        }
+    }
+
     @UiThread
-    void notifyUser(String message){
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    void notifyUser(List<Notification> notifications){
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, PendingIntent.FLAG_UPDATE_CURRENT, FeedActivity_.intent(this).get(), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle("Raycast")
+                .setContentText("You have " + notifications.size() + " unread notifications")
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pendingIntent);
+        notificationManager.notify(0, builder.build());
     }
 }
