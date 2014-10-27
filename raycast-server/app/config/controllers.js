@@ -1,13 +1,14 @@
 'use strict';
 
-var log                 = require('../util/log')(module);
-var authController      = require('../controllers/AuthController');
-var oAuth2Controller    = require('../controllers/OAuth2Controller');
-var messageController   = require('../controllers/MessageController');
-var userController      = require('../controllers/UserController');
-var commentController   = require('../controllers/CommentController');
-var clientController    = require('../controllers/ClientController');
-var accountController   = require('../controllers/AccountController');
+var log                     = require('../util/log')(module);
+var authController          = require('../controllers/AuthController');
+var oAuth2Controller        = require('../controllers/OAuth2Controller');
+var messageController       = require('../controllers/MessageController');
+var userController          = require('../controllers/UserController');
+var commentController       = require('../controllers/CommentController');
+var clientController        = require('../controllers/ClientController');
+var accountController       = require('../controllers/AccountController');
+var notificationsController = require('../controllers/NotificationController');
 
 module.exports = function(router){
 
@@ -48,6 +49,10 @@ module.exports = function(router){
     router.route('/user/email/:user_email')
         .get(userController.getUserByEmail);
 
+    // --------- Notifications ----------
+    router.route('/user/notifications')
+        .get(notificationsController.getNotifications);
+
     // --------- Clients ----------
     router.route('/client')
         .post(clientController.addClient)
@@ -79,6 +84,7 @@ module.exports = function(router){
     router.route('/comment/:comment_id')
         .get(commentController.getCommentById)
         .delete(commentController.removeComment);
+
 
     return router;
 };
