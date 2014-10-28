@@ -39,6 +39,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -77,6 +78,12 @@ public class FeedActivity extends RaycastBaseActivity implements
         DialogFragment dialog = new MessageWriteDialogFragment_();
         dialog.setArguments(dialogArgs);
         dialog.show(getFragmentManager(), "MessageWriteDialog");
+    }
+
+
+    @OptionsItem(R.id.action_refresh)
+    void actionRefresh(){
+        listMessages(true);
     }
 
     @AfterInject
@@ -203,17 +210,14 @@ public class FeedActivity extends RaycastBaseActivity implements
             }
             swipeView.setRefreshing(false);
         }
-        listMessagesUI();
+        listMessagesUI(reload);
     }
 
     @UiThread
-    void listMessagesUI(){
+    void listMessagesUI(boolean reload){
         messageFeedAdapter.bind(messages);
         messageFeedAdapter.setMyLocation(myLocation);
-        if(feed.getAdapter() == messageFeedAdapter){
-            messageFeedAdapter.notifyDataSetChanged();
-        }
-        else {
+        if(reload || feed.getAdapter() != messageFeedAdapter) {
             feed.setAdapter(messageFeedAdapter);
             swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
@@ -241,6 +245,9 @@ public class FeedActivity extends RaycastBaseActivity implements
                     }
                 }
             });
+        }
+        else {
+            messageFeedAdapter.notifyDataSetChanged();
         }
     }
 
