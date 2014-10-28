@@ -12,5 +12,6 @@
     <string name="title_activity_message_detail">Message</string>
     <string name="message_detail_default_text">...</string>
     <string name="comment_time">Time</string>
+    <string name="comment_hint">Oq vc acha?</string>
 
 </resources>
