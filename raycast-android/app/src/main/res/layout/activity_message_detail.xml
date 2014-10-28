@@ -15,7 +15,9 @@
             android:paddingTop="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:paddingBottom="15dp"
             android:id="@+id/messagedetail"
+            android:background="@color/raycast_active_background"
             tools:context="com.raycast.controller.MessageDetailActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true">
@@ -38,31 +40,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/messagedetail"
-            android:paddingTop="15dp"
             android:gravity="bottom">
 
             <View
                 android:layout_width="fill_parent"
-                android:layout_height="1dip"
+                android:layout_height="0.4dp"
                 android:background="#797979" />
 
             <ListView
                 android:id="@+id/messagedetail_commentlist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="50dp"
+                android:background="@color/raycast_background"/>
 
             <EditText
                 android:id="@+id/messagedetail_editcomment"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:background="#ffffff"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:hint="@string/comment_hint"
                 android:inputType="text" />
             <Button

@@ -2,6 +2,7 @@ package com.raycast.controller;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -57,37 +58,6 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         fetchMessage();
     }
 
-    @AfterViews
-    void setListeners() {
-        if (editComment.getText() == null || editComment.getText().toString().length() == 0) {
-            sendCommentButton.setEnabled(false);
-            sendCommentButton.setVisibility(View.GONE);
-        }
-
-        editComment.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString() == null || s.toString().length() == 0) {
-                    sendCommentButton.setEnabled(false);
-                    sendCommentButton.setVisibility(View.GONE);
-                } else {
-                    sendCommentButton.setEnabled(true);
-                    sendCommentButton.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
-
     @OptionsItem(R.id.action_refresh)
     @Background
     void fetchMessage(){
@@ -98,7 +68,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
             comments = raycastRESTClient.getComments(messageId);
             updateMessageUi();
         }catch(Exception ex){
-            handleException("Não foi possível baixar mensagem :(", ex);
+            notifyUser("Não foi possível baixar mensagem :(");
             swipeArea.setRefreshing(false);
         }
     }
@@ -106,6 +76,11 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     @Click(R.id.messagedetail_sendcomment)
     @Background
     void sendComment(){
+        if(TextUtils.isEmpty(editComment.getText())){
+            notifyUser("Comentário vazio!");
+            return;
+        }
+
         swipeArea.setRefreshing(true);
 
         try{
@@ -115,7 +90,8 @@ public class MessageDetailActivity extends RaycastBaseActivity {
             comments = raycastRESTClient.getComments(messageId);
             updateCommentUi();
         }catch (Exception ex){
-            handleException("Não foi possível enviar comentário :(", ex);
+            Log.e(TAG, ex.getMessage(), ex);
+            notifyUser("Não foi possível enviar comentário :(");
             swipeArea.setRefreshing(false);
         }
     }
@@ -139,8 +115,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     }
 
     @UiThread
-    void handleException(String msg, Exception ex){
-        Log.e(TAG, ex.getMessage(), ex);
+    void notifyUser(String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

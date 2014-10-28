@@ -9,7 +9,7 @@
     android:paddingTop="5dp"
     android:paddingBottom="5dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relativeLayout">
+    android:id="@+id/item_comment">
 
     <ImageView
         android:id="@+id/comment_image"
@@ -26,7 +26,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/message_author"
-        android:layout_alignTop="@id/comment_image"
         android:layout_toRightOf="@+id/comment_image"
         android:layout_toEndOf="@id/comment_image"
         android:textSize="16sp"

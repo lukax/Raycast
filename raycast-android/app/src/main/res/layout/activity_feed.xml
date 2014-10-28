@@ -8,12 +8,14 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:background="@color/raycast_background"
         tools:context="com.raycast.controller.FeedActivity">
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/feed" />
+            android:id="@+id/feed"
+            tools:listitem="@layout/item_message" />
 
         <Button
             android:layout_width="wrap_content"

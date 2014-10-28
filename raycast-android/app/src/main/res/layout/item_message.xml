@@ -4,12 +4,15 @@
     android:layout_alignParentTop="true"
     android:layout_alignParentLeft="true"
     android:layout_alignParentStart="true"
+    android:layout_marginTop="4dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:paddingTop="10dp"
+    android:paddingTop="7dp"
     android:paddingBottom="10dp"
+    android:background="@drawable/message_border"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relativeLayout">
+    android:id="@+id/item_message">
+
 
     <ImageView
         android:id="@+id/message_image"
@@ -37,7 +40,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/message_author"
-        android:layout_alignTop="@id/message_image"
         android:layout_toRightOf="@+id/message_image"
         android:layout_toEndOf="@id/message_image"
         android:textSize="16sp"
