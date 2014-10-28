@@ -58,13 +58,13 @@ public class CachedImageLoader {
 
     private void setImageDisplayOptions() {
         options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_action_refresh)
+                //.showImageOnLoading(R.drawable.ic_action_refresh)
                 .showImageForEmptyUri(R.drawable.ic_action_person)
                 .showImageOnFail(R.drawable.ic_action_person)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .considerExifParams(true)
-                .displayer(new RoundedBitmapDisplayer(20))
+                .displayer(new RoundedBitmapDisplayer(100))
                 .build();
     }
 }
