@@ -6,8 +6,8 @@
     android:layout_alignParentStart="true"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relativeLayout">
 
@@ -30,7 +30,7 @@
         android:layout_alignLeft="@id/message_image"
         android:layout_alignStart="@id/message_image"
         android:textColor="@color/raycast_sub_text"
-        android:textSize="13sp"/>
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/message_author"
@@ -54,10 +54,8 @@
         android:layout_toRightOf="@+id/message_author"
         android:layout_toEndOf="@id/message_author"
         android:layout_alignTop="@id/message_author"
-        android:textSize="13sp"
+        android:textSize="15sp"
         android:textColor="@color/raycast_sub_text"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
 

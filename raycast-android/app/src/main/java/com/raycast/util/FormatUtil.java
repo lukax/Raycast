@@ -17,17 +17,18 @@ import java.text.SimpleDateFormat;
  */
 @EBean
 public class FormatUtil {
-    public SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
-    public DecimalFormat rayFormat = new DecimalFormat("#.#");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
 
     public String calculateMessageDistanceFromMyLocation(Message message, Location location) {
         Location messageLocation = message.getLocation().toLocation();
         double distance = messageLocation.distanceTo(location);
 
         if (distance < 1000.0) {
-            return rayFormat.format(distance) + " m";
+            return new DecimalFormat("#.#").format(distance) + "m";
+        } else if(distance < 10000.0) {
+            return new DecimalFormat("#.#").format(distance / 1000.0) + "km";
         } else {
-            return rayFormat.format(distance / 1000.0) + " km";
+            return new DecimalFormat("#").format(distance / 1000.0) + "km";
         }
     }
 
