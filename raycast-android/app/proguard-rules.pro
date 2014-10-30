@@ -32,3 +32,7 @@
 -keepnames class * implements android.os.Parcelable {
     public static final ** CREATOR;
 }
+
+-keepclassmembers class ** {
+    public void onEvent*(**);
+}

@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -25,6 +26,8 @@ import com.raycast.R;
 import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.controller.component.MessageFeedAdapter;
 import com.raycast.domain.Message;
+import com.raycast.event.MessagesFetchedEvent;
+import com.raycast.service.RaycastService;
 import com.raycast.service.base.RaycastRESTClient;
 import com.raycast.util.CachedImageLoader;
 import com.raycast.util.FormatUtil;
@@ -49,6 +52,8 @@ import org.springframework.web.client.RestClientException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.raycast.controller.RaycastApp.BUS;
+
 @EActivity(R.layout.activity_feed)
 @OptionsMenu(R.menu.feed)
 public class FeedActivity extends RaycastBaseActivity implements
@@ -57,7 +62,7 @@ public class FeedActivity extends RaycastBaseActivity implements
         MessageWriteDialogFragment.MessageWriteDialogListener {
 
     public static final String TAG = "FeedActivity";
-    @RestService RaycastRESTClient raycastRESTClient;
+    @Bean RaycastService raycastService;
     @Bean MessageFeedAdapter messageFeedAdapter;
     @Bean FormatUtil formatUtil;
     @Bean CachedImageLoader loader;
@@ -66,7 +71,6 @@ public class FeedActivity extends RaycastBaseActivity implements
     DisplayImageOptions options;
     Location myLocation;
     float myFeedRadius;
-    @InstanceState ArrayList<Message> messages;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
@@ -80,22 +84,14 @@ public class FeedActivity extends RaycastBaseActivity implements
         dialog.show(getFragmentManager(), "MessageWriteDialog");
     }
 
-
-    @OptionsItem(R.id.action_refresh)
-    void actionRefresh(){
-        listMessages(true);
-    }
-
     @AfterInject
     void getImageDisplayOptions() {
         options = loader.getImageDisplayOptions();
     }
 
     @AfterViews
-    void setSwipeViewPrefs() { swipeView.setColorSchemeResources(R.color.raycast_purple_main, R.color.raycast_purple_sub, R.color.raycast_purple_dark, R.color.raycast_purple_light);}
-
-    @AfterViews
-    void getTimeZone() {
+    void afterViews(){
+        swipeView.setColorSchemeResources(R.color.raycast_purple_main, R.color.raycast_purple_sub, R.color.raycast_purple_dark, R.color.raycast_purple_light);
         JodaTimeAndroid.init(getApplicationContext());
     }
 
@@ -112,6 +108,7 @@ public class FeedActivity extends RaycastBaseActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        BUS.register(this);
         mGoogleApiClient.connect();
     }
 
@@ -124,6 +121,7 @@ public class FeedActivity extends RaycastBaseActivity implements
 
     @Override
     protected void onStop() {
+        BUS.unregister(this);
         mGoogleApiClient.disconnect();
         super.onStop();
     }
@@ -162,8 +160,7 @@ public class FeedActivity extends RaycastBaseActivity implements
             myLocation.setLongitude(-43.1970773);
             notifyUser("Não foi possível pegar dados do GPS :(");
         }
-        //Get List of messages
-        listMessages(false);
+        raycastService.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
     }
 
     @Override
@@ -195,34 +192,25 @@ public class FeedActivity extends RaycastBaseActivity implements
         //TODO When user closes write message dialog...
     }
 
-    @Background
-    void listMessages(boolean reload) {
-        if(reload || messages == null)
-        {
-            swipeView.setRefreshing(true);
-            try {
-                messages = (ArrayList) raycastRESTClient.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
-            }catch(RestClientException ex){
-                notifyUser("Erro ao carregar mensagens :(");
-            }
-            if (messages.size() == 0) {
-                notifyUser("Nenhuma mensagem nova!");
-            }
-            swipeView.setRefreshing(false);
-        }
-        listMessagesUI(reload);
-    }
-
     @UiThread
-    void listMessagesUI(boolean reload){
-        messageFeedAdapter.bind(messages);
+    public void onEvent(MessagesFetchedEvent e) {
+        if (e.getMessages() == null) {
+            notifyUser("Erro ao carregar mensagens :(");
+            return;
+        }
+        else if (e.getMessages().size() == 0) {
+            notifyUser("Nenhuma mensagem nova!");
+            return;
+        }
+
+        messageFeedAdapter.bind(e.getMessages());
         messageFeedAdapter.setMyLocation(myLocation);
-        if(reload || feed.getAdapter() != messageFeedAdapter) {
+        if(feed.getAdapter() != messageFeedAdapter) {
             feed.setAdapter(messageFeedAdapter);
             swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    listMessages(true);
+                    actionRefresh();
                 }
             });
             feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -250,6 +238,19 @@ public class FeedActivity extends RaycastBaseActivity implements
             messageFeedAdapter.notifyDataSetChanged();
         }
     }
+
+    @OptionsItem(R.id.action_refresh)
+    void actionRefresh(){
+        raycastService.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
+        swipeView.setRefreshing(true);
+        ( new Handler()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeView.setRefreshing(false);
+            }
+        }, 3000);
+    }
+
 
     @UiThread
     void notifyUser(String msg){
