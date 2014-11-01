@@ -1,5 +1,6 @@
 package com.raycast.service;
 
+import android.net.ConnectivityManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import com.raycast.service.base.AbstractCrudService;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.SystemService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +28,15 @@ import org.springframework.web.client.RestTemplate;
 @EBean(scope = EBean.Scope.Singleton)
 public class AccountService extends AbstractCrudService {
 
-    @Bean
-    RaycastAuthStore authStore;
+    @SystemService ConnectivityManager connectivityManager;
+    @Bean RaycastAuthStore authStore;
 
-    public AccountService(){
+    public AccountService() {
         super("account");
     }
 
-    public boolean login(final String code){
-        if(TextUtils.isEmpty(code)){
+    public boolean login(final String code) {
+        if (TextUtils.isEmpty(code)) {
             return false;
         }
         try {
@@ -48,18 +50,18 @@ public class AccountService extends AbstractCrudService {
             credendial.add("client_secret", authStore.getClientSecret());
             ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/account/login", credendial, Token.class);
             Token token = responseEntity.getBody();
-            if(token != null){
+            if (token != null) {
                 authStore.setToken(token);
                 return true;
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(getClass().getName(), ex.getMessage(), ex);
         }
         return false;
     }
 
-    public boolean login(final String username, final String password){
-        if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
+    public boolean login(final String username, final String password) {
+        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
             return false;
         }
         try {
@@ -74,21 +76,27 @@ public class AccountService extends AbstractCrudService {
             credendial.add("client_secret", authStore.getClientSecret());
             ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/oauth/token", credendial, Token.class);
             Token token = responseEntity.getBody();
-            if(token != null){
+            if (token != null) {
                 authStore.setToken(token);
             }
             return true;
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(getClass().getName(), ex.getMessage(), ex);
         }
         return false;
     }
 
-    public boolean isLoggedIn(){
-        if(authStore.getToken() == null || TextUtils.isEmpty(authStore.getToken().getAccessToken())) {
+    public boolean isLoggedIn() {
+        if (authStore.getToken() == null || TextUtils.isEmpty(authStore.getToken().getAccessToken())) {
+            //This means no previous login
             return false;
         }
+        if(connectivityManager.getActiveNetworkInfo() == null || !connectivityManager.getActiveNetworkInfo().isConnected()){
+            //Enable offline access if has token and user isn't connected
+            //It means that he was logged in before but we don't know if the token is expired or not
+            return true;
+        }
+
         try {
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -97,29 +105,27 @@ public class AccountService extends AbstractCrudService {
             HttpEntity httpEntity = new HttpEntity(headers);
             ResponseEntity<RaycastMessageSVO> responseEntity = restTemplate.exchange(ROOT_URL, HttpMethod.GET, httpEntity, RaycastMessageSVO.class);
             return (responseEntity.getBody() != null);
-        }
-        catch(HttpClientErrorException ex){
+        } catch (HttpClientErrorException ex) {
             //Forbidden
             Log.d(getClass().getName(), "access forbidden", ex);
             Token newToken = exchangeRefreshToken();
-            if(newToken != null){
+            if (newToken != null) {
                 authStore.setToken(newToken);
                 Log.d(getClass().getName(), "successfully exchanged the refresh token");
                 return true;
             }
             return false;
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             Log.e(getClass().getName(), ex.getMessage(), ex);
             return false;
         }
     }
 
-    public void logout(){
+    public void logout() {
         authStore.setToken(null);
     }
 
-    private Token exchangeRefreshToken(){
+    private Token exchangeRefreshToken() {
         try {
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
@@ -131,8 +137,7 @@ public class AccountService extends AbstractCrudService {
             credendial.add("client_secret", authStore.getClientSecret());
             ResponseEntity<Token> responseEntity = restTemplate.postForEntity(ROOT_URL + "/oauth/token", credendial, Token.class);
             return responseEntity.getBody();
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             Log.e(getClass().getName(), "error while trying to exchange refresh token", ex);
         }
         return null;
