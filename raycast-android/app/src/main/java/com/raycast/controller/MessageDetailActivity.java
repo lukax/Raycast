@@ -16,8 +16,10 @@ import com.raycast.controller.component.CommentListAdapter;
 import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
 import com.raycast.event.MessageDetailFetchedEvent;
+import com.raycast.event.RaycastErrorEvent;
 import com.raycast.service.RaycastService;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
@@ -70,23 +72,24 @@ public class MessageDetailActivity extends RaycastBaseActivity {
 
     @UiThread
     public void onEvent(MessageDetailFetchedEvent event){
+        //TODO: show a loader while messages aren't yet downloaded
         if(event.getMessage() != null){
             msgText.setText(event.getMessage().getMessage());
             commentListAdapter.bind(event.getComments());
             commentList.setAdapter(commentListAdapter);
         }
-        else{
-            notifyUser("Não foi possível baixar mensagem :(");
-        }
 
+        //TODO: show a loader while comments aren't yet downloaded
         if(event.getComments() != null){
             commentListAdapter.bind(event.getComments());
             commentList.setAdapter(commentListAdapter);
             editComment.setText("");
         }
-        else{
-            notifyUser("Não foi possível baixar os comentários :(");
-        }
+    }
+
+    @UiThread
+    public void onEvent(RaycastErrorEvent event){
+        notifyUser(event.getMessage());
     }
 
     @OptionsItem(R.id.action_refresh)
@@ -107,19 +110,16 @@ public class MessageDetailActivity extends RaycastBaseActivity {
             notifyUser("Comentário vazio!");
             return;
         }
-        try{
-            Comment comment = new Comment();
-            comment.setComment(editComment.getText().toString());
-            raycastService.addComment(messageId, comment);
-            raycastService.getMessageDetail(messageId);
-        }catch (Exception ex){
-            Log.e(TAG, ex.getMessage(), ex);
-            notifyUser("Não foi possível enviar comentário :(");
-        }
+
+        Comment comment = new Comment();
+        comment.setComment(editComment.getText().toString());
+        raycastService.addComment(messageId, comment);
+        raycastService.getMessageDetail(messageId);
     }
 
     @UiThread
     void notifyUser(String msg){
+        //TODO: show a notification bar with the message instead of a toast
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

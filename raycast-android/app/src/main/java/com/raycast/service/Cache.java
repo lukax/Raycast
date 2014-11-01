@@ -1,4 +1,4 @@
-package com.raycast.service.util;
+package com.raycast.service;
 
 import android.content.Context;
 import android.util.Log;

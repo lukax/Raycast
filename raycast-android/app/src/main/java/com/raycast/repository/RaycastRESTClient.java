@@ -12,6 +12,7 @@ import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Post;
 import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.api.rest.MediaType;
+import org.androidannotations.api.rest.RestClientErrorHandling;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
       converters = {MappingJackson2HttpMessageConverter.class },
       interceptors = {RaycastAuthHttpRequestInterceptor.class })
 @Accept(MediaType.APPLICATION_JSON)
-public interface RaycastRESTClient {
+public interface RaycastRESTClient extends RestClientErrorHandling {
 
     @Get("/message?latitude={latitude}&longitude={longitude}&radius={radius}")
     List<Message> getMessages(double latitude, double longitude, double radius);

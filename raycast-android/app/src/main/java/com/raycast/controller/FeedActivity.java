@@ -27,6 +27,7 @@ import com.raycast.controller.base.RaycastBaseActivity;
 import com.raycast.controller.component.MessageFeedAdapter;
 import com.raycast.domain.Message;
 import com.raycast.event.MessagesFetchedEvent;
+import com.raycast.event.RaycastErrorEvent;
 import com.raycast.service.RaycastService;
 import com.raycast.util.CachedImageLoader;
 import com.raycast.util.FormatUtil;
@@ -185,17 +186,17 @@ public class FeedActivity extends RaycastBaseActivity implements
     }
 
     @UiThread
-    public void onEvent(MessagesFetchedEvent e) {
-        if (e.getMessages() == null) {
+    public void onEvent(MessagesFetchedEvent event) {
+        if (event.getMessages() == null) {
             notifyUser("Erro ao carregar mensagens :(");
             return;
         }
-        else if (e.getMessages().size() == 0) {
+        else if (event.getMessages().size() == 0) {
             notifyUser("Nenhuma mensagem nova!");
             return;
         }
 
-        messageFeedAdapter.bind(e.getMessages());
+        messageFeedAdapter.bind(event.getMessages());
         messageFeedAdapter.setMyLocation(myLocation);
         if(feed.getAdapter() != messageFeedAdapter) {
             feed.setAdapter(messageFeedAdapter);
@@ -231,6 +232,12 @@ public class FeedActivity extends RaycastBaseActivity implements
         }
     }
 
+    @UiThread
+    public void onEvent(RaycastErrorEvent event){
+        notifyUser(event.getMessage());
+    }
+
+
     @OptionsItem(R.id.action_refresh)
     void actionRefresh(){
         raycastService.getMessages(myLocation.getLatitude(), myLocation.getLongitude(), myFeedRadius);
@@ -246,6 +253,7 @@ public class FeedActivity extends RaycastBaseActivity implements
 
     @UiThread
     void notifyUser(String msg){
+        //TODO: show a notification bar with the message instead of a toast
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 }
