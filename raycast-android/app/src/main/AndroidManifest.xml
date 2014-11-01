@@ -30,11 +30,21 @@
         </activity>
         <activity
             android:name=".controller.SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".controller.FeedActivity_">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.FeedActivity_" />
         </activity>
         <activity
             android:name=".controller.MessageDetailActivity_"
-            android:label="@string/title_activity_message_detail" >
+            android:label="@string/title_activity_message_detail"
+            android:parentActivityName=".controller.FeedActivity_">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.FeedActivity_" />
         </activity>
         <service android:name=".service.NotificationService_" android:enabled="true" />
     </application>
