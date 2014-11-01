@@ -4,4 +4,7 @@
     <color name="raycast_purple_sub">#ff925ab4</color>
     <color name="raycast_purple_dark">#ff563269</color>
     <color name="raycast_purple_light">#ffc083eb</color>
+    <color name="raycast_sub_text">#ff838383</color>
+    <color name="raycast_active_background">#ffffff</color>
+    <color name="raycast_background">#ffebebeb</color>
 </resources>

@@ -4,14 +4,22 @@
     android:layout_alignParentTop="true"
     android:layout_alignParentLeft="true"
     android:layout_alignParentStart="true"
+    android:layout_marginTop="4dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="7dp"
+    android:paddingBottom="10dp"
+    android:background="@drawable/message_border"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relativeLayout">
+    android:id="@+id/item_message">
+
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
         android:id="@+id/message_image"
         android:src="@drawable/ic_action_person"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -22,8 +30,9 @@
         android:layout_height="wrap_content"
         android:text="@string/message_distance"
         android:layout_below="@id/message_image"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_alignLeft="@id/message_image"
+        android:layout_alignStart="@id/message_image"
+        android:textColor="@color/raycast_sub_text"
         android:textSize="14sp"/>
 
     <TextView
@@ -33,10 +42,10 @@
         android:text="@string/message_author"
         android:layout_toRightOf="@+id/message_image"
         android:layout_toEndOf="@id/message_image"
-        android:textSize="18sp"
+        android:textSize="16sp"
+        android:textStyle="bold"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="2dp" />
+        android:layout_marginStart="10dp" />
 
     <TextView
         android:id="@+id/message_time"
@@ -47,9 +56,8 @@
         android:layout_toRightOf="@+id/message_author"
         android:layout_toEndOf="@id/message_author"
         android:layout_alignTop="@id/message_author"
-        android:textSize="14sp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
+        android:textSize="15sp"
+        android:textColor="@color/raycast_sub_text"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
 
@@ -63,7 +71,7 @@
         android:layout_toEndOf="@id/message_image"
         android:layout_below="@+id/message_author"
         android:textSize="16sp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="1dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginStart="10dp" />
 </RelativeLayout>

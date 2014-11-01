@@ -19,6 +19,7 @@
     "express": "~4.0.0",
     "googleapis": "^1.0.14",
     "mongoose": "~3.8.15",
+    "newrelic": "^1.13.0",
     "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",
     "passport-http": "^0.2.2",

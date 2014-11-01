@@ -22,12 +22,12 @@ android {
             storeFile file('debug.keystore')
         }
     }
-    compileSdkVersion 19
-    buildToolsVersion '20.0.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.0.2'
         defaultConfig {
         applicationId 'com.raycast'
         minSdkVersion 15
-        targetSdkVersion 20
+        targetSdkVersion 21
         versionCode 3
         versionName '1.2'
     }
@@ -63,7 +63,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:20.+'
+    //compile 'com.android.support:appcompat-v7:20.+'
     compile 'com.google.android.gms:play-services:6.1.+'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
@@ -71,4 +71,7 @@ dependencies {
     apt     'org.androidannotations:androidannotations:3.1'
     compile 'org.androidannotations:androidannotations-api:3.1'
     compile 'net.danlew:android.joda:2.4.1'
+    compile 'com.snappydb:snappydb-lib:0.5.0'
+    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
+    compile 'de.greenrobot:eventbus:2.2.1'
 }

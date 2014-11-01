@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Iterator;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Iterator;
  */
 @JsonSerialize(using = CoordinatesSerializer.class)
 @JsonDeserialize(using = CoordinatesDeserializer.class)
-public class Coordinates {
+public class Coordinates implements Serializable{
     private double latitude;
     private double longitude;
 

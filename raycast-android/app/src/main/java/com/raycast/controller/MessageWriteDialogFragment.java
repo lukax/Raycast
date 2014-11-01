@@ -22,12 +22,11 @@ import com.raycast.R;
 import com.raycast.domain.CustomLocation;
 import com.raycast.domain.Message;
 import com.raycast.domain.User;
-import com.raycast.service.base.RaycastRESTClient;
+import com.raycast.repository.RaycastRESTClient;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
-import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
 
 /**

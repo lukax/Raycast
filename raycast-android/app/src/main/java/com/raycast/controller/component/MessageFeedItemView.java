@@ -1,7 +1,13 @@
 package com.raycast.controller.component;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,6 +24,9 @@ import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Lucas on 20/10/2014.
@@ -44,6 +53,18 @@ public class MessageFeedItemView extends RelativeLayout {
         animateFirstListener = loader.getAnimateFirstListener();
     }
 
+    void highlightHashtags(TextView textView, Message message) {
+        SpannableString hashtagInMessage = new SpannableString(message.getMessage());
+        Matcher matcher = Pattern.compile("#([A-Za-z0-9_-]+)").matcher(hashtagInMessage);
+
+        while (matcher.find())
+        {
+            hashtagInMessage.setSpan(new ForegroundColorSpan(Color.BLUE), matcher.start(), matcher.end(), 0);
+        }
+
+        textView.setText(hashtagInMessage);
+    }
+
     public MessageFeedItemView(Context context) {
         super(context);
     }
@@ -54,9 +75,9 @@ public class MessageFeedItemView extends RelativeLayout {
 
     public void bind(Message message) {
         ImageLoader.getInstance().displayImage(message.getAuthor().getImage(), profileImage, options, animateFirstListener);
+        highlightHashtags(content, message);
 
         name.setText(message.getAuthor().getName());
-        content.setText(message.getMessage());
         distance.setText(formatUtil.calculateMessageDistanceFromMyLocation(message, myLocation));
         time.setText(formatUtil.formatDate(message));
     }

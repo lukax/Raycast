@@ -2,10 +2,12 @@ package com.raycast.domain;
 
 import android.location.Location;
 
+import java.io.Serializable;
+
 /**
  * Created by Lucas on 29/08/2014.
  */
-public class CustomLocation {
+public class CustomLocation implements Serializable {
     private String type;
     private Coordinates coordinates;
 
