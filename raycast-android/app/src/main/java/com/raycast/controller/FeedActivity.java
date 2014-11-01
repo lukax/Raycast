@@ -28,7 +28,6 @@ import com.raycast.controller.component.MessageFeedAdapter;
 import com.raycast.domain.Message;
 import com.raycast.event.MessagesFetchedEvent;
 import com.raycast.service.RaycastService;
-import com.raycast.service.base.RaycastRESTClient;
 import com.raycast.util.CachedImageLoader;
 import com.raycast.util.FormatUtil;
 import com.raycast.util.Preferences;
@@ -37,20 +36,13 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.rest.RestService;
-import org.springframework.web.client.RestClientException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.raycast.controller.RaycastApp.BUS;
 

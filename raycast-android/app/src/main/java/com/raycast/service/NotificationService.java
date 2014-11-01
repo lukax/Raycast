@@ -11,7 +11,7 @@ import android.util.Log;
 import com.raycast.R;
 import com.raycast.controller.FeedActivity_;
 import com.raycast.domain.Notification;
-import com.raycast.service.base.RaycastRESTClient;
+import com.raycast.repository.RaycastRESTClient;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EService;

@@ -15,30 +15,31 @@ import org.androidannotations.annotations.RootContext;
  */
 @EBean
 public class Cache {
-    public static enum CacheKey {
-        KEY_MESSAGES
-    }
-
     public static final String TAG = "Cache";
     private static final String DB_NAME = "raycastcache";
     @RootContext Context context;
+    public static enum CacheKey {
+        KEY_MESSAGES,
+        KEY_MESSAGEDETAIL,
+        KEY_COMMENTS
+    }
 
-    public <T> T get(CacheKey key, Class<T> returnType){
+    public <T> T get(String key, Class<T> returnType){
         T obj = null;
         try {
             DB db = DBFactory.open(context, DB_NAME);
-            obj = db.getObject(key.toString(), returnType);
+            obj = db.getObject(key, returnType);
             db.close();
         } catch (SnappydbException e) {
-            Log.e(TAG, "Error while getting obj from db", e);
+            Log.d(TAG, "Error while getting obj from db");
         }
         return obj;
     }
 
-    public <T> void put(CacheKey key, T value){
+    public <T> void put(String key, T value){
         try{
             DB db = DBFactory.open(context, DB_NAME);
-            db.put(key.toString(), value);
+            db.put(key, value);
             db.close();
         } catch (SnappydbException e) {
             Log.e(TAG, "Error while putting obj to db", e);

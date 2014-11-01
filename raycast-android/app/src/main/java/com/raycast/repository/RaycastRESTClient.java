@@ -1,9 +1,10 @@
-package com.raycast.service.base;
+package com.raycast.repository;
 
 import com.raycast.domain.Comment;
 import com.raycast.domain.Message;
 import com.raycast.domain.Notification;
 import com.raycast.service.auth.RaycastAuthHttpRequestInterceptor;
+import com.raycast.service.base.AbstractCrudService;
 
 import org.androidannotations.annotations.rest.Accept;
 import org.androidannotations.annotations.rest.Delete;
