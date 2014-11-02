@@ -33,11 +33,13 @@ import org.androidannotations.annotations.ViewById;
 
 import java.io.IOException;
 
-@EActivity
+@EActivity(R.layout.activity_login)
 public class LoginActivity extends Activity {
     public static final String TAG = "LoginActivity";
     public static final int REQUEST_ACCOUNT_CODE = 1001;
     public static final int RESULT_CANCELLED_CODE = 0;
+    @ViewById(R.id.login_form) View loginForm;
+    @ViewById(R.id.login_progress) View loginProgress;
     @ViewById(R.id.user_username) EditText usernameView;
     @ViewById(R.id.user_password) EditText passwordView;
     @Bean AccountService accountService;
@@ -49,6 +51,7 @@ public class LoginActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateLoginProgress(true);
         checkIfAlreadyLoggedIn();
         /////////////////////////
     }
@@ -129,7 +132,13 @@ public class LoginActivity extends Activity {
 
     @UiThread
     void onLoginFail(){
-        setContentView(R.layout.activity_login);
+        updateLoginProgress(false);
+    }
+
+    @UiThread
+    void updateLoginProgress(boolean wait){
+        loginForm.setVisibility(wait ? View.INVISIBLE : View.VISIBLE);
+        loginProgress.setVisibility(wait ? View.VISIBLE : View.INVISIBLE);
     }
 
     @UiThread
@@ -140,6 +149,7 @@ public class LoginActivity extends Activity {
         }
         else{
             Toast.makeText(this, "Could not login :(", Toast.LENGTH_SHORT).show();
+            onLoginFail();
         }
     }
 }

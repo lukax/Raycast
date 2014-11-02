@@ -36,10 +36,11 @@
 
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@id/messagedetail"
-            android:layout_marginBottom="50dp">
+            android:layout_marginBottom="50dp"
+            android:background="@color/raycast_background">
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="0.4dp"
@@ -59,8 +60,8 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
             <EditText
                 android:id="@+id/messagedetail_editcomment"
                 android:layout_width="fill_parent"
