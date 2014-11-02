@@ -1,5 +1,6 @@
 <android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/swipe_area">
@@ -9,7 +10,6 @@
         android:layout_height="fill_parent">
 
         <RelativeLayout
-            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
@@ -21,7 +21,6 @@
             tools:context="com.raycast.controller.MessageDetailActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true">
-
             <TextView
                 android:id="@+id/messagedetail_message"
                 android:layout_width="wrap_content"
@@ -37,24 +36,31 @@
 
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:layout_below="@id/messagedetail"
-            android:gravity="bottom">
-
+            android:layout_marginBottom="50dp">
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="0.4dp"
-                android:background="#797979" />
-
+                android:background="#9b9b9b"/>
             <ListView
                 android:id="@+id/messagedetail_commentlist"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="50dp"
-                android:background="@color/raycast_background"/>
+                tools:listitem="@layout/item_comment"/>
+            <TextView
+                android:id="@+id/alert_nocomment"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text="@string/alert_nocomment"
+                android:gravity="center_horizontal"
+                android:visibility="invisible"/>
+        </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
             <EditText
                 android:id="@+id/messagedetail_editcomment"
                 android:layout_width="fill_parent"

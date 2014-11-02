@@ -6,5 +6,5 @@
     <color name="raycast_purple_light">#ffc083eb</color>
     <color name="raycast_sub_text">#ff838383</color>
     <color name="raycast_active_background">#ffffff</color>
-    <color name="raycast_background">#ffebebeb</color>
+    <color name="raycast_background">#fff0f0f0</color>
 </resources>

@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -61,6 +62,7 @@ public class FeedActivity extends RaycastBaseActivity implements
     @Bean CachedImageLoader loader;
     @ViewById(R.id.feed) ListView feed;
     @ViewById(R.id.swipe_container) SwipeRefreshLayout swipeView;
+    @ViewById(R.id.alert_nomessage) TextView noMessageView;
     DisplayImageOptions options;
     Location myLocation;
     float myFeedRadius;
@@ -187,12 +189,9 @@ public class FeedActivity extends RaycastBaseActivity implements
 
     @UiThread
     public void onEvent(MessagesFetchedEvent event) {
+        noMessageView.setVisibility(event.getMessages() == null || event.getMessages().isEmpty() ? View.VISIBLE : View.INVISIBLE);
         if (event.getMessages() == null) {
             notifyUser("Erro ao carregar mensagens :(");
-            return;
-        }
-        else if (event.getMessages().size() == 0) {
-            notifyUser("Nenhuma mensagem nova!");
             return;
         }
 

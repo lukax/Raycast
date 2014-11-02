@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -47,6 +48,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
     @ViewById(R.id.messagedetail_message) TextView msgText;
     @ViewById(R.id.messagedetail_editcomment) EditText editComment;
     @ViewById(R.id.messagedetail_commentlist) ListView commentList;
+    @ViewById(R.id.alert_nocomment) TextView noCommentView;
     @Bean CommentListAdapter commentListAdapter;
 
     @Override
@@ -80,6 +82,7 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         }
 
         //TODO: show a loader while comments aren't yet downloaded
+        noCommentView.setVisibility(event.getComments() == null || event.getComments().isEmpty() ? View.VISIBLE : View.INVISIBLE);
         if(event.getComments() != null){
             commentListAdapter.bind(event.getComments());
             commentList.setAdapter(commentListAdapter);

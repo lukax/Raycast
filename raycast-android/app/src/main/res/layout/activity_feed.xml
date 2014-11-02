@@ -1,21 +1,29 @@
 <android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipe_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@color/raycast_background"
         tools:context="com.raycast.controller.FeedActivity">
 
         <ListView
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/feed"
             tools:listitem="@layout/item_message" />
+
+        <TextView
+            android:id="@+id/alert_nomessage"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:text="@string/alert_nomessage"
+            android:gravity="center_horizontal"
+            android:visibility="invisible"/>
 
         <Button
             android:layout_width="wrap_content"
