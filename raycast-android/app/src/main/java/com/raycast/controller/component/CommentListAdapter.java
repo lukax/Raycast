@@ -10,6 +10,7 @@ import com.raycast.domain.Comment;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ import java.util.List;
 public class CommentListAdapter extends BaseAdapter {
 
     @RootContext Context context;
-    List<Comment> comments;
+    List<Comment> comments = new ArrayList<Comment>();
 
     public void bind(List<Comment> comments){
         this.comments = comments;

@@ -11,6 +11,7 @@ import com.raycast.domain.Message;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class MessageFeedAdapter extends BaseAdapter {
     @RootContext Context context;
 
     Location myLocation;
-    List<Message> messages;
+    List<Message> messages = new ArrayList<Message>();
 
     public void bind(List<Message> messages) {
         this.messages = messages;

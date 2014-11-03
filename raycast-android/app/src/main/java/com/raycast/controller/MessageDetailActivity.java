@@ -82,12 +82,13 @@ public class MessageDetailActivity extends RaycastBaseActivity {
         }
 
         //TODO: show a loader while comments aren't yet downloaded
-        noCommentView.setVisibility(event.getComments() == null || event.getComments().isEmpty() ? View.VISIBLE : View.INVISIBLE);
         if(event.getComments() != null){
             commentListAdapter.bind(event.getComments());
             commentList.setAdapter(commentListAdapter);
             editComment.setText("");
         }
+
+        noCommentView.setVisibility(commentListAdapter.getCount() == 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     @UiThread

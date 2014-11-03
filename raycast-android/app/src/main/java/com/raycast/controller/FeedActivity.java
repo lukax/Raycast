@@ -189,46 +189,45 @@ public class FeedActivity extends RaycastBaseActivity implements
 
     @UiThread
     public void onEvent(MessagesFetchedEvent event) {
-        noMessageView.setVisibility(event.getMessages() == null || event.getMessages().isEmpty() ? View.VISIBLE : View.INVISIBLE);
-        if (event.getMessages() == null) {
-            notifyUser("Erro ao carregar mensagens :(");
-            return;
+        if (event.getMessages() != null) {
+            messageFeedAdapter.bind(event.getMessages());
+            messageFeedAdapter.setMyLocation(myLocation);
+
+            if(feed.getAdapter() != messageFeedAdapter) {
+                feed.setAdapter(messageFeedAdapter);
+                swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        actionRefresh();
+                    }
+                });
+                feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        final Message msg = (Message) adapterView.getItemAtPosition(i);
+                        MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
+                    }
+                });
+                feed.setOnScrollListener(new AbsListView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    }
+                    @Override
+                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                        if (firstVisibleItem == 0) {
+                            swipeView.setEnabled(true);
+                        } else {
+                            swipeView.setEnabled(false);
+                        }
+                    }
+                });
+            }
+            else {
+                messageFeedAdapter.notifyDataSetChanged();
+            }
         }
 
-        messageFeedAdapter.bind(event.getMessages());
-        messageFeedAdapter.setMyLocation(myLocation);
-        if(feed.getAdapter() != messageFeedAdapter) {
-            feed.setAdapter(messageFeedAdapter);
-            swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    actionRefresh();
-                }
-            });
-            feed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    final Message msg = (Message) adapterView.getItemAtPosition(i);
-                    MessageDetailActivity_.intent(FeedActivity.this).extra(MessageDetailActivity.EXTRA_MESSAGEDETAIL_MESSAGEID, msg.getId()).start();
-                }
-            });
-            feed.setOnScrollListener(new AbsListView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {
-                }
-                @Override
-                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    if (firstVisibleItem == 0) {
-                        swipeView.setEnabled(true);
-                    } else {
-                        swipeView.setEnabled(false);
-                    }
-                }
-            });
-        }
-        else {
-            messageFeedAdapter.notifyDataSetChanged();
-        }
+        noMessageView.setVisibility(messageFeedAdapter.getCount() == 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     @UiThread
